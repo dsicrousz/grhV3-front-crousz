@@ -91,7 +91,7 @@ function FonctionsPage() {
 
   const handleSubmit = async (values: CreateFonctionDto) => {
     if (editingFonction) {
-      updateMutation.mutate({ id: editingFonction.id, data: values })
+      updateMutation.mutate({ id: editingFonction._id, data: values })
     } else {
       createMutation.mutate(values)
     }
@@ -129,7 +129,7 @@ function FonctionsPage() {
           <Popconfirm
             title="Supprimer cette fonction ?"
             description="Cette action est irréversible."
-            onConfirm={() => deleteMutation.mutate(record.id)}
+            onConfirm={() => deleteMutation.mutate(record._id)}
             okText="Supprimer"
             cancelText="Annuler"
             okButtonProps={{ danger: true }}

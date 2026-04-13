@@ -20,7 +20,7 @@ import {
   Col,
   Switch
 } from 'antd'
-import { Plus, Pencil, Trash2, Calendar, CheckCircle, XCircle, Search, Filter, Award, Building2, Users, Briefcase } from 'lucide-react'
+import { Plus, Pencil, Trash2, Calendar, Search, Filter, Award, Building2, Users, Briefcase } from 'lucide-react'
 import type { Nomination, CreateNominationDto, UpdateNominationDto } from '@/types/nomination'
 import { NominationService } from '@/services/nomination.service'
 import { EmployeService } from '@/services/employe.service'
