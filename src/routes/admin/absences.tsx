@@ -32,7 +32,7 @@ import type { Employe } from '@/types/employe'
 import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
 
-pdfMake.vfs = pdfFonts.vfs
+pdfMake.vfs = pdfFonts.vfs as any
 
 const { Title, Text } = Typography
 const { RangePicker } = DatePicker

@@ -185,9 +185,9 @@ export interface FileRoutesByFullPath {
   '/admin/parametrage/fonctions': typeof AdminParametrageFonctionsRoute
   '/admin/parametrage/rubriques': typeof AdminParametrageRubriquesRoute
   '/admin/parametrage/utilisateurs': typeof AdminParametrageUtilisateursRoute
-  '/admin/employes': typeof AdminEmployesIndexRoute
-  '/admin/lots': typeof AdminLotsIndexRoute
-  '/admin/parametrage': typeof AdminParametrageIndexRoute
+  '/admin/employes/': typeof AdminEmployesIndexRoute
+  '/admin/lots/': typeof AdminLotsIndexRoute
+  '/admin/parametrage/': typeof AdminParametrageIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -265,9 +265,9 @@ export interface FileRouteTypes {
     | '/admin/parametrage/fonctions'
     | '/admin/parametrage/rubriques'
     | '/admin/parametrage/utilisateurs'
-    | '/admin/employes'
-    | '/admin/lots'
-    | '/admin/parametrage'
+    | '/admin/employes/'
+    | '/admin/lots/'
+    | '/admin/parametrage/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -409,21 +409,21 @@ declare module '@tanstack/react-router' {
     '/admin/parametrage/': {
       id: '/admin/parametrage/'
       path: '/parametrage'
-      fullPath: '/admin/parametrage'
+      fullPath: '/admin/parametrage/'
       preLoaderRoute: typeof AdminParametrageIndexRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/lots/': {
       id: '/admin/lots/'
       path: '/lots'
-      fullPath: '/admin/lots'
+      fullPath: '/admin/lots/'
       preLoaderRoute: typeof AdminLotsIndexRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/employes/': {
       id: '/admin/employes/'
       path: '/employes'
-      fullPath: '/admin/employes'
+      fullPath: '/admin/employes/'
       preLoaderRoute: typeof AdminEmployesIndexRouteImport
       parentRoute: typeof AdminRoute
     }

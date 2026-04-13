@@ -389,7 +389,7 @@ function ReportingPage() {
               <XAxis dataKey="nom" angle={-20} textAnchor="end" height={80} interval={0} fontSize={11} />
               <YAxis tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
               <RechartsTooltip
-                formatter={(value: number | undefined) => [`${(value ?? 0).toLocaleString('fr-FR')} FCFA`]}
+                formatter={(value: any) => [`${(Number(value) ?? 0).toLocaleString('fr-FR')} FCFA`]}
               />
               <Legend />
               <Bar dataKey="masse_salariale" name="Masse salariale" fill="#3b82f6" radius={[4, 4, 0, 0]} />
