@@ -358,11 +358,11 @@ function AbsencesPage() {
                 ],
                 [
                   { text: 'Matricule', bold: true, fillColor: '#f5f5f5', margin: [8, 10], fontSize: 10 },
-                  { text: employe.matricule_de_solde || employe.code || '-', margin: [8, 10], fontSize: 10 }
+                  { text: employe.contrat_actif?.matricule_de_solde || employe.code || '-', margin: [8, 10], fontSize: 10 }
                 ],
                 [
                   { text: 'Poste / Fonction', bold: true, fillColor: '#f5f5f5', margin: [8, 10], fontSize: 10 },
-                  { text: employe.poste || '-', margin: [8, 10], fontSize: 10 }
+                  { text: typeof employe.contrat_actif?.poste === 'string' ? employe.contrat_actif.poste : employe.contrat_actif?.poste?.nom || '-', margin: [8, 10], fontSize: 10 }
                 ],
                 [
                   { text: "Type d'absence", bold: true, fillColor: '#f5f5f5', margin: [8, 10], fontSize: 10 },
@@ -510,7 +510,7 @@ function AbsencesPage() {
         return employe ? (
           <div>
             <div className="font-medium">{employe.prenom} {employe.nom}</div>
-            <div className="text-xs text-gray-500">{employe.matricule_de_solde || employe.code}</div>
+            <div className="text-xs text-gray-500">{employe.contrat_actif?.matricule_de_solde || employe.code}</div>
           </div>
         ) : '-'
       },
@@ -858,7 +858,7 @@ function AbsencesPage() {
               disabled={!!editingAbsence}
               options={employes.map(emp => ({
                 value: emp._id,
-                label: `${emp.prenom} ${emp.nom} (${emp.matricule_de_solde || emp.code || ''})`,
+                label: `${emp.prenom} ${emp.nom} (${emp.contrat_actif?.matricule_de_solde || emp.code || ''})`,
               }))}
             />
           </Form.Item>

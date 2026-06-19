@@ -31,6 +31,7 @@ export const Route = createFileRoute('/admin/parametrage/exclusions')({
 function ExclusionsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingExclusion, setEditingExclusion] = useState<ExclusionSpecifique | null>(null)
+  const [searchText, setSearchText] = useState('')
   const [form] = Form.useForm()
   const queryClient = useQueryClient()
 
@@ -89,8 +90,8 @@ function ExclusionsPage() {
     if (exclusion) {
       setEditingExclusion(exclusion)
       form.setFieldsValue({
-        employe: exclusion.employe._id,
-        rubrique: exclusion.rubrique._id,
+        employe: typeof exclusion.employe === 'object' && exclusion.employe ? exclusion.employe._id : exclusion.employe,
+        rubrique: typeof exclusion.rubrique === 'object' && exclusion.rubrique ? exclusion.rubrique._id : exclusion.rubrique,
         description: exclusion.description
       })
     } else {
@@ -118,22 +119,37 @@ function ExclusionsPage() {
     {
       title: 'Employé',
       key: 'employe',
-      render: (_, record) => (
-        <div className="flex flex-col">
-          <Text strong>{record.employe.prenom} {record.employe.nom}</Text>
-          <Text type="secondary" className="text-xs">{record.employe.poste}</Text>
-        </div>
-      ),
+      sorter: (a, b) => {
+        const nameA = typeof a.employe === 'object' && a.employe ? `${a.employe.prenom} ${a.employe.nom}` : String(a.employe ?? '')
+        const nameB = typeof b.employe === 'object' && b.employe ? `${b.employe.prenom} ${b.employe.nom}` : String(b.employe ?? '')
+        return nameA.localeCompare(nameB)
+      },
+      render: (_, record) => {
+        const emp = typeof record.employe === 'object' && record.employe ? record.employe : null
+        return (
+          <div className="flex flex-col">
+            <Text strong>{emp ? `${emp.prenom} ${emp.nom}` : String(record.employe)}</Text>
+          </div>
+        )
+      },
     },
     {
       title: 'Rubrique',
       key: 'rubrique',
-      render: (_, record) => (
-        <div className="flex flex-col">
-          <Text strong>{record.rubrique.code}</Text>
-          <Text type="secondary" className="text-xs">{record.rubrique.libelle}</Text>
-        </div>
-      ),
+      sorter: (a, b) => {
+        const codeA = typeof a.rubrique === 'object' && a.rubrique ? String(a.rubrique.code ?? '') : String(a.rubrique ?? '')
+        const codeB = typeof b.rubrique === 'object' && b.rubrique ? String(b.rubrique.code ?? '') : String(b.rubrique ?? '')
+        return codeA.localeCompare(codeB)
+      },
+      render: (_, record) => {
+        const rub = typeof record.rubrique === 'object' && record.rubrique ? record.rubrique : null
+        return (
+          <div className="flex flex-col">
+            <Text strong>{rub ? rub.code : String(record.rubrique)}</Text>
+            <Text type="secondary" className="text-xs">{rub ? rub.libelle : ''}</Text>
+          </div>
+        )
+      },
     },
     {
       title: 'Description',
@@ -202,9 +218,24 @@ function ExclusionsPage() {
 
       {/* Table */}
       <Card>
+        <div className="mb-4">
+          <Input.Search
+            placeholder="Rechercher par employé, code ou libellé..."
+            allowClear
+            onChange={(e) => setSearchText(e.target.value)}
+            style={{ maxWidth: 400 }}
+          />
+        </div>
         <Table
           columns={columns}
-          dataSource={exclusions}
+          dataSource={exclusions.filter((e) => {
+            if (!searchText.trim()) return true
+            const search = searchText.toLowerCase()
+            const employeName = (typeof e.employe === 'object' && e.employe) ? `${e.employe.prenom} ${e.employe.nom}`.toLowerCase() : String(e.employe ?? '').toLowerCase()
+            const rubriqueCode = (typeof e.rubrique === 'object' && e.rubrique) ? String(e.rubrique.code ?? '').toLowerCase() : String(e.rubrique ?? '').toLowerCase()
+            const rubriqueLibelle = (typeof e.rubrique === 'object' && e.rubrique) ? (e.rubrique.libelle ?? '').toLowerCase() : ''
+            return employeName.includes(search) || rubriqueCode.includes(search) || rubriqueLibelle.includes(search)
+          })}
           rowKey="_id"
           loading={isLoading}
           pagination={{
@@ -238,16 +269,14 @@ function ExclusionsPage() {
             rules={[{ required: true, message: 'L\'employé est requis' }]}
           >
             <Select
-              showSearch={
-                {
-                  optionFilterProp: 'children',
-                }
-              }
+              showSearch
               placeholder="Sélectionner un employé"
-              role="select"
+              filterOption={(input, option) =>
+                String(option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+              }
               options={employes.map(employe => ({
                 value: employe._id,
-                label: `${employe.prenom} ${employe.nom} - ${employe.poste}`,
+                label: `${employe.prenom} ${employe.nom}${employe.contrat_actif?.matricule_de_solde ? ` (${employe.contrat_actif.matricule_de_solde})` : ''}`,
               }))}
             />
           </Form.Item>
@@ -258,13 +287,11 @@ function ExclusionsPage() {
             rules={[{ required: true, message: 'La rubrique est requise' }]}
           >
             <Select
-              showSearch={
-                {
-                  optionFilterProp: 'children',
-                }
-              }
+              showSearch
               placeholder="Sélectionner une rubrique"
-              role="select"
+              filterOption={(input, option) =>
+                String(option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+              }
               options={rubriques.map(rubrique => ({
                 value: rubrique._id,
                 label: `${rubrique.code} - ${rubrique.libelle}`,

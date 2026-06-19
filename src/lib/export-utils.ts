@@ -72,7 +72,7 @@ export function exportToCSV(
 // --- Colonnes prédéfinies pour chaque module ---
 
 export const employeExportColumns: ExportColumn[] = [
-  { header: 'Matricule', key: 'matricule_de_solde' },
+  { header: 'Matricule', key: 'contrat_actif', transform: (_v, row) => row?.contrat_actif?.matricule_de_solde ?? '' },
   { header: 'Civilité', key: 'civilite' },
   { header: 'Prénom', key: 'prenom' },
   { header: 'Nom', key: 'nom' },
@@ -83,11 +83,12 @@ export const employeExportColumns: ExportColumn[] = [
   { header: 'CNI', key: 'nci' },
   { header: 'Téléphone', key: 'telephone' },
   { header: 'Adresse', key: 'adresse' },
-  { header: 'Poste', key: 'poste' },
-  { header: 'Type contrat', key: 'type' },
+  { header: 'Poste', key: 'contrat_actif', transform: (_v, row) => row?.contrat_actif?.poste ?? '' },
+  { header: 'Type contrat', key: 'contrat_actif', transform: (_v, row) => row?.contrat_actif?.type ?? '' },
+  { header: 'Date début contrat', key: 'contrat_actif', transform: (_v, row) => row?.contrat_actif?.date_debut ? dayjs(row.contrat_actif.date_debut).format('DD/MM/YYYY') : '' },
+  { header: 'Date fin contrat', key: 'contrat_actif', transform: (_v, row) => row?.contrat_actif?.date_fin ? dayjs(row.contrat_actif.date_fin).format('DD/MM/YYYY') : '' },
+  { header: 'Site', key: 'affectation_site', transform: (_v, row) => { const s = row?.affectation_site?.site; return typeof s === 'object' ? s?.nom ?? '' : '' } },
   { header: 'Catégorie', key: 'categorie', transform: (v) => v?.code ?? '' },
-  { header: 'Date recrutement', key: 'date_de_recrutement', transform: (v) => v ? dayjs(v).format('DD/MM/YYYY') : '' },
-  { header: 'Date fin contrat', key: 'date_de_fin_de_contrat', transform: (v) => v ? dayjs(v).format('DD/MM/YYYY') : '' },
   { header: 'Catégorie valeur', key: 'categorie', transform: (v: any) => v?.valeur ?? '' },
   { header: 'Actif', key: 'is_actif', transform: (v) => v ? 'Oui' : 'Non' },
 ]

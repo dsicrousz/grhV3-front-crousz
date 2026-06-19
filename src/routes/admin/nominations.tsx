@@ -229,9 +229,8 @@ function NominationsPage() {
       render: (_, record) => {
         const employe = record.employe as Employe
         return employe ? (
-          <div>
+          <div className="w-fit">
             <div className="font-medium">{employe.prenom} {employe.nom}</div>
-            <div className="text-xs text-gray-500">{employe.matricule_de_solde || employe.code}</div>
           </div>
         ) : '-'
       },
@@ -259,7 +258,7 @@ function NominationsPage() {
       render: (_, record) => {
         const division = record.division as Division
         return division ? (
-          <Tag color="blue" className="flex items-center gap-1 w-fit">
+          <Tag color="blue" className="flex items-center gap-1 w-28">
             <Building2 className="w-3 h-3" />
             {division.nom}
           </Tag>
@@ -274,7 +273,7 @@ function NominationsPage() {
       render: (_, record) => {
         const service = record.service as Service | undefined
         return service ? (
-          <Tag color="green" className="flex items-center gap-1 w-fit">
+          <Tag color="green" className="flex items-center gap-1 w-28">
             <Users className="w-3 h-3" />
             {service.nom}
           </Tag>
@@ -559,7 +558,7 @@ function NominationsPage() {
               disabled={!!editingNomination}
               options={employes.map((emp: Employe) => ({
                 value: emp._id,
-                label: `${emp.prenom} ${emp.nom} (${emp.matricule_de_solde || emp.code || ''})`,
+                label: `${emp.prenom} ${emp.nom} (${emp.contrat_actif?.matricule_de_solde || emp.code || ''})`,
               }))}
             />
           </Form.Item>

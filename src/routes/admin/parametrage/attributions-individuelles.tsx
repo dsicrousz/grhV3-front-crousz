@@ -49,6 +49,7 @@ function AttributionsIndividuellesPage() {
     queryFn: () => AttributionIndividuelleService.getAll(),
   })
 
+
   const { data: employes = [] } = useQuery({
     queryKey: ['employes'],
     queryFn: () => EmployeService.getAll(),
@@ -64,20 +65,24 @@ function AttributionsIndividuellesPage() {
     return attributions.filter((attr) => {
       // Filtre par texte de recherche (nom/prénom employé ou code/libellé rubrique)
       const searchLower = searchText.toLowerCase()
-      const matchesSearch = searchText === '' || 
-        `${attr.employe.prenom} ${attr.employe.nom}`.toLowerCase().includes(searchLower) ||
-        attr.employe.poste?.toLowerCase().includes(searchLower) ||
-        attr.rubrique.code.toLowerCase().includes(searchLower) ||
-        attr.rubrique.libelle.toLowerCase().includes(searchLower)
+      const rubriqueCode = typeof attr.rubrique === 'object' && attr.rubrique.code ? String(attr.rubrique.code) : ''
+      const rubriqueLibelle = typeof attr.rubrique === 'object' && attr.rubrique.libelle ? String(attr.rubrique.libelle) : ''
+      const employeName = attr.employe ? `${attr.employe.prenom} ${attr.employe.nom}` : ''
+      const matchesSearch = searchText === '' ||
+        employeName.toLowerCase().includes(searchLower) ||
+        rubriqueCode.toLowerCase().includes(searchLower) ||
+        rubriqueLibelle.toLowerCase().includes(searchLower)
 
       // Filtre par employé
-      const matchesEmploye = !filterEmploye || attr.employe._id === filterEmploye
+      const matchesEmploye = !filterEmploye || (attr.employe && attr.employe._id === filterEmploye)
 
       // Filtre par rubrique
-      const matchesRubrique = !filterRubrique || attr.rubrique._id === filterRubrique
+      const rubriqueId = typeof attr.rubrique === 'object' ? attr.rubrique._id : attr.rubrique
+      const matchesRubrique = !filterRubrique || rubriqueId === filterRubrique
 
       // Filtre par type de rubrique
-      const matchesType = !filterType || attr.rubrique.type === filterType
+      const rubriqueType = typeof attr.rubrique === 'object' ? attr.rubrique.type : undefined
+      const matchesType = !filterType || rubriqueType === filterType
 
       return matchesSearch && matchesEmploye && matchesRubrique && matchesType
     })
@@ -133,7 +138,8 @@ function AttributionsIndividuellesPage() {
       setEditingAttribution(attribution)
       form.setFieldsValue({
         employe: attribution.employe._id,
-        rubrique: attribution.rubrique._id
+        rubrique: attribution.rubrique._id,
+        valeur_par_defaut: attribution.valeur_par_defaut
       })
     } else {
       setEditingAttribution(null)
@@ -160,12 +166,16 @@ function AttributionsIndividuellesPage() {
     {
       title: 'Employé',
       key: 'employe',
-      render: (_, record) => (
-        <div className="flex flex-col">
-          <Text strong>{record.employe.prenom} {record.employe.nom}</Text>
-          <Text type="secondary" className="text-xs">{record.employe.poste}</Text>
-        </div>
-      ),
+      render: (_, record) => {
+        if (!record.employe) return <Text type="secondary">N/A</Text>
+        const employe = typeof record.employe === 'object' ? record.employe : null
+        if (!employe) return <Text type="secondary">N/A</Text>
+        return (
+          <div className="flex flex-col">
+            <Text strong>{employe.prenom} {employe.nom}</Text>
+          </div>
+        )
+      },
     },
     {
       title: 'Rubrique',
@@ -184,6 +194,21 @@ function AttributionsIndividuellesPage() {
         <Tag color={record.rubrique.type === 'IMPOSABLE' ? 'green' : 'red'}>
           {record.rubrique.type}
         </Tag>
+      ),
+    },
+    {
+      title: 'Valeur par défaut',
+      key: 'valeur_par_default',
+      render: (_, record) => (
+        <Text type="secondary">
+          {record.valeur_par_defaut !== undefined && record.valeur_par_defaut !== null
+            ? new Intl.NumberFormat('fr-FR', {
+                style: 'currency',
+                currency: 'XAF',
+                minimumFractionDigits: 0
+              }).format(record.valeur_par_defaut)
+            : 'N/A'}
+        </Text>
       ),
     },
     {
@@ -364,7 +389,7 @@ function AttributionsIndividuellesPage() {
               role="select"
               options={employes.map(employe => ({
                 value: employe._id,
-                label: `${employe.prenom} ${employe.nom} - ${employe.poste}`,
+                label: `${employe.prenom} ${employe.nom} - ${employe.contrat_actif?.matricule_de_solde || ''}`,
               }))}
             />
           </Form.Item>

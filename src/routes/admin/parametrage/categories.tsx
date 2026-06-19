@@ -6,6 +6,7 @@ import {
   Button, 
   Modal, 
   Form, 
+  Input,
   InputNumber,
   Switch,
   Space, 
@@ -29,6 +30,7 @@ export const Route = createFileRoute('/admin/parametrage/categories')({
 function CategoriesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingCategorie, setEditingCategorie] = useState<Categorie | null>(null)
+  const [searchText, setSearchText] = useState('')
   const [form] = Form.useForm()
   const queryClient = useQueryClient()
 
@@ -198,10 +200,23 @@ function CategoriesPage() {
 
       {/* Table */}
       <Card>
+        <div className="mb-4">
+          <Input.Search
+            placeholder="Rechercher par code ou valeur..."
+            allowClear
+            onChange={(e) => setSearchText(e.target.value)}
+            style={{ maxWidth: 400 }}
+          />
+        </div>
         <Table
           columns={columns}
-          dataSource={categories}
-          rowKey="id"
+          dataSource={categories.filter((cat) => {
+            if (!searchText.trim()) return true
+            const search = searchText.toLowerCase()
+            return cat.code.toString().includes(search) || 
+                   cat.valeur.toString().includes(search)
+          })}
+          rowKey="_id"
           loading={isLoading}
           pagination={{
             showSizeChanger: true,

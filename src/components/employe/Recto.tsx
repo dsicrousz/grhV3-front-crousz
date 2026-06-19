@@ -1,3 +1,4 @@
+import { env } from "@/env";
 import type { Employe } from "@/types/employe";
 import { Document,Font,Image,Page, StyleSheet, Text, View,Svg,Path } from "@react-pdf/renderer";
 import { createTw } from "react-pdf-tailwind";
@@ -64,7 +65,7 @@ function Recto({user}: {user: Partial<Employe>}) {
         </View>
         <View style={tw("flex flex-row mx-auto w-10/12")}>
             <Image
-              src={`${import.meta.env.VITE_BACKURL}/uploads/profiles/${user?.profile}`}
+              src={`${env.VITE_R2_URL}/profiles/${user?.profile}`}
               style={tw('rounded-full object-center object-cover h-24 w-24 m-2')}
             />
 
@@ -73,11 +74,11 @@ function Recto({user}: {user: Partial<Employe>}) {
                <Text style={{fontFamily:'Bebas Neue',fontSize:'18px',textAlign:'center'}}>{`${user?.prenom} ${user?.nom}`}</Text>
               </View>
               <View style={{width:'60%'}}>
-            <Text style={{fontFamily:'Bebas Neue',fontSize:'10px',textAlign:'left'}}>{user?.poste}</Text>
+            <Text style={{fontFamily:'Bebas Neue',fontSize:'10px',textAlign:'left'}}>{typeof user?.contrat_actif?.poste === 'string' ? user?.contrat_actif?.poste : user?.contrat_actif?.poste?.nom || ''}</Text>
                 {/* <Text style={{fontFamily:'Bebas Neue',fontSize:'10px',textAlign:'left'}}>Partenariat et de la coopération</Text> */}
               </View>
               <View>
-                <Text style={{fontFamily:'Bebas Neue',fontSize:'8px',textAlign:'left'}}>{`MAT SOLDE : ${user?.matricule_de_solde}`}</Text>
+                <Text style={{fontFamily:'Bebas Neue',fontSize:'8px',textAlign:'left'}}>{`MAT SOLDE : ${user?.contrat_actif?.matricule_de_solde || ''}`}</Text>
               </View>
             </View>
           </View>

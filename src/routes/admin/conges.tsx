@@ -231,7 +231,7 @@ function CongesPage() {
         return employe ? (
           <div>
             <div className="font-medium">{employe.prenom} {employe.nom}</div>
-            <div className="text-xs text-gray-500">{employe.matricule_de_solde || employe.code}</div>
+            <div className="text-xs text-gray-500">{employe.contrat_actif?.matricule_de_solde || employe.code}</div>
           </div>
         ) : '-'
       },
@@ -575,7 +575,7 @@ function CongesPage() {
               disabled={!!editingConge}
               options={employes.map(emp => ({
                 value: emp._id,
-                label: `${emp.prenom} ${emp.nom} (${emp.matricule_de_solde || emp.code || ''})`,
+                label: `${emp.prenom} ${emp.nom} (${emp.contrat_actif?.matricule_de_solde || emp.code || ''})`,
               }))}
             />
           </Form.Item>

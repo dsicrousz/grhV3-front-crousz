@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Typography, Card, Button, Space, Tabs, Spin, Tag, Popconfirm, message } from 'antd'
-import { ChevronLeft, Power } from 'lucide-react'
+import { ChevronLeft, Power, FileText, MapPin } from 'lucide-react'
 import { EmployeService } from '@/services/employe.service'
 import { EmployeInformations } from '@/components/employe/informations'
 import { EmployeNominations } from '@/components/employe/nominations'
@@ -12,6 +12,9 @@ import { EmployeBulletins } from '@/components/employe/bulletins'
 import { EmployeAbsences } from '@/components/employe/absences'
 import { EmployeConges } from '@/components/employe/conges'
 import { EmployePiecesJointes } from '@/components/employe/pieces-jointes'
+import { EmployeContrats } from '@/components/employe/contrats'
+import { EmployeAffectationsSite } from '@/components/employe/affectations-site'
+import { EmployeHistorique } from '@/components/employe/historique'
 
 const { Title } = Typography
 
@@ -26,7 +29,10 @@ function EmployeDetailsPage() {
 
   const { data: employe, isLoading: isLoadingEmploye } = useQuery({
     queryKey: ['employe', employeeId],
-    queryFn: () => EmployeService.getOne(employeeId),
+    queryFn: async () => {
+      const all = await EmployeService.getAllAgregated()
+      return all.find((e) => e._id === employeeId) ?? await EmployeService.getOne(employeeId)
+    },
   })
 
   const toggleMutation = useMutation({
@@ -44,53 +50,75 @@ function EmployeDetailsPage() {
   if (isLoadingEmploye) return <div className="flex items-center justify-center h-screen"><Spin size="large" /></div>
   if (!employe) return <div>Employé non trouvé</div>
 
+  const isCDI = employe.contrat_actif?.type === 'CDI'
+
   const items = [
     {
       key: 'informations',
       label: 'Informations',
       children: <EmployeInformations employe={employe} />
     },
-    {
+    ...(isCDI ? [{
       key: 'professionnal_card',
       label: 'Carte professionnelle',
       children: <ProfessionalCard employe={employe} />
-    },
-    {
+    }] : []),
+    ...(isCDI ? [{
       key: 'nominations',
       label: 'Nominations',
       children: <EmployeNominations employeId={employeeId} />
-    },
-    {
+    }] : []),
+    ...(isCDI ? [{
       key: 'attributions',
       label: 'Attributions',
       children: <EmployeAttributions employeId={employeeId} />
-    },
-    {
+    }] : []),
+    ...(isCDI ? [{
       key: 'exclusions',
       label: 'Exclusions',
       children: <EmployeExclusions employeId={employeeId} />
-    },
+    }] : []),
     {
       key: 'bulletins',
       label: 'Bulletins',
       children: <EmployeBulletins employeId={employeeId} />
     },
-    {
+    ...(isCDI ? [{
       key: 'absences',
       label: 'Absences',
       children: <EmployeAbsences employeId={employeeId} />
-    },
-    {
+    }] : []),
+    ...(isCDI ? [{
       key: 'conges',
       label: 'Congés',
       children: <EmployeConges employeId={employeeId} />
+    }] : []),
+    {
+      key: 'contrats',
+      label: 'Contrats',
+      children: <EmployeContrats employeId={employeeId} />
+    },
+    {
+      key: 'affectations-site',
+      label: 'Affectations site',
+      children: <EmployeAffectationsSite employeId={employeeId} />
     },
     {
       key: 'pieces-jointes',
       label: 'Pièces jointes',
       children: <EmployePiecesJointes employeId={employeeId} />
+    },
+    {
+      key: 'historique',
+      label: 'Historique',
+      children: <EmployeHistorique employeId={employeeId} />
     }
   ]
+
+  const contrat = employe.contrat_actif
+  const site = employe.affectation_site
+    ? typeof employe.affectation_site.site === 'object' ? employe.affectation_site.site : null
+    : null
 
   return (
     <div className="space-y-6 p-6">
@@ -102,12 +130,33 @@ function EmployeDetailsPage() {
           >
             Retour
           </Button>
-          <Title level={4} className="mb-0!">
-            {employe.prenom} {employe.nom}
-          </Title>
-          <Tag color={employe.is_actif ? 'green' : 'red'}>
-            {employe.is_actif ? 'Actif' : 'Inactif'}
-          </Tag>
+          <div>
+            <div className="flex items-center gap-2">
+              <Title level={4} className="mb-0!">
+                {employe.prenom} {employe.nom}
+              </Title>
+              <Tag color={employe.is_actif ? 'green' : 'red'}>
+                {employe.is_actif ? 'Actif' : 'Inactif'}
+              </Tag>
+              {contrat && (
+                <Tag color={contrat.type === 'CDI' ? 'green' : contrat.type === 'CDD' ? 'orange' : 'blue'}>
+                  {contrat.type}
+                </Tag>
+              )}
+            </div>
+            <div className="flex items-center gap-3 mt-1">
+              {contrat?.poste && (
+                <span className="text-sm text-gray-500 flex items-center gap-1">
+                  <FileText className="w-3 h-3" />{typeof contrat.poste === 'string' ? contrat.poste : contrat.poste?.nom}
+                </span>
+              )}
+              {site && (
+                <span className="text-sm text-gray-500 flex items-center gap-1">
+                  <MapPin className="w-3 h-3" />{site.nom}{site.ville ? ` — ${site.ville}` : ''}
+                </span>
+              )}
+            </div>
+          </div>
         </Space>
         <Popconfirm
           title={employe.is_actif ? "Désactiver l'employé" : "Activer l'employé"}

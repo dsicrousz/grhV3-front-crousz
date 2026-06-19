@@ -1,10 +1,11 @@
 import type { Fonction } from './fonction'
 import type { Rubrique } from './rubrique'
+import { TypeContrat } from './contrat'
 
 export interface AttributionFonctionnelle {
   _id: string
-  fonction: string | Fonction
-  rubrique: string | Rubrique
+  fonction: Fonction
+  rubrique: Rubrique
   valeur_par_default?: number
   createdAt?: string
   updatedAt?: string
@@ -25,6 +26,7 @@ export interface UpdateAttributionFonctionnelleDto {
 export interface AttributionGlobale {
   _id: string
   rubrique: string | Rubrique
+  type_contrat?: TypeContrat
   valeur_par_default?: number
   createdAt?: string
   updatedAt?: string
@@ -32,10 +34,12 @@ export interface AttributionGlobale {
 
 export interface CreateAttributionGlobaleDto {
   rubrique: string
+  type_contrat?: TypeContrat
   valeur_par_default?: number
 }
 
 export interface UpdateAttributionGlobaleDto {
   rubrique?: string
+  type_contrat?: TypeContrat
   valeur_par_default?: number
 }

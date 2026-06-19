@@ -34,6 +34,7 @@ export const Route = createFileRoute('/admin/parametrage/rubriques')({
 function RubriquesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingRubrique, setEditingRubrique] = useState<Rubrique | null>(null)
+  const [searchText, setSearchText] = useState('')
   const [form] = Form.useForm<CreateRubriqueDto>()
   const queryClient = useQueryClient()
 
@@ -268,10 +269,23 @@ function RubriquesPage() {
 
       {/* Table */}
       <Card>
+        <div className="mb-4">
+          <Input.Search
+            placeholder="Rechercher par code ou libellé..."
+            allowClear
+            onChange={(e) => setSearchText(e.target.value)}
+            style={{ maxWidth: 400 }}
+          />
+        </div>
         <Table
           columns={columns}
-          dataSource={rubriques}
-          rowKey="id"
+          dataSource={rubriques.filter((r) => {
+            if (!searchText.trim()) return true
+            const search = searchText.toLowerCase()
+            return String(r.code).toLowerCase().includes(search) ||
+                   r.libelle.toLowerCase().includes(search)
+          })}
+          rowKey="_id"
           loading={isLoading}
           pagination={{
             pageSize: 10,

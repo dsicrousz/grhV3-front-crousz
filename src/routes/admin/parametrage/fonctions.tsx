@@ -28,6 +28,7 @@ export const Route = createFileRoute('/admin/parametrage/fonctions')({
 function FonctionsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingFonction, setEditingFonction] = useState<Fonction | null>(null)
+  const [searchText, setSearchText] = useState('')
   const [form] = Form.useForm()
   const queryClient = useQueryClient()
 
@@ -173,10 +174,21 @@ function FonctionsPage() {
 
       {/* Table */}
       <Card>
+        <div className="mb-4">
+          <Input.Search
+            placeholder="Rechercher par nom..."
+            allowClear
+            onChange={(e) => setSearchText(e.target.value)}
+            style={{ maxWidth: 400 }}
+          />
+        </div>
         <Table
           columns={columns}
-          dataSource={fonctions}
-          rowKey="id"
+          dataSource={fonctions.filter((f) => {
+            if (!searchText.trim()) return true
+            return f.nom.toLowerCase().includes(searchText.toLowerCase())
+          })}
+          rowKey="_id"
           loading={isLoading}
           pagination={{
             showSizeChanger: true,

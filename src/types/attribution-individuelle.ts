@@ -5,7 +5,7 @@ export interface AttributionIndividuelle {
   _id: string
   employe: Employe
   rubrique: Rubrique
-  valeur_par_default?: number
+  valeur_par_defaut?: number
   createdAt?: string
   updatedAt?: string
 }
@@ -19,5 +19,5 @@ export interface CreateAttributionIndividuelleDto {
 export interface UpdateAttributionIndividuelleDto {
   employe?: string
   rubrique?: string
-  valeur_par_default?: number
+  valeur_par_defaut?: number
 }

@@ -6,6 +6,7 @@ import {
   Button, 
   Modal, 
   Form, 
+  Input,
   Select,
   Space, 
   Typography, 
@@ -16,13 +17,14 @@ import {
   Tabs,
   InputNumber
 } from 'antd'
-import { Plus, Trash2, Link2, FileText } from 'lucide-react'
+import { Plus, Trash2, Link2, FileText, Pencil } from 'lucide-react'
 import type { 
   AttributionFonctionnelle, 
   AttributionGlobale,
   CreateAttributionFonctionnelleDto, 
   CreateAttributionGlobaleDto 
 } from '@/types/attribution'
+import { TypeContrat } from '@/types/contrat'
 import { AttributionFonctionnelleService, AttributionGlobaleService } from '@/services/attribution.service'
 import { FonctionService } from '@/services/fonction.service'
 import { RubriqueService } from '@/services/rubrique.service'
@@ -38,7 +40,9 @@ export const Route = createFileRoute('/admin/parametrage/attributions')({
 function AttributionsPage() {
   const [activeTab, setActiveTab] = useState('fonctionnelle')
   const [isModalOpen, setIsModalOpen] = useState(false)
-  // Pas d'édition pour les attributions, seulement création et suppression
+  const [searchTextFonctionnelle, setSearchTextFonctionnelle] = useState('')
+  const [searchTextGlobale, setSearchTextGlobale] = useState('')
+  const [editingAttributionGlobale, setEditingAttributionGlobale] = useState<AttributionGlobale | null>(null)
   const [form] = Form.useForm()
   const queryClient = useQueryClient()
 
@@ -116,13 +120,37 @@ function AttributionsPage() {
     },
   })
 
-  const handleOpenModal = () => {
-    form.resetFields()
+  const updateGlobaleMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: CreateAttributionGlobaleDto }) => 
+      AttributionGlobaleService.update(id, data),
+    onSuccess: () => {
+      message.success('Attribution globale modifiée avec succès')
+      queryClient.invalidateQueries({ queryKey: ['attributions-globales'] })
+      handleCloseModal()
+    },
+    onError: (error: Error) => {
+      message.error(error.message || 'Erreur lors de la modification')
+    },
+  })
+
+  const handleOpenModal = (attributionGlobale?: AttributionGlobale) => {
+    if (attributionGlobale) {
+      setEditingAttributionGlobale(attributionGlobale)
+      form.setFieldsValue({
+        rubrique: typeof attributionGlobale.rubrique === 'string' ? attributionGlobale.rubrique : attributionGlobale.rubrique._id,
+        type_contrat: attributionGlobale.type_contrat,
+        valeur_par_defaut: attributionGlobale.valeur_par_default,
+      })
+    } else {
+      setEditingAttributionGlobale(null)
+      form.resetFields()
+    }
     setIsModalOpen(true)
   }
 
   const handleCloseModal = () => {
     setIsModalOpen(false)
+    setEditingAttributionGlobale(null)
     form.resetFields()
   }
 
@@ -130,7 +158,11 @@ function AttributionsPage() {
     if (activeTab === 'fonctionnelle') {
       createFonctionnelleMutation.mutate(values as CreateAttributionFonctionnelleDto)
     } else {
-      createGlobaleMutation.mutate(values as CreateAttributionGlobaleDto)
+      if (editingAttributionGlobale) {
+        updateGlobaleMutation.mutate({ id: editingAttributionGlobale._id, data: values as CreateAttributionGlobaleDto })
+      } else {
+        createGlobaleMutation.mutate(values as CreateAttributionGlobaleDto)
+      }
     }
   }
 
@@ -146,9 +178,8 @@ function AttributionsPage() {
     {
       title: 'Rubrique',
       key: 'rubrique',
-      render: (_, record) => {
-        const rubrique = rubriques.find(r => r._id === (typeof record.rubrique === 'string' ? record.rubrique : record.rubrique._id))
-        return rubrique?.code || '-'
+      render: (_,record) => {
+        return record.rubrique?.code + ' - ' + record.rubrique?.libelle
       },
     },
     {
@@ -190,12 +221,33 @@ function AttributionsPage() {
       },
     },
     {
+      title: 'Type de contrat',
+      key: 'type_contrat',
+      render: (_, record) => {
+        if (!record.type_contrat) return 'Tous'
+        const typeLabels: Record<TypeContrat, string> = {
+          [TypeContrat.CDI]: 'CDI',
+          [TypeContrat.CDD]: 'CDD',
+          [TypeContrat.TEMPORAIRE]: 'Temporaire',
+        }
+        return typeLabels[record.type_contrat] || record.type_contrat
+      },
+    },
+    {
       title: 'Actions',
       key: 'actions',
       width: 120,
       align: 'center',
       render: (_, record) => (
         <Space size="small">
+          <Tooltip title="Modifier">
+            <Button
+              type="text"
+              size="small"
+              icon={<Pencil className="w-4 h-4" />}
+              onClick={() => handleOpenModal(record)}
+            />
+          </Tooltip>
           <Popconfirm
             title="Supprimer cette attribution ?"
             description="Cette action est irréversible."
@@ -253,10 +305,27 @@ function AttributionsPage() {
             } 
             key="fonctionnelle"
           >
+            <div className="mb-4">
+              <Input.Search
+                placeholder="Rechercher par fonction, code ou libellé..."
+                allowClear
+                onChange={(e) => setSearchTextFonctionnelle(e.target.value)}
+                style={{ maxWidth: 400 }}
+              />
+            </div>
             <Table
               columns={columnsFonctionnelles}
-              dataSource={attributionsFonctionnelles}
-              rowKey="id"
+              dataSource={attributionsFonctionnelles.filter((a) => {
+                if (!searchTextFonctionnelle.trim()) return true
+                const search = searchTextFonctionnelle.toLowerCase()
+                const fonctionName = typeof a.fonction === 'string' ? a.fonction : a.fonction?.nom || ''
+                const rubriqueCode = typeof a.rubrique === 'string' ? a.rubrique : a.rubrique?.code || ''
+                const rubriqueLibelle = typeof a.rubrique === 'string' ? '' : a.rubrique?.libelle || ''
+                return fonctionName.toLowerCase().includes(search) || 
+                       (typeof rubriqueCode === 'string' && rubriqueCode.toLowerCase().includes(search)) ||
+                       (typeof rubriqueLibelle === 'string' && rubriqueLibelle.toLowerCase().includes(search))
+              })}
+              rowKey="_id"
               loading={isLoadingFonctionnelles}
               pagination={{
                 showSizeChanger: true,
@@ -274,10 +343,25 @@ function AttributionsPage() {
             } 
             key="globale"
           >
+            <div className="mb-4">
+              <Input.Search
+                placeholder="Rechercher par code ou libellé..."
+                allowClear
+                onChange={(e) => setSearchTextGlobale(e.target.value)}
+                style={{ maxWidth: 400 }}
+              />
+            </div>
             <Table
               columns={columnsGlobales}
-              dataSource={attributionsGlobales}
-              rowKey="id"
+              dataSource={attributionsGlobales.filter((a) => {
+                if (!searchTextGlobale.trim()) return true
+                const search = searchTextGlobale.toLowerCase()
+                const rubriqueCode = typeof a.rubrique === 'string' ? a.rubrique : a.rubrique?.code || ''
+                const rubriqueLibelle = typeof a.rubrique === 'string' ? '' : a.rubrique?.libelle || ''
+                return (typeof rubriqueCode === 'string' && rubriqueCode.toLowerCase().includes(search)) ||
+                       (typeof rubriqueLibelle === 'string' && rubriqueLibelle.toLowerCase().includes(search))
+              })}
+              rowKey="_id"
               loading={isLoadingGlobales}
               pagination={{
                 showSizeChanger: true,
@@ -298,7 +382,9 @@ function AttributionsPage() {
             ) : (
               <FileText className="w-5 h-5 text-rose-600" />
             )}
-            <span>Nouvelle attribution {activeTab === 'fonctionnelle' ? 'fonctionnelle' : 'globale'}</span>
+            <span>
+              {activeTab === 'globale' && editingAttributionGlobale ? 'Modifier' : 'Nouvelle'} attribution {activeTab === 'fonctionnelle' ? 'fonctionnelle' : 'globale'}
+            </span>
           </div>
         }
         open={isModalOpen}
@@ -359,6 +445,23 @@ function AttributionsPage() {
             />
           </Form.Item>
 
+          {activeTab === 'globale' && (
+            <Form.Item
+              name="type_contrat"
+              label="Type de contrat"
+            >
+              <Select
+                placeholder="Tous les types"
+                allowClear
+                options={[
+                  { value: TypeContrat.CDI, label: 'CDI' },
+                  { value: TypeContrat.CDD, label: 'CDD' },
+                  { value: TypeContrat.TEMPORAIRE, label: 'Temporaire' },
+                ]}
+              />
+            </Form.Item>
+          )}
+
            <Form.Item
             name="valeur_par_defaut"
             label="Valeur par défaut"
@@ -373,10 +476,10 @@ function AttributionsPage() {
             <Button
               type="primary"
               htmlType="submit"
-              loading={createFonctionnelleMutation.isPending || createGlobaleMutation.isPending}
+              loading={createFonctionnelleMutation.isPending || createGlobaleMutation.isPending || updateGlobaleMutation.isPending}
               style={{ backgroundColor: '#0d9488' }}
             >
-              Créer
+              {activeTab === 'globale' && editingAttributionGlobale ? 'Enregistrer' : 'Créer'}
             </Button>
           </div>
         </Form>

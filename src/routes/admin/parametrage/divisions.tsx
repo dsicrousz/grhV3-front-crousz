@@ -12,9 +12,11 @@ import {
   Card, 
   message,
   Tree,
-  Dropdown
+  Dropdown,
+  Segmented
 } from 'antd'
-import { Plus, Pencil, Trash2, Building2, FolderTree, MoreHorizontal, Power, PowerOff } from 'lucide-react'
+import { Plus, Pencil, Trash2, Building2, FolderTree, MoreHorizontal, Power, PowerOff, Network, ListTree } from 'lucide-react'
+import { DivisionsOrganigramme } from '@/components/divisions/organigramme'
 import type { 
   Division, 
   Service, 
@@ -39,6 +41,8 @@ function DivisionsPage() {
   const [editingDivision, setEditingDivision] = useState<Division | null>(null)
   const [editingService, setEditingService] = useState<Service | null>(null)
   const [selectedNode, setSelectedNode] = useState<{ key: string, type: 'division' | 'service' } | null>(null)
+  const [searchText, setSearchText] = useState('')
+  const [viewMode, setViewMode] = useState<'tree' | 'chart'>('tree')
   const [form] = Form.useForm()
   const queryClient = useQueryClient()
 
@@ -209,6 +213,24 @@ function DivisionsPage() {
         createServiceMutation.mutate(values as CreateServiceDto)
       }
     }
+  }
+
+  const filterTreeData = (nodes: DataNode[], search: string): DataNode[] => {
+    if (!search.trim()) return nodes
+    const lowerSearch = search.toLowerCase()
+    return nodes.filter(node => {
+      const title = typeof node.title === 'string' ? node.title : ''
+      const matches = title.toLowerCase().includes(lowerSearch)
+      if (matches) return true
+      if (node.children) {
+        const filteredChildren = filterTreeData(node.children, search)
+        if (filteredChildren.length > 0) {
+          node.children = filteredChildren
+          return true
+        }
+      }
+      return false
+    })
   }
 
   const convertToTreeData = (divisions: DivisionTree[]): DataNode[] => {
@@ -396,24 +418,47 @@ function DivisionsPage() {
         </Space>
       </div>
 
-      {/* Tree */}
+      {/* Tree / Organigramme */}
       <Card>
-        <Tree
-          treeData={treeData}
-          showLine
-          defaultExpandAll={true}
-          className="[&_.ant-tree-node-content-wrapper:hover]:bg-slate-50!"
-          onSelect={(selectedKeys) => {
-            const key = selectedKeys[0]?.toString()
-            if (key) {
-              const type = key.startsWith('division-') ? 'division' : 'service'
-              const id = key.replace(`${type}-`, '')
-              setSelectedNode({ key: id, type })
-            } else {
-              setSelectedNode(null)
-            }
-          }}
-        />
+        <div className="mb-4 flex items-center justify-between gap-4 flex-wrap">
+          {viewMode === 'tree' && (
+            <Input.Search
+              placeholder="Rechercher une division ou un service..."
+              allowClear
+              onChange={(e) => setSearchText(e.target.value)}
+              style={{ maxWidth: 400, flex: 1 }}
+            />
+          )}
+          <Segmented
+            value={viewMode}
+            onChange={(val) => setViewMode(val as 'tree' | 'chart')}
+            options={[
+              { label: <span className="flex items-center gap-1"><ListTree className="w-4 h-4" /> Arbre</span>, value: 'tree' },
+              { label: <span className="flex items-center gap-1"><Network className="w-4 h-4" /> Organigramme</span>, value: 'chart' },
+            ]}
+            style={{ marginLeft: 'auto' }}
+          />
+        </div>
+        {viewMode === 'tree' ? (
+          <Tree
+            treeData={filterTreeData(treeData, searchText)}
+            showLine
+            defaultExpandAll={true}
+            className="[&_.ant-tree-node-content-wrapper:hover]:bg-slate-50!"
+            onSelect={(selectedKeys) => {
+              const key = selectedKeys[0]?.toString()
+              if (key) {
+                const type = key.startsWith('division-') ? 'division' : 'service'
+                const id = key.replace(`${type}-`, '')
+                setSelectedNode({ key: id, type })
+              } else {
+                setSelectedNode(null)
+              }
+            }}
+          />
+        ) : (
+          <DivisionsOrganigramme divisions={divisionTree} />
+        )}
       </Card>
 
       {/* Modal Create/Edit */}

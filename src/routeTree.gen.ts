@@ -9,11 +9,11 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as RegisterRouteImport } from './routes/register'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminUnauthorizedRouteImport } from './routes/admin/unauthorized'
+import { Route as AdminSitesRouteImport } from './routes/admin/sites'
 import { Route as AdminReportingRouteImport } from './routes/admin/reporting'
 import { Route as AdminProfilRouteImport } from './routes/admin/profil'
 import { Route as AdminNominationsRouteImport } from './routes/admin/nominations'
@@ -22,9 +22,12 @@ import { Route as AdminCalendrierRouteImport } from './routes/admin/calendrier'
 import { Route as AdminAbsencesRouteImport } from './routes/admin/absences'
 import { Route as AdminParametrageIndexRouteImport } from './routes/admin/parametrage/index'
 import { Route as AdminLotsIndexRouteImport } from './routes/admin/lots/index'
+import { Route as AdminLotsTemporairesIndexRouteImport } from './routes/admin/lots-temporaires/index'
+import { Route as AdminLotsCddIndexRouteImport } from './routes/admin/lots-cdd/index'
 import { Route as AdminEmployesIndexRouteImport } from './routes/admin/employes/index'
 import { Route as AdminParametrageUtilisateursRouteImport } from './routes/admin/parametrage/utilisateurs'
 import { Route as AdminParametrageRubriquesRouteImport } from './routes/admin/parametrage/rubriques'
+import { Route as AdminParametragePostesRouteImport } from './routes/admin/parametrage/postes'
 import { Route as AdminParametrageFonctionsRouteImport } from './routes/admin/parametrage/fonctions'
 import { Route as AdminParametrageExclusionsRouteImport } from './routes/admin/parametrage/exclusions'
 import { Route as AdminParametrageDivisionsRouteImport } from './routes/admin/parametrage/divisions'
@@ -32,13 +35,10 @@ import { Route as AdminParametrageCategoriesRouteImport } from './routes/admin/p
 import { Route as AdminParametrageAttributionsIndividuellesRouteImport } from './routes/admin/parametrage/attributions-individuelles'
 import { Route as AdminParametrageAttributionsRouteImport } from './routes/admin/parametrage/attributions'
 import { Route as AdminLotsLotIdRouteImport } from './routes/admin/lots/$lotId'
+import { Route as AdminLotsTemporairesLotIdRouteImport } from './routes/admin/lots-temporaires/$lotId'
+import { Route as AdminLotsCddLotIdRouteImport } from './routes/admin/lots-cdd/$lotId'
 import { Route as AdminEmployesEmployeeIdRouteImport } from './routes/admin/employes/$employeeId'
 
-const RegisterRoute = RegisterRouteImport.update({
-  id: '/register',
-  path: '/register',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -57,6 +57,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const AdminUnauthorizedRoute = AdminUnauthorizedRouteImport.update({
   id: '/unauthorized',
   path: '/unauthorized',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSitesRoute = AdminSitesRouteImport.update({
+  id: '/sites',
+  path: '/sites',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminReportingRoute = AdminReportingRouteImport.update({
@@ -99,6 +104,17 @@ const AdminLotsIndexRoute = AdminLotsIndexRouteImport.update({
   path: '/lots/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminLotsTemporairesIndexRoute =
+  AdminLotsTemporairesIndexRouteImport.update({
+    id: '/lots-temporaires/',
+    path: '/lots-temporaires/',
+    getParentRoute: () => AdminRoute,
+  } as any)
+const AdminLotsCddIndexRoute = AdminLotsCddIndexRouteImport.update({
+  id: '/lots-cdd/',
+  path: '/lots-cdd/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminEmployesIndexRoute = AdminEmployesIndexRouteImport.update({
   id: '/employes/',
   path: '/employes/',
@@ -116,6 +132,11 @@ const AdminParametrageRubriquesRoute =
     path: '/parametrage/rubriques',
     getParentRoute: () => AdminRoute,
   } as any)
+const AdminParametragePostesRoute = AdminParametragePostesRouteImport.update({
+  id: '/parametrage/postes',
+  path: '/parametrage/postes',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminParametrageFonctionsRoute =
   AdminParametrageFonctionsRouteImport.update({
     id: '/parametrage/fonctions',
@@ -157,6 +178,17 @@ const AdminLotsLotIdRoute = AdminLotsLotIdRouteImport.update({
   path: '/lots/$lotId',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminLotsTemporairesLotIdRoute =
+  AdminLotsTemporairesLotIdRouteImport.update({
+    id: '/lots-temporaires/$lotId',
+    path: '/lots-temporaires/$lotId',
+    getParentRoute: () => AdminRoute,
+  } as any)
+const AdminLotsCddLotIdRoute = AdminLotsCddLotIdRouteImport.update({
+  id: '/lots-cdd/$lotId',
+  path: '/lots-cdd/$lotId',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminEmployesEmployeeIdRoute = AdminEmployesEmployeeIdRouteImport.update({
   id: '/employes/$employeeId',
   path: '/employes/$employeeId',
@@ -166,16 +198,18 @@ const AdminEmployesEmployeeIdRoute = AdminEmployesEmployeeIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
-  '/register': typeof RegisterRoute
   '/admin/absences': typeof AdminAbsencesRoute
   '/admin/calendrier': typeof AdminCalendrierRoute
   '/admin/conges': typeof AdminCongesRoute
   '/admin/nominations': typeof AdminNominationsRoute
   '/admin/profil': typeof AdminProfilRoute
   '/admin/reporting': typeof AdminReportingRoute
+  '/admin/sites': typeof AdminSitesRoute
   '/admin/unauthorized': typeof AdminUnauthorizedRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/employes/$employeeId': typeof AdminEmployesEmployeeIdRoute
+  '/admin/lots-cdd/$lotId': typeof AdminLotsCddLotIdRoute
+  '/admin/lots-temporaires/$lotId': typeof AdminLotsTemporairesLotIdRoute
   '/admin/lots/$lotId': typeof AdminLotsLotIdRoute
   '/admin/parametrage/attributions': typeof AdminParametrageAttributionsRoute
   '/admin/parametrage/attributions-individuelles': typeof AdminParametrageAttributionsIndividuellesRoute
@@ -183,24 +217,29 @@ export interface FileRoutesByFullPath {
   '/admin/parametrage/divisions': typeof AdminParametrageDivisionsRoute
   '/admin/parametrage/exclusions': typeof AdminParametrageExclusionsRoute
   '/admin/parametrage/fonctions': typeof AdminParametrageFonctionsRoute
+  '/admin/parametrage/postes': typeof AdminParametragePostesRoute
   '/admin/parametrage/rubriques': typeof AdminParametrageRubriquesRoute
   '/admin/parametrage/utilisateurs': typeof AdminParametrageUtilisateursRoute
   '/admin/employes/': typeof AdminEmployesIndexRoute
+  '/admin/lots-cdd/': typeof AdminLotsCddIndexRoute
+  '/admin/lots-temporaires/': typeof AdminLotsTemporairesIndexRoute
   '/admin/lots/': typeof AdminLotsIndexRoute
   '/admin/parametrage/': typeof AdminParametrageIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/register': typeof RegisterRoute
   '/admin/absences': typeof AdminAbsencesRoute
   '/admin/calendrier': typeof AdminCalendrierRoute
   '/admin/conges': typeof AdminCongesRoute
   '/admin/nominations': typeof AdminNominationsRoute
   '/admin/profil': typeof AdminProfilRoute
   '/admin/reporting': typeof AdminReportingRoute
+  '/admin/sites': typeof AdminSitesRoute
   '/admin/unauthorized': typeof AdminUnauthorizedRoute
   '/admin': typeof AdminIndexRoute
   '/admin/employes/$employeeId': typeof AdminEmployesEmployeeIdRoute
+  '/admin/lots-cdd/$lotId': typeof AdminLotsCddLotIdRoute
+  '/admin/lots-temporaires/$lotId': typeof AdminLotsTemporairesLotIdRoute
   '/admin/lots/$lotId': typeof AdminLotsLotIdRoute
   '/admin/parametrage/attributions': typeof AdminParametrageAttributionsRoute
   '/admin/parametrage/attributions-individuelles': typeof AdminParametrageAttributionsIndividuellesRoute
@@ -208,9 +247,12 @@ export interface FileRoutesByTo {
   '/admin/parametrage/divisions': typeof AdminParametrageDivisionsRoute
   '/admin/parametrage/exclusions': typeof AdminParametrageExclusionsRoute
   '/admin/parametrage/fonctions': typeof AdminParametrageFonctionsRoute
+  '/admin/parametrage/postes': typeof AdminParametragePostesRoute
   '/admin/parametrage/rubriques': typeof AdminParametrageRubriquesRoute
   '/admin/parametrage/utilisateurs': typeof AdminParametrageUtilisateursRoute
   '/admin/employes': typeof AdminEmployesIndexRoute
+  '/admin/lots-cdd': typeof AdminLotsCddIndexRoute
+  '/admin/lots-temporaires': typeof AdminLotsTemporairesIndexRoute
   '/admin/lots': typeof AdminLotsIndexRoute
   '/admin/parametrage': typeof AdminParametrageIndexRoute
 }
@@ -218,16 +260,18 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
-  '/register': typeof RegisterRoute
   '/admin/absences': typeof AdminAbsencesRoute
   '/admin/calendrier': typeof AdminCalendrierRoute
   '/admin/conges': typeof AdminCongesRoute
   '/admin/nominations': typeof AdminNominationsRoute
   '/admin/profil': typeof AdminProfilRoute
   '/admin/reporting': typeof AdminReportingRoute
+  '/admin/sites': typeof AdminSitesRoute
   '/admin/unauthorized': typeof AdminUnauthorizedRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/employes/$employeeId': typeof AdminEmployesEmployeeIdRoute
+  '/admin/lots-cdd/$lotId': typeof AdminLotsCddLotIdRoute
+  '/admin/lots-temporaires/$lotId': typeof AdminLotsTemporairesLotIdRoute
   '/admin/lots/$lotId': typeof AdminLotsLotIdRoute
   '/admin/parametrage/attributions': typeof AdminParametrageAttributionsRoute
   '/admin/parametrage/attributions-individuelles': typeof AdminParametrageAttributionsIndividuellesRoute
@@ -235,9 +279,12 @@ export interface FileRoutesById {
   '/admin/parametrage/divisions': typeof AdminParametrageDivisionsRoute
   '/admin/parametrage/exclusions': typeof AdminParametrageExclusionsRoute
   '/admin/parametrage/fonctions': typeof AdminParametrageFonctionsRoute
+  '/admin/parametrage/postes': typeof AdminParametragePostesRoute
   '/admin/parametrage/rubriques': typeof AdminParametrageRubriquesRoute
   '/admin/parametrage/utilisateurs': typeof AdminParametrageUtilisateursRoute
   '/admin/employes/': typeof AdminEmployesIndexRoute
+  '/admin/lots-cdd/': typeof AdminLotsCddIndexRoute
+  '/admin/lots-temporaires/': typeof AdminLotsTemporairesIndexRoute
   '/admin/lots/': typeof AdminLotsIndexRoute
   '/admin/parametrage/': typeof AdminParametrageIndexRoute
 }
@@ -246,16 +293,18 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
-    | '/register'
     | '/admin/absences'
     | '/admin/calendrier'
     | '/admin/conges'
     | '/admin/nominations'
     | '/admin/profil'
     | '/admin/reporting'
+    | '/admin/sites'
     | '/admin/unauthorized'
     | '/admin/'
     | '/admin/employes/$employeeId'
+    | '/admin/lots-cdd/$lotId'
+    | '/admin/lots-temporaires/$lotId'
     | '/admin/lots/$lotId'
     | '/admin/parametrage/attributions'
     | '/admin/parametrage/attributions-individuelles'
@@ -263,24 +312,29 @@ export interface FileRouteTypes {
     | '/admin/parametrage/divisions'
     | '/admin/parametrage/exclusions'
     | '/admin/parametrage/fonctions'
+    | '/admin/parametrage/postes'
     | '/admin/parametrage/rubriques'
     | '/admin/parametrage/utilisateurs'
     | '/admin/employes/'
+    | '/admin/lots-cdd/'
+    | '/admin/lots-temporaires/'
     | '/admin/lots/'
     | '/admin/parametrage/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/register'
     | '/admin/absences'
     | '/admin/calendrier'
     | '/admin/conges'
     | '/admin/nominations'
     | '/admin/profil'
     | '/admin/reporting'
+    | '/admin/sites'
     | '/admin/unauthorized'
     | '/admin'
     | '/admin/employes/$employeeId'
+    | '/admin/lots-cdd/$lotId'
+    | '/admin/lots-temporaires/$lotId'
     | '/admin/lots/$lotId'
     | '/admin/parametrage/attributions'
     | '/admin/parametrage/attributions-individuelles'
@@ -288,25 +342,30 @@ export interface FileRouteTypes {
     | '/admin/parametrage/divisions'
     | '/admin/parametrage/exclusions'
     | '/admin/parametrage/fonctions'
+    | '/admin/parametrage/postes'
     | '/admin/parametrage/rubriques'
     | '/admin/parametrage/utilisateurs'
     | '/admin/employes'
+    | '/admin/lots-cdd'
+    | '/admin/lots-temporaires'
     | '/admin/lots'
     | '/admin/parametrage'
   id:
     | '__root__'
     | '/'
     | '/admin'
-    | '/register'
     | '/admin/absences'
     | '/admin/calendrier'
     | '/admin/conges'
     | '/admin/nominations'
     | '/admin/profil'
     | '/admin/reporting'
+    | '/admin/sites'
     | '/admin/unauthorized'
     | '/admin/'
     | '/admin/employes/$employeeId'
+    | '/admin/lots-cdd/$lotId'
+    | '/admin/lots-temporaires/$lotId'
     | '/admin/lots/$lotId'
     | '/admin/parametrage/attributions'
     | '/admin/parametrage/attributions-individuelles'
@@ -314,9 +373,12 @@ export interface FileRouteTypes {
     | '/admin/parametrage/divisions'
     | '/admin/parametrage/exclusions'
     | '/admin/parametrage/fonctions'
+    | '/admin/parametrage/postes'
     | '/admin/parametrage/rubriques'
     | '/admin/parametrage/utilisateurs'
     | '/admin/employes/'
+    | '/admin/lots-cdd/'
+    | '/admin/lots-temporaires/'
     | '/admin/lots/'
     | '/admin/parametrage/'
   fileRoutesById: FileRoutesById
@@ -324,18 +386,10 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
-  RegisterRoute: typeof RegisterRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/register': {
-      id: '/register'
-      path: '/register'
-      fullPath: '/register'
-      preLoaderRoute: typeof RegisterRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -362,6 +416,13 @@ declare module '@tanstack/react-router' {
       path: '/unauthorized'
       fullPath: '/admin/unauthorized'
       preLoaderRoute: typeof AdminUnauthorizedRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/sites': {
+      id: '/admin/sites'
+      path: '/sites'
+      fullPath: '/admin/sites'
+      preLoaderRoute: typeof AdminSitesRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/reporting': {
@@ -420,6 +481,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLotsIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/lots-temporaires/': {
+      id: '/admin/lots-temporaires/'
+      path: '/lots-temporaires'
+      fullPath: '/admin/lots-temporaires/'
+      preLoaderRoute: typeof AdminLotsTemporairesIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/lots-cdd/': {
+      id: '/admin/lots-cdd/'
+      path: '/lots-cdd'
+      fullPath: '/admin/lots-cdd/'
+      preLoaderRoute: typeof AdminLotsCddIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/employes/': {
       id: '/admin/employes/'
       path: '/employes'
@@ -439,6 +514,13 @@ declare module '@tanstack/react-router' {
       path: '/parametrage/rubriques'
       fullPath: '/admin/parametrage/rubriques'
       preLoaderRoute: typeof AdminParametrageRubriquesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/parametrage/postes': {
+      id: '/admin/parametrage/postes'
+      path: '/parametrage/postes'
+      fullPath: '/admin/parametrage/postes'
+      preLoaderRoute: typeof AdminParametragePostesRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/parametrage/fonctions': {
@@ -490,6 +572,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLotsLotIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/lots-temporaires/$lotId': {
+      id: '/admin/lots-temporaires/$lotId'
+      path: '/lots-temporaires/$lotId'
+      fullPath: '/admin/lots-temporaires/$lotId'
+      preLoaderRoute: typeof AdminLotsTemporairesLotIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/lots-cdd/$lotId': {
+      id: '/admin/lots-cdd/$lotId'
+      path: '/lots-cdd/$lotId'
+      fullPath: '/admin/lots-cdd/$lotId'
+      preLoaderRoute: typeof AdminLotsCddLotIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/employes/$employeeId': {
       id: '/admin/employes/$employeeId'
       path: '/employes/$employeeId'
@@ -507,9 +603,12 @@ interface AdminRouteChildren {
   AdminNominationsRoute: typeof AdminNominationsRoute
   AdminProfilRoute: typeof AdminProfilRoute
   AdminReportingRoute: typeof AdminReportingRoute
+  AdminSitesRoute: typeof AdminSitesRoute
   AdminUnauthorizedRoute: typeof AdminUnauthorizedRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminEmployesEmployeeIdRoute: typeof AdminEmployesEmployeeIdRoute
+  AdminLotsCddLotIdRoute: typeof AdminLotsCddLotIdRoute
+  AdminLotsTemporairesLotIdRoute: typeof AdminLotsTemporairesLotIdRoute
   AdminLotsLotIdRoute: typeof AdminLotsLotIdRoute
   AdminParametrageAttributionsRoute: typeof AdminParametrageAttributionsRoute
   AdminParametrageAttributionsIndividuellesRoute: typeof AdminParametrageAttributionsIndividuellesRoute
@@ -517,9 +616,12 @@ interface AdminRouteChildren {
   AdminParametrageDivisionsRoute: typeof AdminParametrageDivisionsRoute
   AdminParametrageExclusionsRoute: typeof AdminParametrageExclusionsRoute
   AdminParametrageFonctionsRoute: typeof AdminParametrageFonctionsRoute
+  AdminParametragePostesRoute: typeof AdminParametragePostesRoute
   AdminParametrageRubriquesRoute: typeof AdminParametrageRubriquesRoute
   AdminParametrageUtilisateursRoute: typeof AdminParametrageUtilisateursRoute
   AdminEmployesIndexRoute: typeof AdminEmployesIndexRoute
+  AdminLotsCddIndexRoute: typeof AdminLotsCddIndexRoute
+  AdminLotsTemporairesIndexRoute: typeof AdminLotsTemporairesIndexRoute
   AdminLotsIndexRoute: typeof AdminLotsIndexRoute
   AdminParametrageIndexRoute: typeof AdminParametrageIndexRoute
 }
@@ -531,9 +633,12 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminNominationsRoute: AdminNominationsRoute,
   AdminProfilRoute: AdminProfilRoute,
   AdminReportingRoute: AdminReportingRoute,
+  AdminSitesRoute: AdminSitesRoute,
   AdminUnauthorizedRoute: AdminUnauthorizedRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminEmployesEmployeeIdRoute: AdminEmployesEmployeeIdRoute,
+  AdminLotsCddLotIdRoute: AdminLotsCddLotIdRoute,
+  AdminLotsTemporairesLotIdRoute: AdminLotsTemporairesLotIdRoute,
   AdminLotsLotIdRoute: AdminLotsLotIdRoute,
   AdminParametrageAttributionsRoute: AdminParametrageAttributionsRoute,
   AdminParametrageAttributionsIndividuellesRoute:
@@ -542,9 +647,12 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminParametrageDivisionsRoute: AdminParametrageDivisionsRoute,
   AdminParametrageExclusionsRoute: AdminParametrageExclusionsRoute,
   AdminParametrageFonctionsRoute: AdminParametrageFonctionsRoute,
+  AdminParametragePostesRoute: AdminParametragePostesRoute,
   AdminParametrageRubriquesRoute: AdminParametrageRubriquesRoute,
   AdminParametrageUtilisateursRoute: AdminParametrageUtilisateursRoute,
   AdminEmployesIndexRoute: AdminEmployesIndexRoute,
+  AdminLotsCddIndexRoute: AdminLotsCddIndexRoute,
+  AdminLotsTemporairesIndexRoute: AdminLotsTemporairesIndexRoute,
   AdminLotsIndexRoute: AdminLotsIndexRoute,
   AdminParametrageIndexRoute: AdminParametrageIndexRoute,
 }
@@ -554,7 +662,6 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
-  RegisterRoute: RegisterRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,9 +1,7 @@
 import type { Categorie } from './categorie'
-
-export enum TypeEmploye {
-  CDD = "CDD",
-  CDI = "CDI"
-}
+import type { Contrat } from './contrat'
+import type { AffectationSite } from './affectation-site'
+import type { Nomination } from './nomination'
 
 export enum Genre {
   HOMME = "Homme",
@@ -11,8 +9,8 @@ export enum Genre {
 }
 
 export enum Civilite {
-  MARIE = "MARIE",
-  CELIBATAIRE = "CELIBATAIRE",
+  MARIE = "Marié(e)",
+  CELIBATAIRE = "Célibataire",
 }
 
 export interface Employe {
@@ -20,12 +18,10 @@ export interface Employe {
   prenom: string
   nom: string
   code?: string
+  password?: string
   qualification?: string
-  date_de_fin_de_contrat?: string
-  date_de_recrutement: string
   telephone: string
   adresse: string
-  poste: string
   nationalite: string
   nci: string
   npp?: string
@@ -33,13 +29,14 @@ export interface Employe {
   genre: Genre
   civilite: Civilite
   nombre_de_parts?: number
-  mensualite?: number
   date_de_naissance: string
   lieu_de_naissance?: string
   profile?: string
   categorie?: Categorie
-  type: TypeEmploye,
-  is_actif?: boolean,
+  is_actif?: boolean
+  contrat_actif?: Contrat
+  affectation_site?: AffectationSite
+  nominations?: Nomination[]
   createdAt?: string
   updatedAt?: string
 }
@@ -49,25 +46,17 @@ export interface CreateEmployeDto {
   nom: string
   code?: string
   qualification?: string
-  date_de_fin_de_contrat?: string
-  date_de_recrutement: string
   telephone: string
   adresse: string
-  poste: string
   nationalite: string
   nci: string
   npp?: string
-  matricule_de_solde?: string
   genre: Genre
   civilite: Civilite
-  nombre_de_parts?: number
-  mensualite?: number
   date_de_naissance: string
   lieu_de_naissance?: string
   profile?: string
-  categorie?: string
-  is_actif?: boolean,
-  type: TypeEmploye
+  is_actif?: boolean
 }
 
 export interface UpdateEmployeDto {
@@ -75,23 +64,15 @@ export interface UpdateEmployeDto {
   nom?: string
   code?: string
   qualification?: string
-  date_de_fin_de_contrat?: string
-  date_de_recrutement?: string
   telephone?: string
   adresse?: string
-  poste?: string
   nationalite?: string
   nci?: string
   npp?: string
-  matricule_de_solde?: string
   genre?: Genre
   civilite?: Civilite
-  nombre_de_parts?: number
-  mensualite?: number
   date_de_naissance?: string
   lieu_de_naissance?: string
   profile?: string
-  categorie?: string
-  is_actif?: boolean,
-  type?: TypeEmploye
+  is_actif?: boolean
 }

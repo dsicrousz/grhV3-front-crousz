@@ -43,8 +43,8 @@ const typeLabels = {
 
 export function DashboardRappels() {
   const { data: employes = [] } = useQuery({
-    queryKey: ['employes'],
-    queryFn: () => EmployeService.getAll(),
+    queryKey: ['employes', 'agregated'],
+    queryFn: () => EmployeService.getAllAgregated(),
   })
 
   const { data: conges = [] } = useQuery({
@@ -56,11 +56,12 @@ export function DashboardRappels() {
     const result: Rappel[] = []
     const today = dayjs()
 
-    // 1. CDD expirant dans les 30/60/90 jours
+    // 1. Contrats (CDD/Temporaire) expirant dans les 30/60/90 jours
     employes
-      .filter((e: Employe) => e.is_actif && e.type === 'CDD' && e.date_de_fin_de_contrat)
+      .filter((e: Employe) => e.is_actif && e.contrat_actif && e.contrat_actif.type !== 'CDI' && e.contrat_actif.date_fin)
       .forEach((e: Employe) => {
-        const endDate = dayjs(e.date_de_fin_de_contrat)
+        const contrat = e.contrat_actif!
+        const endDate = dayjs(contrat.date_fin)
         const daysLeft = endDate.diff(today, 'day')
 
         if (daysLeft < 0) {
@@ -68,9 +69,9 @@ export function DashboardRappels() {
             id: `cdd-expired-${e._id}`,
             type: 'cdd_expiration',
             severity: 'critical',
-            title: `CDD expiré — ${e.prenom} ${e.nom}`,
+            title: `${contrat.type} expiré — ${e.prenom} ${e.nom}`,
             description: `Le contrat a expiré le ${endDate.format('DD/MM/YYYY')} (il y a ${Math.abs(daysLeft)} jours)`,
-            date: e.date_de_fin_de_contrat,
+            date: contrat.date_fin,
             employeId: e._id,
           })
         } else if (daysLeft <= 30) {
@@ -78,9 +79,9 @@ export function DashboardRappels() {
             id: `cdd-30-${e._id}`,
             type: 'cdd_expiration',
             severity: 'critical',
-            title: `CDD expire bientôt — ${e.prenom} ${e.nom}`,
+            title: `${contrat.type} expire bientôt — ${e.prenom} ${e.nom}`,
             description: `Le contrat expire le ${endDate.format('DD/MM/YYYY')} (dans ${daysLeft} jours)`,
-            date: e.date_de_fin_de_contrat,
+            date: contrat.date_fin,
             employeId: e._id,
           })
         } else if (daysLeft <= 60) {
@@ -88,9 +89,9 @@ export function DashboardRappels() {
             id: `cdd-60-${e._id}`,
             type: 'cdd_expiration',
             severity: 'warning',
-            title: `CDD expire dans 2 mois — ${e.prenom} ${e.nom}`,
+            title: `${contrat.type} expire dans 2 mois — ${e.prenom} ${e.nom}`,
             description: `Le contrat expire le ${endDate.format('DD/MM/YYYY')} (dans ${daysLeft} jours)`,
-            date: e.date_de_fin_de_contrat,
+            date: contrat.date_fin,
             employeId: e._id,
           })
         } else if (daysLeft <= 90) {
@@ -98,9 +99,9 @@ export function DashboardRappels() {
             id: `cdd-90-${e._id}`,
             type: 'cdd_expiration',
             severity: 'info',
-            title: `CDD expire dans 3 mois — ${e.prenom} ${e.nom}`,
+            title: `${contrat.type} expire dans 3 mois — ${e.prenom} ${e.nom}`,
             description: `Le contrat expire le ${endDate.format('DD/MM/YYYY')} (dans ${daysLeft} jours)`,
-            date: e.date_de_fin_de_contrat,
+            date: contrat.date_fin,
             employeId: e._id,
           })
         }

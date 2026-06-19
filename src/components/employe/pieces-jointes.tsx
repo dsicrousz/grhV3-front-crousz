@@ -6,7 +6,6 @@ import type { PieceJointe } from '@/types/piece-jointe'
 import { TypePieceJointe } from '@/types/piece-jointe'
 import type { CreatePieceJointeDto } from '@/types/piece-jointe'
 import { PieceJointeService } from '@/services/piece-jointe.service'
-import { env } from '@/env'
 import dayjs from 'dayjs'
 
 const { Title, Text } = Typography
@@ -143,7 +142,7 @@ export const EmployePiecesJointes = ({ employeId }: EmployePiecesJointesProps) =
 
   const handleDownload = (piece: PieceJointe) => {
     if (piece.url) {
-      window.open(`${env.VITE_APP_BACKEND}/${piece.url}`, '_blank')
+      window.open(`${piece.url}`, '_blank')
     }
   }
 

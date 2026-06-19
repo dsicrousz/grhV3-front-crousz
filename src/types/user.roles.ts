@@ -9,7 +9,7 @@ export const USER_ROLE_LABELS: Record<USER_ROLE, string> = {
   [USER_ROLE.USER]: 'Utilisateur',
   [USER_ROLE.ADMIN]: 'Administrateur',
   [USER_ROLE.RH]: 'Ressources Humaines',
-  [USER_ROLE.CSA]: 'Comptabilité / Paie',
+  [USER_ROLE.CSA]: 'CSA',
 }
 
 export const USER_ROLE_COLORS: Record<USER_ROLE, string> = {

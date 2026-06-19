@@ -1,4 +1,10 @@
-import type { CreateLotDto, Lot, UpdateLotDto } from '@/types/lot'
+import type {
+  CreateLotDto,
+  Lot,
+  LotStatistiquesPeriodeParams,
+  LotStatistiquesPeriodeResponse,
+  UpdateLotDto,
+} from '@/types/lot'
 import Api from './Api'
 import { Service } from './Service'
 
@@ -57,6 +63,10 @@ class LotServiceClass extends Service {
 
   async reject(id: string): Promise<Lot> {
     return this.api.patch(`${this.ressource}/reject/${id}`).then(res => res.data)
+  }
+
+  async getStatistiquesByPeriode(params: LotStatistiquesPeriodeParams): Promise<LotStatistiquesPeriodeResponse> {
+    return this.api.get(`${this.ressource}/statistiques/periode`, { params }).then(res => res.data)
   }
 }
 

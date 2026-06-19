@@ -5,7 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import type { Nomination } from '@/types/nomination'
 import type { CreateNominationDto } from '@/types/nomination'
 import { NominationService } from '@/services/nomination.service'
-import { DivisionService } from '@/services/division.service'
+import { DivisionService, ServiceService } from '@/services/division.service'
 import { FonctionService } from '@/services/fonction.service'
 import dayjs from 'dayjs'
 
@@ -18,6 +18,7 @@ interface EmployeNominationsProps {
 export const EmployeNominations = ({ employeId }: EmployeNominationsProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingNomination, setEditingNomination] = useState<Nomination | null>(null)
+  const [selectedDivision, setSelectedDivision] = useState<string | null>(null)
   const [form] = Form.useForm()
   const queryClient = useQueryClient()
 
@@ -37,10 +38,14 @@ export const EmployeNominations = ({ employeId }: EmployeNominationsProps) => {
     queryFn: () => DivisionService.getAll()
   })
 
-  const { data: services = [], isLoading: isLoadingServices } = useQuery({
+  const { data: allServices = [] } = useQuery({
     queryKey: ['services'],
-    queryFn: () => DivisionService.getAll()
+    queryFn: () => ServiceService.getAll()
   })
+  const services = selectedDivision ? allServices.filter(s => {
+    const divId = typeof s.division === 'object' ? (s.division as any)?._id : s.division
+    return divId === selectedDivision
+  }) : allServices
 
   const createMutation = useMutation({
     mutationFn: (data: CreateNominationDto) => NominationService.create(data),
@@ -74,7 +79,7 @@ export const EmployeNominations = ({ employeId }: EmployeNominationsProps) => {
     const data = {
       ...values,
       employe: employeId,
-      date: values.date.toISOString()
+      date: values.date.format('YYYY-MM-DD')
     }
 
     if (editingNomination) {
@@ -89,11 +94,13 @@ export const EmployeNominations = ({ employeId }: EmployeNominationsProps) => {
 
   const handleEdit = (nomination: Nomination) => {
     setEditingNomination(nomination)
+    const divId = typeof nomination.division === 'object' ? nomination.division._id : nomination.division
+    setSelectedDivision(divId)
     form.setFieldsValue({
       ...nomination,
-      fonction: nomination.fonction._id,
-      division: nomination.division._id,
-      service: nomination.service?._id,
+      fonction: typeof nomination.fonction === 'object' ? nomination.fonction._id : nomination.fonction,
+      division: divId,
+      service: nomination.service ? (typeof nomination.service === 'object' ? nomination.service._id : nomination.service) : undefined,
       date: dayjs(nomination.date)
     })
     setIsModalOpen(true)
@@ -229,6 +236,7 @@ export const EmployeNominations = ({ employeId }: EmployeNominationsProps) => {
         onCancel={() => {
           setIsModalOpen(false)
           setEditingNomination(null)
+          setSelectedDivision(null)
           form.resetFields()
         }}
         footer={null}
@@ -246,7 +254,6 @@ export const EmployeNominations = ({ employeId }: EmployeNominationsProps) => {
             <Select
               placeholder="Sélectionner une fonction"
               loading={isLoadingFonctions}
-              role="select"
               showSearch
               options={fonctions.map(f => ({ label: f.nom, value: f._id }))}
             />
@@ -260,8 +267,8 @@ export const EmployeNominations = ({ employeId }: EmployeNominationsProps) => {
             <Select
               placeholder="Sélectionner une division"
               loading={isLoadingDivisions}
-              role="select"
               showSearch
+              onChange={(val) => { setSelectedDivision(val); form.setFieldValue('service', undefined) }}
               options={divisions.map(d => ({ label: d.nom, value: d._id }))}
             />
           </Form.Item>
@@ -272,10 +279,9 @@ export const EmployeNominations = ({ employeId }: EmployeNominationsProps) => {
           >
             <Select
               placeholder="Sélectionner un service (optionnel)"
-              loading={isLoadingServices}
-              role="select"
               showSearch
               allowClear
+              disabled={!selectedDivision}
               options={services.map(s => ({ label: s.nom, value: s._id }))}
             />
           </Form.Item>

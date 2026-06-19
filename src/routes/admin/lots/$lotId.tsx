@@ -4,7 +4,6 @@ import { Typography, Card, Button, Space, Descriptions, Tag, Steps, Spin, Divide
 import { ChevronLeft, Calendar, FileText, File } from 'lucide-react'
 import { Empty } from 'antd'
 import { LotService } from '@/services/lot.service'
-import { StateLot } from '@/types/lot'
 import dayjs from 'dayjs'
 import { env } from '@/env'
 
@@ -23,32 +22,30 @@ function LotDetailsPage() {
     queryFn: () => LotService.getOne(lotId),
   })
 
-  console.log(lot)
-
-  const getStateStep = (etat: StateLot) => {
+  const getStateStep = (etat: string) => {
     switch(etat) {
-      case StateLot.BROUILLON:
+      case 'BROUILLON':
         return 0
-      case StateLot.WAITING1:
+      case 'SOUMIS':
         return 1
-      case StateLot.WAITING2:
+      case 'EN COURS DE VALIDATION':
         return 2
-      case StateLot.VALIDE:
+      case 'VALIDE':
         return 3
       default:
         return 0
     }
   }
 
-  const getStateColor = (etat: StateLot) => {
+  const getStateColor = (etat: string) => {
     switch(etat) {
-      case StateLot.BROUILLON:
+      case 'BROUILLON':
         return 'default'
-      case StateLot.WAITING1:
+      case 'SOUMIS':
         return 'processing'
-      case StateLot.WAITING2:
+      case 'EN COURS DE VALIDATION':
         return 'warning'
-      case StateLot.VALIDE:
+      case 'VALIDE':
         return 'success'
       default:
         return 'default'
@@ -160,7 +157,7 @@ function LotDetailsPage() {
                 </Title>
                 <div className="border rounded-lg overflow-hidden" style={{ height: '600px' }}>
                   <iframe
-                    src={env.VITE_APP_BACKEND + '/' + lot.url}
+                    src={env.VITE_R2_URL + '/' + lot.url}
                     width="100%"
                     height="100%"
                     title="PDF du lot"

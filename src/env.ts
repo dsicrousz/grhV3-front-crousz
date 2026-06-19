@@ -16,6 +16,7 @@ export const env = createEnv({
     VITE_APP_TITLE: z.string().min(1).optional(),
     VITE_APP_BACKEND: z.url(),
     VITE_APP_TOKENSTORAGENAME: z.string(),
+    VITE_R2_URL:z.string()
   },
 
   /**

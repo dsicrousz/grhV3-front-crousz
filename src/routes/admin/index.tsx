@@ -1,5 +1,5 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { useQueries } from '@tanstack/react-query'
+import { createFileRoute, Link } from '@tanstack/react-router'
+import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { NumberTicker } from '@/components/ui/number-ticker'
@@ -7,23 +7,34 @@ import { EmployeService } from '@/services/employe.service'
 import { LotService } from '@/services/lot.service'
 import { DivisionService, ServiceService } from '@/services/division.service'
 import { NominationService } from '@/services/nomination.service'
-import { FonctionService } from '@/services/fonction.service'
-import type { Employe, Genre, TypeEmploye } from '@/types/employe'
+import type { Employe, Genre } from '@/types/employe'
+import type { Poste } from '@/types/poste'
 import { StateLot, type Lot } from '@/types/lot'
 import type { Nomination } from '@/types/nomination'
-import { 
-  Users, 
-  Building2, 
-  Briefcase, 
-  FileText, 
-  TrendingUp, 
-  UserCheck, 
+import dayjs from 'dayjs'
+import 'dayjs/locale/fr'
+import {
+  Users,
+  Building2,
+  Briefcase,
+  FileText,
+  TrendingUp,
+  UserCheck,
   Clock,
   CheckCircle2,
   AlertCircle,
-  Calendar
+  Calendar,
+  Cake,
+  FileWarning,
+  Plus,
+  BarChart3,
+  Settings,
+  ChevronRight,
+  ArrowUpRight,
 } from 'lucide-react'
 import { DashboardRappels } from '@/components/dashboard/rappels'
+
+dayjs.locale('fr')
 
 export const Route = createFileRoute('/admin/')({
   component: RouteComponent,
@@ -33,6 +44,7 @@ interface DashboardStats {
   totalEmployes: number
   employesCDI: number
   employesCDD: number
+  employesTemporaire: number
   hommes: number
   femmes: number
   totalDivisions: number
@@ -47,50 +59,67 @@ interface DashboardStats {
   employesParDivision: { nom: string; count: number }[]
   employesParService: { nom: string; count: number }[]
   employesParFonction: { nom: string; count: number }[]
+  anniversaires: Employe[]
+  cddExpirant: Employe[]
+  nouveauxCetteSemaine: number
+}
+
+const QUICK_ACTIONS = [
+  { label: 'Nouvel employé', icon: Plus, to: '/admin/employes', color: 'bg-blue-500 hover:bg-blue-600' },
+  { label: 'Nouveau lot', icon: FileText, to: '/admin/lots', color: 'bg-emerald-500 hover:bg-emerald-600' },
+  { label: 'Nominations', icon: UserCheck, to: '/admin/nominations', color: 'bg-purple-500 hover:bg-purple-600' },
+  { label: 'Reporting', icon: BarChart3, to: '/admin/reporting', color: 'bg-amber-500 hover:bg-amber-600' },
+  { label: 'Paramétrage', icon: Settings, to: '/admin/parametrage', color: 'bg-slate-500 hover:bg-slate-600' },
+] as const
+
+function getSalutation() {
+  const h = new Date().getHours()
+  if (h < 6) return 'Bonne nuit'
+  if (h < 12) return 'Bonjour'
+  if (h < 18) return 'Bon après-midi'
+  return 'Bonsoir'
 }
 
 function RouteComponent() {
-  const results = useQueries({
-    queries: [
-      {
-        queryKey: ['employes'],
-        queryFn: () => EmployeService.getAll(),
-      },
-      {
-        queryKey: ['lots'],
-        queryFn: () => LotService.getAll(),
-      },
-      {
-        queryKey: ['divisions'],
-        queryFn: () => DivisionService.getAll(),
-      },
-      {
-        queryKey: ['services'],
-        queryFn: () => ServiceService.getAll(),
-      },
-      {
-        queryKey: ['nominations'],
-        queryFn: () => NominationService.getAll(),
-      },
-      {
-        queryKey: ['fonctions'],
-        queryFn: () => FonctionService.getAll(),
-      },
-    ],
+  const getPosteName = (poste: Poste | string | undefined): string => {
+    if (!poste) return ''
+    if (typeof poste === 'string') return poste
+    return poste.nom
+  }
+
+  const { data: employesData, isLoading: isLoadingEmployes, isError: isErrorEmployes } = useQuery({
+    queryKey: ['employes', 'agregated'],
+    queryFn: () => EmployeService.getAllAgregated(),
+  })
+  const { data: lotsData, isLoading: isLoadingLots, isError: isErrorLots } = useQuery({
+    queryKey: ['lots'],
+    queryFn: () => LotService.getAll(),
+  })
+  const { data: divisionsData, isLoading: isLoadingDivisions, isError: isErrorDivisions } = useQuery({
+    queryKey: ['divisions'],
+    queryFn: () => DivisionService.getAll(),
+  })
+  const { data: servicesData, isLoading: isLoadingServices, isError: isErrorServices } = useQuery({
+    queryKey: ['services'],
+    queryFn: () => ServiceService.getAll(),
+  })
+  const { data: nominationsData, isLoading: isLoadingNominations, isError: isErrorNominations } = useQuery({
+    queryKey: ['nominations'],
+    queryFn: () => NominationService.getAll(),
   })
 
-  const [employesQuery, lotsQuery, divisionsQuery, servicesQuery, nominationsQuery, fonctionsQuery] = results
-  const isLoading = results.some((r) => r.isLoading)
-  const isError = results.some((r) => r.isError)
+  const isLoading = isLoadingEmployes || isLoadingLots || isLoadingDivisions || isLoadingServices || isLoadingNominations
+  const isError = isErrorEmployes || isErrorLots || isErrorDivisions || isErrorServices || isErrorNominations
 
   const stats = useMemo<DashboardStats>(() => {
-    const employes = employesQuery.data ?? []
-    const lots = lotsQuery.data ?? []
-    const divisions = divisionsQuery.data ?? []
-    const services = servicesQuery.data ?? []
+    const employes = employesData ?? []
+    const lots = lotsData ?? []
+    const divisions = divisionsData ?? []
+    const services = servicesData ?? []
 
-    const employesCDI = employes.filter((e: Employe) => e.type === 'CDI' as TypeEmploye).length
-    const employesCDD = employes.filter((e: Employe) => e.type === 'CDD' as TypeEmploye).length
+    const employesCDI = employes.filter((e: Employe) => e.contrat_actif?.type === 'CDI').length
+    const employesCDD = employes.filter((e: Employe) => e.contrat_actif?.type === 'CDD').length
+    const employesTemporaire = employes.filter((e: Employe) => e.contrat_actif?.type === 'TEMPORAIRE').length
     const hommes = employes.filter((e: Employe) => e.genre === 'Homme' as Genre).length
     const femmes = employes.filter((e: Employe) => e.genre === 'Femme' as Genre).length
 
@@ -100,22 +129,18 @@ function RouteComponent() {
     const lotsEnCours = lots.filter((l: Lot) => l.etat === StateLot.WAITING2).length
 
     const recentEmployes = [...employes]
-      .sort((a, b) => new Date(b.date_de_recrutement || '').getTime() - new Date(a.date_de_recrutement || '').getTime())
+      .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime())
       .slice(0, 5)
 
     const recentLots = [...lots]
       .sort((a, b) => new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime())
       .slice(0, 5)
 
-    // Statistiques des nominations actives
-    const nominations = nominationsQuery.data ?? []
-    const nominationsActives = nominations.filter((n: Nomination) => n.est_active)
-
     // Employés par division
     const divisionCounts = new Map<string, number>()
-    nominationsActives.forEach((n: Nomination) => {
-      if (n.division) {
-        const divName = typeof n.division === 'string' ? n.division : n.division.nom
+    employes.forEach((e: Employe) => {
+      if (e.affectation_site?.division) {
+        const divName = typeof e.affectation_site.division === 'string' ? e.affectation_site.division : e.affectation_site.division.nom
         divisionCounts.set(divName, (divisionCounts.get(divName) || 0) + 1)
       }
     })
@@ -126,9 +151,9 @@ function RouteComponent() {
 
     // Employés par service
     const serviceCounts = new Map<string, number>()
-    nominationsActives.forEach((n: Nomination) => {
-      if (n.service) {
-        const svcName = typeof n.service === 'string' ? n.service : n.service.nom
+    employes.forEach((e: Employe) => {
+      if (e.affectation_site?.service) {
+        const svcName = typeof e.affectation_site.service === 'string' ? e.affectation_site.service : e.affectation_site.service.nom
         serviceCounts.set(svcName, (serviceCounts.get(svcName) || 0) + 1)
       }
     })
@@ -138,6 +163,8 @@ function RouteComponent() {
       .slice(0, 10)
 
     // Employés par fonction
+    const nominations = nominationsData ?? []
+    const nominationsActives = nominations.filter((n: Nomination) => n.est_active)
     const fonctionCounts = new Map<string, number>()
     nominationsActives.forEach((n: Nomination) => {
       if (n.fonction) {
@@ -150,10 +177,39 @@ function RouteComponent() {
       .sort((a, b) => b.count - a.count)
       .slice(0, 10)
 
+    // Anniversaires du mois courant
+    const today = dayjs()
+    const currentMonth = today.month()
+    const anniversaires = employes
+      .filter((e: Employe) => {
+        if (!e.is_actif || !e.date_de_naissance) return false
+        return dayjs(e.date_de_naissance).month() === currentMonth
+      })
+      .sort((a, b) => dayjs(a.date_de_naissance).date() - dayjs(b.date_de_naissance).date())
+      .slice(0, 8)
+
+    // Contrats CDD expirant dans les 30 prochains jours
+    const in30Days = today.add(30, 'day')
+    const cddExpirant = employes
+      .filter((e: Employe) => {
+        if (!e.is_actif || e.contrat_actif?.type !== 'CDD' || !e.contrat_actif?.date_fin) return false
+        const dateFin = dayjs(e.contrat_actif.date_fin)
+        return dateFin.isAfter(today) && dateFin.isBefore(in30Days)
+      })
+      .sort((a, b) => dayjs(a.contrat_actif!.date_fin!).valueOf() - dayjs(b.contrat_actif!.date_fin!).valueOf())
+      .slice(0, 8)
+
+    // Nouveaux employés cette semaine
+    const startOfWeek = today.startOf('week')
+    const nouveauxCetteSemaine = employes.filter((e: Employe) =>
+      e.createdAt && dayjs(e.createdAt).isAfter(startOfWeek),
+    ).length
+
     return {
       totalEmployes: employes.length,
       employesCDI,
       employesCDD,
+      employesTemporaire,
       hommes,
       femmes,
       totalDivisions: divisions.length,
@@ -168,8 +224,11 @@ function RouteComponent() {
       employesParDivision,
       employesParService,
       employesParFonction,
+      anniversaires,
+      cddExpirant,
+      nouveauxCetteSemaine,
     }
-  }, [employesQuery.data, lotsQuery.data, divisionsQuery.data, servicesQuery.data, nominationsQuery.data, fonctionsQuery.data])
+  }, [employesData, lotsData, divisionsData, servicesData, nominationsData])
 
   if (isError) {
     return (
@@ -187,83 +246,122 @@ function RouteComponent() {
     )
   }
 
+  const tauxHommes = stats.totalEmployes > 0 ? Math.round((stats.hommes / stats.totalEmployes) * 100) : 0
+  const tauxFemmes = stats.totalEmployes > 0 ? 100 - tauxHommes : 0
+
   return (
     <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
+      {/* Header avec salutation */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Tableau de bord</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{getSalutation()} 👋</h1>
           <p className="text-muted-foreground">Vue d'ensemble de la gestion des ressources humaines</p>
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Calendar className="h-4 w-4" />
-          {new Date().toLocaleDateString('fr-FR', { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-          })}
+          {dayjs().format('dddd D MMMM YYYY')}
         </div>
       </div>
 
-      {/* Statistiques principales */}
+      {/* Quick Actions */}
+      <div className="flex flex-wrap gap-2">
+        {QUICK_ACTIONS.map((action) => {
+          const Icon = action.icon
+          return (
+            <Link
+              key={action.to}
+              to={action.to}
+              className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg text-white text-sm font-medium transition-colors ${action.color}`}
+            >
+              <Icon className="h-4 w-4" />
+              {action.label}
+            </Link>
+          )
+        })}
+      </div>
+
+      {/* Statistiques principales — cards cliquables */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Employés</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              <NumberTicker value={stats.totalEmployes} />
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {stats.employesCDI} CDI · {stats.employesCDD} CDD
-            </p>
-          </CardContent>
-        </Card>
+        <Link to="/admin/employes" className="group">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer h-full border-l-4 border-l-blue-500">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Employés</CardTitle>
+              <div className="p-2 rounded-lg bg-blue-50 text-blue-600">
+                <Users className="h-4 w-4" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                <NumberTicker value={stats.totalEmployes} />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {stats.employesCDI} CDI · {stats.employesCDD} CDD · {stats.employesTemporaire} Temp
+              </p>
+              {stats.nouveauxCetteSemaine > 0 && (
+                <p className="text-xs text-emerald-600 font-medium mt-1 flex items-center gap-1">
+                  <ArrowUpRight className="h-3 w-3" />
+                  +{stats.nouveauxCetteSemaine} cette semaine
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        </Link>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Divisions</CardTitle>
-            <Building2 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              <NumberTicker value={stats.totalDivisions} />
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {stats.totalServices} services
-            </p>
-          </CardContent>
-        </Card>
+        <Link to="/admin/parametrage/divisions" className="group">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer h-full border-l-4 border-l-purple-500">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Divisions</CardTitle>
+              <div className="p-2 rounded-lg bg-purple-50 text-purple-600">
+                <Building2 className="h-4 w-4" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                <NumberTicker value={stats.totalDivisions} />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {stats.totalServices} services
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Lots de paie</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              <NumberTicker value={stats.totalLots} />
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {stats.lotsValides} validés
-            </p>
-          </CardContent>
-        </Card>
+        <Link to="/admin/lots" className="group">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer h-full border-l-4 border-l-emerald-500">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Lots de paie</CardTitle>
+              <div className="p-2 rounded-lg bg-emerald-50 text-emerald-600">
+                <FileText className="h-4 w-4" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                <NumberTicker value={stats.totalLots} />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {stats.lotsValides} validés · {stats.lotsBrouillon} brouillons
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
 
-        <Card>
+        <Card className="border-l-4 border-l-pink-500">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Répartition H/F</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <div className="p-2 rounded-lg bg-pink-50 text-pink-600">
+              <TrendingUp className="h-4 w-4" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {stats.totalEmployes > 0 
-                ? Math.round((stats.hommes / stats.totalEmployes) * 100) 
-                : 0}% / {stats.totalEmployes > 0 
-                ? Math.round((stats.femmes / stats.totalEmployes) * 100) 
-                : 0}%
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-sm font-bold text-blue-600">{tauxHommes}%</span>
+              <div className="flex-1 h-2 bg-pink-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-blue-500"
+                  style={{ width: `${tauxHommes}%` }}
+                />
+              </div>
+              <span className="text-sm font-bold text-pink-600">{tauxFemmes}%</span>
             </div>
             <p className="text-xs text-muted-foreground">
               {stats.hommes} hommes · {stats.femmes} femmes
@@ -323,15 +421,120 @@ function RouteComponent() {
         </Card>
       </div>
 
-      {/* Listes récentes */}
+      {/* Événements & Alertes */}
       <div className="grid gap-4 md:grid-cols-2">
+        {/* Anniversaires du mois */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <UserCheck className="h-5 w-5" />
-              Employés récents
+              <Cake className="h-5 w-5 text-pink-500" />
+              Anniversaires du mois
             </CardTitle>
-            <CardDescription>Les 5 derniers employés ajoutés</CardDescription>
+            <CardDescription>
+              {dayjs().format('MMMM YYYY')} · {stats.anniversaires.length} anniversaire{stats.anniversaires.length > 1 ? 's' : ''}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {stats.anniversaires.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4">Aucun anniversaire ce mois-ci</p>
+            ) : (
+              <div className="space-y-3">
+                {stats.anniversaires.map((employe) => {
+                  const dateNaiss = dayjs(employe.date_de_naissance)
+                  const today = dayjs()
+                  const isToday = dateNaiss.month() === today.month() && dateNaiss.date() === today.date()
+                  const age = today.year() - dateNaiss.year()
+                  return (
+                    <div key={employe._id} className={`flex items-center justify-between border-b pb-2 last:border-0 ${isToday ? 'bg-pink-50 -mx-2 px-2 rounded' : ''}`}>
+                      <div className="flex items-center gap-3">
+                        <div className={`h-8 w-8 rounded-full flex items-center justify-center text-sm font-medium ${isToday ? 'bg-pink-500 text-white' : 'bg-pink-100 text-pink-700'}`}>
+                          {employe.prenom[0]}{employe.nom[0]}
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">{employe.prenom} {employe.nom}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {dateNaiss.format('DD MMMM')} · {age} ans
+                          </p>
+                        </div>
+                      </div>
+                      {isToday && (
+                        <span className="text-xs px-2 py-1 rounded-full bg-pink-500 text-white font-medium">
+                          Aujourd'hui 🎉
+                        </span>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* CDD expirant */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileWarning className="h-5 w-5 text-orange-500" />
+              CDD arrivant à échéance
+            </CardTitle>
+            <CardDescription>
+              Dans les 30 prochains jours · {stats.cddExpirant.length} contrat{stats.cddExpirant.length > 1 ? 's' : ''}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {stats.cddExpirant.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4">Aucun CDD à renouveler prochainement</p>
+            ) : (
+              <div className="space-y-3">
+                {stats.cddExpirant.map((employe) => {
+                  const dateFin = dayjs(employe.contrat_actif!.date_fin!)
+                  const joursRestants = dateFin.diff(dayjs(), 'day')
+                  const isUrgent = joursRestants <= 7
+                  return (
+                    <Link
+                      key={employe._id}
+                      to="/admin/employes/$employeeId"
+                      params={{ employeeId: employe._id }}
+                      className="flex items-center justify-between border-b pb-2 last:border-0 hover:bg-orange-50 -mx-2 px-2 rounded transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`h-8 w-8 rounded-full flex items-center justify-center text-sm font-medium ${isUrgent ? 'bg-red-100 text-red-700' : 'bg-orange-100 text-orange-700'}`}>
+                          {employe.prenom[0]}{employe.nom[0]}
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">{employe.prenom} {employe.nom}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {getPosteName(employe.contrat_actif?.poste) || '—'}
+                          </p>
+                        </div>
+                      </div>
+                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${isUrgent ? 'bg-red-100 text-red-700' : 'bg-orange-100 text-orange-700'}`}>
+                        {joursRestants === 0 ? "Aujourd'hui" : `${joursRestants}j`}
+                      </span>
+                    </Link>
+                  )
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Listes récentes */}
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <UserCheck className="h-5 w-5" />
+                Employés récents
+              </CardTitle>
+              <CardDescription>Les 5 derniers employés ajoutés</CardDescription>
+            </div>
+            <Link to="/admin/employes" className="text-xs text-primary hover:underline flex items-center gap-1">
+              Voir tout
+              <ChevronRight className="h-3 w-3" />
+            </Link>
           </CardHeader>
           <CardContent>
             {stats.recentEmployes.length === 0 ? (
@@ -339,24 +542,33 @@ function RouteComponent() {
             ) : (
               <div className="space-y-3">
                 {stats.recentEmployes.map((employe) => (
-                  <div key={employe._id} className="flex items-center justify-between border-b pb-2 last:border-0">
+                  <Link
+                    key={employe._id}
+                    to="/admin/employes/$employeeId"
+                    params={{ employeeId: employe._id }}
+                    className="flex items-center justify-between border-b pb-2 last:border-0 hover:bg-muted/50 -mx-2 px-2 rounded transition-colors"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium text-sm">
                         {employe.prenom[0]}{employe.nom[0]}
                       </div>
                       <div>
                         <p className="text-sm font-medium">{employe.prenom} {employe.nom}</p>
-                        <p className="text-xs text-muted-foreground">{employe.poste}</p>
+                        <p className="text-xs text-muted-foreground">{getPosteName(employe.contrat_actif?.poste) || '—'}</p>
                       </div>
                     </div>
                     <span className={`text-xs px-2 py-1 rounded-full ${
-                      employe.type === 'CDI' 
-                        ? 'bg-green-100 text-green-700' 
-                        : 'bg-orange-100 text-orange-700'
+                      employe.contrat_actif?.type === 'CDI'
+                        ? 'bg-green-100 text-green-700'
+                        : employe.contrat_actif?.type === 'CDD'
+                        ? 'bg-orange-100 text-orange-700'
+                        : employe.contrat_actif?.type === 'TEMPORAIRE'
+                        ? 'bg-blue-100 text-blue-700'
+                        : 'bg-gray-100 text-gray-700'
                     }`}>
-                      {employe.type}
+                      {employe.contrat_actif?.type || '—'}
                     </span>
-                  </div>
+                  </Link>
                 ))}
               </div>
             )}
@@ -364,12 +576,18 @@ function RouteComponent() {
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              Lots récents
-            </CardTitle>
-            <CardDescription>Les 5 derniers lots de paie</CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                Lots récents
+              </CardTitle>
+              <CardDescription>Les 5 derniers lots de paie</CardDescription>
+            </div>
+            <Link to="/admin/lots" className="text-xs text-primary hover:underline flex items-center gap-1">
+              Voir tout
+              <ChevronRight className="h-3 w-3" />
+            </Link>
           </CardHeader>
           <CardContent>
             {stats.recentLots.length === 0 ? (
@@ -381,15 +599,15 @@ function RouteComponent() {
                     <div>
                       <p className="text-sm font-medium">{lot.libelle}</p>
                       <p className="text-xs text-muted-foreground">
-                        {new Date(lot.debut).toLocaleDateString('fr-FR')} - {new Date(lot.fin).toLocaleDateString('fr-FR')}
+                        {dayjs(lot.debut).format('DD/MM/YYYY')} - {dayjs(lot.fin).format('DD/MM/YYYY')}
                       </p>
                     </div>
                     <span className={`text-xs px-2 py-1 rounded-full ${
-                      lot.etat === 'VALIDÉ' 
-                        ? 'bg-green-100 text-green-700' 
-                        : lot.etat === 'SOUMIS'
+                      lot.etat === StateLot.VALIDE
+                        ? 'bg-green-100 text-green-700'
+                        : lot.etat === StateLot.WAITING1
                         ? 'bg-yellow-100 text-yellow-700'
-                        : lot.etat === 'EN COURS DE VALIDATION'
+                        : lot.etat === StateLot.WAITING2
                         ? 'bg-blue-100 text-blue-700'
                         : 'bg-gray-100 text-gray-700'
                     }`}>
@@ -403,7 +621,7 @@ function RouteComponent() {
         </Card>
       </div>
 
-      {/* Statistiques des nominations */}
+      {/* Statistiques de répartition */}
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader>
@@ -426,8 +644,8 @@ function RouteComponent() {
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-16 h-2 bg-gray-100 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-blue-500 rounded-full" 
+                        <div
+                          className="h-full bg-blue-500 rounded-full"
                           style={{ width: `${Math.min((item.count / (stats.employesParDivision[0]?.count || 1)) * 100, 100)}%` }}
                         />
                       </div>
@@ -446,7 +664,7 @@ function RouteComponent() {
               <Users className="h-5 w-5" />
               Employés par service
             </CardTitle>
-            <CardDescription>Top  10 des services</CardDescription>
+            <CardDescription>Top 10 des services</CardDescription>
           </CardHeader>
           <CardContent>
             {stats.employesParService.length === 0 ? (
@@ -461,8 +679,8 @@ function RouteComponent() {
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-16 h-2 bg-gray-100 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-green-500 rounded-full" 
+                        <div
+                          className="h-full bg-green-500 rounded-full"
                           style={{ width: `${Math.min((item.count / (stats.employesParService[0]?.count || 1)) * 100, 100)}%` }}
                         />
                       </div>
@@ -496,8 +714,8 @@ function RouteComponent() {
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-16 h-2 bg-gray-100 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-purple-500 rounded-full" 
+                        <div
+                          className="h-full bg-purple-500 rounded-full"
                           style={{ width: `${Math.min((item.count / (stats.employesParFonction[0]?.count || 1)) * 100, 100)}%` }}
                         />
                       </div>

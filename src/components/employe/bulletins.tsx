@@ -2,11 +2,13 @@ import { Typography, Spin, Tag, Table, Button, Empty } from 'antd'
 import { Eye, FileText } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { BulletinService } from '@/services/bulletin.service'
+import { EmployeService } from '@/services/employe.service'
 import type { Bulletin } from '@/types/bulletin'
 import type { Lot } from '@/types/lot'
 import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
 import { useNavigate } from '@tanstack/react-router'
+import { TypeContrat } from '@/types/contrat'
 import { env } from '@/env'
 
 const { Title, Text } = Typography
@@ -18,10 +20,24 @@ interface EmployeBulletinsProps {
 export const EmployeBulletins = ({ employeId }: EmployeBulletinsProps) => {
   const navigate = useNavigate()
 
-  const { data: bulletins = [], isLoading } = useQuery({
-    queryKey: ['bulletins', 'employe', employeId],
-    queryFn: () => BulletinService.getByEmploye(employeId),
+  const { data: employe } = useQuery({
+    queryKey: ['employe', employeId],
+    queryFn: () => EmployeService.getOne(employeId),
     enabled: !!employeId
+  })
+
+  const contratActif = employe?.contrat_actif
+  const isCdd = contratActif?.type === TypeContrat.CDD
+  const isTemporaire = contratActif?.type === TypeContrat.TEMPORAIRE
+
+  const { data: bulletins = [], isLoading } = useQuery({
+    queryKey: ['bulletins', 'employe', employeId, isCdd, isTemporaire],
+    queryFn: () => isTemporaire
+      ? BulletinService.getByEmployeTemporaire(employeId)
+      : isCdd 
+        ? BulletinService.getByEmployeCdd(employeId)
+        : BulletinService.getByEmploye(employeId),
+    enabled: !!employeId && contratActif !== undefined
   })
 
   const formatMontant = (montant: number) => {
@@ -96,7 +112,7 @@ export const EmployeBulletins = ({ employeId }: EmployeBulletinsProps) => {
               type="text"
               size="small"
               icon={<FileText className="w-4 h-4" />}
-              onClick={() => window.open(env.VITE_APP_BACKEND + '/' + record.url, '_blank')}
+              onClick={() => window.open(env.VITE_R2_URL + '/' + record.url, '_blank')}
               title="Voir le PDF"
             />
           )}
@@ -107,7 +123,13 @@ export const EmployeBulletins = ({ employeId }: EmployeBulletinsProps) => {
             onClick={() => {
               const lot = record.lot as Lot
               if (lot?._id) {
-                navigate({ to: '/admin/lots/$lotId', params: { lotId: lot._id } })
+                if (isTemporaire) {
+                  navigate({ to: '/admin/lots-temporaires/$lotId', params: { lotId: lot._id } })
+                } else if (isCdd) {
+                  navigate({ to: '/admin/lots-cdd/$lotId', params: { lotId: lot._id } })
+                } else {
+                  navigate({ to: '/admin/lots/$lotId', params: { lotId: lot._id } })
+                }
               }
             }}
             title="Voir le lot"

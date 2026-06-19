@@ -15,6 +15,10 @@ class EmployeServiceClass extends Service {
     return super.getAll()
   }
 
+  async getAllAgregated(): Promise<Employe[]> {
+    return this.api.get(`/${this.ressource}/agregated`).then(res => res.data)
+  }
+
   async getOne(id: string): Promise<Employe> {
     return super.getOne(id)
   }
@@ -29,6 +33,14 @@ class EmployeServiceClass extends Service {
 
   async toggle(id: string, data: UpdateEmployeDto): Promise<Employe> {
     return this.api.patch(`${this.ressource}/toggle/${id}`, data)
+  }
+
+  async uploadProfile(id: string, file: File): Promise<Employe> {
+    const formData = new FormData()
+    formData.append('profile', file)
+    return this.api.patch(`/${this.ressource}/profile/${id}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }).then(res => res.data)
   }
 }
 
