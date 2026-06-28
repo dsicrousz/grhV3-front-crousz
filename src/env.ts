@@ -5,6 +5,7 @@ export const env = {
   VITE_APP_BACKEND: import.meta.env.VITE_APP_BACKEND || 'http://localhost:3001',
   VITE_APP_TOKENSTORAGENAME: import.meta.env.VITE_APP_TOKENSTORAGENAME || 'grh_token',
   VITE_R2_URL: import.meta.env.VITE_R2_URL || '',
+  VITE_BETTER_AUTH_IDENTIFY_URL: import.meta.env.VITE_BETTER_AUTH_IDENTIFY_URL || '',
   
   // Variables serveur (si nécessaire)
   SERVER_URL: import.meta.env.SERVER_URL,

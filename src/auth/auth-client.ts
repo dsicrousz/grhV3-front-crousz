@@ -6,7 +6,10 @@ import { sentinelClient } from "@better-auth/infra/client";
 
 export const authClient = createAuthClient({
   baseURL: env.VITE_APP_BACKEND,
-  plugins: [adminClient(),apiKeyClient(), sentinelClient()],
+  plugins: [adminClient(),apiKeyClient(),
+     sentinelClient({
+    identifyUrl: env.VITE_BETTER_AUTH_IDENTIFY_URL,
+  })],
 })
 
 // Infer types from the auth client and extend with custom fields
