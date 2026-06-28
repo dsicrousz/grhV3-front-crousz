@@ -3,9 +3,10 @@ import { Typography, Button, Space, Card, Spin, Modal, Form, Select, Input, Date
 import { Plus, FileText, Square, Trash2, Pencil, OctagonX, Printer } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import type { Contrat } from '@/types/contrat'
-import { TypeContrat, MotifTerminaison } from '@/types/contrat'
+import { TypeContrat } from '@/types/contrat'
 import type { CreateContratDto, UpdateContratDto, TerminerContratDto } from '@/types/contrat'
 import { ContratService } from '@/services/contrat.service'
+import { MotifRuptureService } from '@/services/motif-rupture.service'
 import { CategorieService } from '@/services/categorie.service'
 import { PosteService } from '@/services/poste.service'
 import { EmployeService } from '@/services/employe.service'
@@ -23,18 +24,6 @@ const typeLabels: Record<TypeContrat, { label: string; color: string }> = {
   [TypeContrat.CDI]: { label: 'CDI', color: 'green' },
   [TypeContrat.CDD]: { label: 'CDD', color: 'orange' },
   [TypeContrat.TEMPORAIRE]: { label: 'Temporaire', color: 'blue' },
-}
-
-const motifLabels: Record<MotifTerminaison, string> = {
-  [MotifTerminaison.DEMISSION]: 'Démission',
-  [MotifTerminaison.LICENCIEMENT_ABUSIF]: 'Licenciement abusif',
-  [MotifTerminaison.LICENCIEMENT_ECONOMIQUE]: 'Licenciement économique',
-  [MotifTerminaison.LICENCIEMENT_DISCIPLINAIRE]: 'Licenciement disciplinaire',
-  [MotifTerminaison.RETRAITE]: 'Retraite',
-  [MotifTerminaison.DECES]: 'Décès',
-  [MotifTerminaison.FIN_CDD]: 'Fin de CDD',
-  [MotifTerminaison.RUPTURE_CONVENTIONNELLE]: 'Rupture conventionnelle',
-  [MotifTerminaison.AUTRE]: 'Autre',
 }
 
 export const EmployeContrats = ({ employeId }: EmployeContratsProps) => {
@@ -80,6 +69,11 @@ export const EmployeContrats = ({ employeId }: EmployeContratsProps) => {
   const { data: postes = [] } = useQuery({
     queryKey: ['postes'],
     queryFn: () => PosteService.getAll(),
+  })
+
+  const { data: motifsRupture = [] } = useQuery({
+    queryKey: ['motifs-rupture'],
+    queryFn: () => MotifRuptureService.getAll(),
   })
 
   const createMutation = useMutation({
@@ -348,7 +342,14 @@ export const EmployeContrats = ({ employeId }: EmployeContratsProps) => {
                         <span>Du {dayjs(contrat.date_debut).format('DD/MM/YYYY')}</span>
                         {contrat.date_fin && <span>au {dayjs(contrat.date_fin).format('DD/MM/YYYY')}</span>}
                         {contrat.salaire_fixe != null && <span>{contrat.salaire_fixe.toLocaleString('fr-FR')} FCFA</span>}
-                        {contrat.motif_terminaison && <span className="text-red-600">Motif: {motifLabels[contrat.motif_terminaison]}</span>}
+                        {contrat.motif_terminaison && (
+                          <span className="text-red-600">
+                            Motif: {typeof contrat.motif_terminaison === 'string'
+                              ? (motifsRupture.find(m => m._id === contrat.motif_terminaison)?.libelle ?? contrat.motif_terminaison)
+                              : contrat.motif_terminaison.libelle
+                            }
+                          </span>
+                        )}
                       </div>
                     </div>
                     <Space>
@@ -520,9 +521,11 @@ export const EmployeContrats = ({ employeId }: EmployeContratsProps) => {
           >
             <Select
               placeholder="Sélectionner un motif"
-              options={Object.values(MotifTerminaison).map(m => ({
-                value: m,
-                label: motifLabels[m],
+              showSearch
+              optionFilterProp="label"
+              options={motifsRupture.map(m => ({
+                value: m._id,
+                label: m.libelle,
               }))}
             />
           </Form.Item>

@@ -28,12 +28,15 @@ import { Route as AdminEmployesIndexRouteImport } from './routes/admin/employes/
 import { Route as AdminParametrageUtilisateursRouteImport } from './routes/admin/parametrage/utilisateurs'
 import { Route as AdminParametrageRubriquesRouteImport } from './routes/admin/parametrage/rubriques'
 import { Route as AdminParametragePostesRouteImport } from './routes/admin/parametrage/postes'
+import { Route as AdminParametrageParametresBulletinsRouteImport } from './routes/admin/parametrage/parametres-bulletins'
+import { Route as AdminParametrageMotifsRuptureRouteImport } from './routes/admin/parametrage/motifs-rupture'
 import { Route as AdminParametrageFonctionsRouteImport } from './routes/admin/parametrage/fonctions'
 import { Route as AdminParametrageExclusionsRouteImport } from './routes/admin/parametrage/exclusions'
 import { Route as AdminParametrageDivisionsRouteImport } from './routes/admin/parametrage/divisions'
 import { Route as AdminParametrageCategoriesRouteImport } from './routes/admin/parametrage/categories'
 import { Route as AdminParametrageAttributionsIndividuellesRouteImport } from './routes/admin/parametrage/attributions-individuelles'
 import { Route as AdminParametrageAttributionsRouteImport } from './routes/admin/parametrage/attributions'
+import { Route as AdminParametrageApiKeysRouteImport } from './routes/admin/parametrage/api-keys'
 import { Route as AdminLotsLotIdRouteImport } from './routes/admin/lots/$lotId'
 import { Route as AdminLotsTemporairesLotIdRouteImport } from './routes/admin/lots-temporaires/$lotId'
 import { Route as AdminLotsCddLotIdRouteImport } from './routes/admin/lots-cdd/$lotId'
@@ -137,6 +140,18 @@ const AdminParametragePostesRoute = AdminParametragePostesRouteImport.update({
   path: '/parametrage/postes',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminParametrageParametresBulletinsRoute =
+  AdminParametrageParametresBulletinsRouteImport.update({
+    id: '/parametrage/parametres-bulletins',
+    path: '/parametrage/parametres-bulletins',
+    getParentRoute: () => AdminRoute,
+  } as any)
+const AdminParametrageMotifsRuptureRoute =
+  AdminParametrageMotifsRuptureRouteImport.update({
+    id: '/parametrage/motifs-rupture',
+    path: '/parametrage/motifs-rupture',
+    getParentRoute: () => AdminRoute,
+  } as any)
 const AdminParametrageFonctionsRoute =
   AdminParametrageFonctionsRouteImport.update({
     id: '/parametrage/fonctions',
@@ -173,6 +188,11 @@ const AdminParametrageAttributionsRoute =
     path: '/parametrage/attributions',
     getParentRoute: () => AdminRoute,
   } as any)
+const AdminParametrageApiKeysRoute = AdminParametrageApiKeysRouteImport.update({
+  id: '/parametrage/api-keys',
+  path: '/parametrage/api-keys',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminLotsLotIdRoute = AdminLotsLotIdRouteImport.update({
   id: '/lots/$lotId',
   path: '/lots/$lotId',
@@ -211,12 +231,15 @@ export interface FileRoutesByFullPath {
   '/admin/lots-cdd/$lotId': typeof AdminLotsCddLotIdRoute
   '/admin/lots-temporaires/$lotId': typeof AdminLotsTemporairesLotIdRoute
   '/admin/lots/$lotId': typeof AdminLotsLotIdRoute
+  '/admin/parametrage/api-keys': typeof AdminParametrageApiKeysRoute
   '/admin/parametrage/attributions': typeof AdminParametrageAttributionsRoute
   '/admin/parametrage/attributions-individuelles': typeof AdminParametrageAttributionsIndividuellesRoute
   '/admin/parametrage/categories': typeof AdminParametrageCategoriesRoute
   '/admin/parametrage/divisions': typeof AdminParametrageDivisionsRoute
   '/admin/parametrage/exclusions': typeof AdminParametrageExclusionsRoute
   '/admin/parametrage/fonctions': typeof AdminParametrageFonctionsRoute
+  '/admin/parametrage/motifs-rupture': typeof AdminParametrageMotifsRuptureRoute
+  '/admin/parametrage/parametres-bulletins': typeof AdminParametrageParametresBulletinsRoute
   '/admin/parametrage/postes': typeof AdminParametragePostesRoute
   '/admin/parametrage/rubriques': typeof AdminParametrageRubriquesRoute
   '/admin/parametrage/utilisateurs': typeof AdminParametrageUtilisateursRoute
@@ -241,12 +264,15 @@ export interface FileRoutesByTo {
   '/admin/lots-cdd/$lotId': typeof AdminLotsCddLotIdRoute
   '/admin/lots-temporaires/$lotId': typeof AdminLotsTemporairesLotIdRoute
   '/admin/lots/$lotId': typeof AdminLotsLotIdRoute
+  '/admin/parametrage/api-keys': typeof AdminParametrageApiKeysRoute
   '/admin/parametrage/attributions': typeof AdminParametrageAttributionsRoute
   '/admin/parametrage/attributions-individuelles': typeof AdminParametrageAttributionsIndividuellesRoute
   '/admin/parametrage/categories': typeof AdminParametrageCategoriesRoute
   '/admin/parametrage/divisions': typeof AdminParametrageDivisionsRoute
   '/admin/parametrage/exclusions': typeof AdminParametrageExclusionsRoute
   '/admin/parametrage/fonctions': typeof AdminParametrageFonctionsRoute
+  '/admin/parametrage/motifs-rupture': typeof AdminParametrageMotifsRuptureRoute
+  '/admin/parametrage/parametres-bulletins': typeof AdminParametrageParametresBulletinsRoute
   '/admin/parametrage/postes': typeof AdminParametragePostesRoute
   '/admin/parametrage/rubriques': typeof AdminParametrageRubriquesRoute
   '/admin/parametrage/utilisateurs': typeof AdminParametrageUtilisateursRoute
@@ -273,12 +299,15 @@ export interface FileRoutesById {
   '/admin/lots-cdd/$lotId': typeof AdminLotsCddLotIdRoute
   '/admin/lots-temporaires/$lotId': typeof AdminLotsTemporairesLotIdRoute
   '/admin/lots/$lotId': typeof AdminLotsLotIdRoute
+  '/admin/parametrage/api-keys': typeof AdminParametrageApiKeysRoute
   '/admin/parametrage/attributions': typeof AdminParametrageAttributionsRoute
   '/admin/parametrage/attributions-individuelles': typeof AdminParametrageAttributionsIndividuellesRoute
   '/admin/parametrage/categories': typeof AdminParametrageCategoriesRoute
   '/admin/parametrage/divisions': typeof AdminParametrageDivisionsRoute
   '/admin/parametrage/exclusions': typeof AdminParametrageExclusionsRoute
   '/admin/parametrage/fonctions': typeof AdminParametrageFonctionsRoute
+  '/admin/parametrage/motifs-rupture': typeof AdminParametrageMotifsRuptureRoute
+  '/admin/parametrage/parametres-bulletins': typeof AdminParametrageParametresBulletinsRoute
   '/admin/parametrage/postes': typeof AdminParametragePostesRoute
   '/admin/parametrage/rubriques': typeof AdminParametrageRubriquesRoute
   '/admin/parametrage/utilisateurs': typeof AdminParametrageUtilisateursRoute
@@ -306,12 +335,15 @@ export interface FileRouteTypes {
     | '/admin/lots-cdd/$lotId'
     | '/admin/lots-temporaires/$lotId'
     | '/admin/lots/$lotId'
+    | '/admin/parametrage/api-keys'
     | '/admin/parametrage/attributions'
     | '/admin/parametrage/attributions-individuelles'
     | '/admin/parametrage/categories'
     | '/admin/parametrage/divisions'
     | '/admin/parametrage/exclusions'
     | '/admin/parametrage/fonctions'
+    | '/admin/parametrage/motifs-rupture'
+    | '/admin/parametrage/parametres-bulletins'
     | '/admin/parametrage/postes'
     | '/admin/parametrage/rubriques'
     | '/admin/parametrage/utilisateurs'
@@ -336,12 +368,15 @@ export interface FileRouteTypes {
     | '/admin/lots-cdd/$lotId'
     | '/admin/lots-temporaires/$lotId'
     | '/admin/lots/$lotId'
+    | '/admin/parametrage/api-keys'
     | '/admin/parametrage/attributions'
     | '/admin/parametrage/attributions-individuelles'
     | '/admin/parametrage/categories'
     | '/admin/parametrage/divisions'
     | '/admin/parametrage/exclusions'
     | '/admin/parametrage/fonctions'
+    | '/admin/parametrage/motifs-rupture'
+    | '/admin/parametrage/parametres-bulletins'
     | '/admin/parametrage/postes'
     | '/admin/parametrage/rubriques'
     | '/admin/parametrage/utilisateurs'
@@ -367,12 +402,15 @@ export interface FileRouteTypes {
     | '/admin/lots-cdd/$lotId'
     | '/admin/lots-temporaires/$lotId'
     | '/admin/lots/$lotId'
+    | '/admin/parametrage/api-keys'
     | '/admin/parametrage/attributions'
     | '/admin/parametrage/attributions-individuelles'
     | '/admin/parametrage/categories'
     | '/admin/parametrage/divisions'
     | '/admin/parametrage/exclusions'
     | '/admin/parametrage/fonctions'
+    | '/admin/parametrage/motifs-rupture'
+    | '/admin/parametrage/parametres-bulletins'
     | '/admin/parametrage/postes'
     | '/admin/parametrage/rubriques'
     | '/admin/parametrage/utilisateurs'
@@ -523,6 +561,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminParametragePostesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/parametrage/parametres-bulletins': {
+      id: '/admin/parametrage/parametres-bulletins'
+      path: '/parametrage/parametres-bulletins'
+      fullPath: '/admin/parametrage/parametres-bulletins'
+      preLoaderRoute: typeof AdminParametrageParametresBulletinsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/parametrage/motifs-rupture': {
+      id: '/admin/parametrage/motifs-rupture'
+      path: '/parametrage/motifs-rupture'
+      fullPath: '/admin/parametrage/motifs-rupture'
+      preLoaderRoute: typeof AdminParametrageMotifsRuptureRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/parametrage/fonctions': {
       id: '/admin/parametrage/fonctions'
       path: '/parametrage/fonctions'
@@ -563,6 +615,13 @@ declare module '@tanstack/react-router' {
       path: '/parametrage/attributions'
       fullPath: '/admin/parametrage/attributions'
       preLoaderRoute: typeof AdminParametrageAttributionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/parametrage/api-keys': {
+      id: '/admin/parametrage/api-keys'
+      path: '/parametrage/api-keys'
+      fullPath: '/admin/parametrage/api-keys'
+      preLoaderRoute: typeof AdminParametrageApiKeysRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/lots/$lotId': {
@@ -610,12 +669,15 @@ interface AdminRouteChildren {
   AdminLotsCddLotIdRoute: typeof AdminLotsCddLotIdRoute
   AdminLotsTemporairesLotIdRoute: typeof AdminLotsTemporairesLotIdRoute
   AdminLotsLotIdRoute: typeof AdminLotsLotIdRoute
+  AdminParametrageApiKeysRoute: typeof AdminParametrageApiKeysRoute
   AdminParametrageAttributionsRoute: typeof AdminParametrageAttributionsRoute
   AdminParametrageAttributionsIndividuellesRoute: typeof AdminParametrageAttributionsIndividuellesRoute
   AdminParametrageCategoriesRoute: typeof AdminParametrageCategoriesRoute
   AdminParametrageDivisionsRoute: typeof AdminParametrageDivisionsRoute
   AdminParametrageExclusionsRoute: typeof AdminParametrageExclusionsRoute
   AdminParametrageFonctionsRoute: typeof AdminParametrageFonctionsRoute
+  AdminParametrageMotifsRuptureRoute: typeof AdminParametrageMotifsRuptureRoute
+  AdminParametrageParametresBulletinsRoute: typeof AdminParametrageParametresBulletinsRoute
   AdminParametragePostesRoute: typeof AdminParametragePostesRoute
   AdminParametrageRubriquesRoute: typeof AdminParametrageRubriquesRoute
   AdminParametrageUtilisateursRoute: typeof AdminParametrageUtilisateursRoute
@@ -640,6 +702,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminLotsCddLotIdRoute: AdminLotsCddLotIdRoute,
   AdminLotsTemporairesLotIdRoute: AdminLotsTemporairesLotIdRoute,
   AdminLotsLotIdRoute: AdminLotsLotIdRoute,
+  AdminParametrageApiKeysRoute: AdminParametrageApiKeysRoute,
   AdminParametrageAttributionsRoute: AdminParametrageAttributionsRoute,
   AdminParametrageAttributionsIndividuellesRoute:
     AdminParametrageAttributionsIndividuellesRoute,
@@ -647,6 +710,9 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminParametrageDivisionsRoute: AdminParametrageDivisionsRoute,
   AdminParametrageExclusionsRoute: AdminParametrageExclusionsRoute,
   AdminParametrageFonctionsRoute: AdminParametrageFonctionsRoute,
+  AdminParametrageMotifsRuptureRoute: AdminParametrageMotifsRuptureRoute,
+  AdminParametrageParametresBulletinsRoute:
+    AdminParametrageParametresBulletinsRoute,
   AdminParametragePostesRoute: AdminParametragePostesRoute,
   AdminParametrageRubriquesRoute: AdminParametrageRubriquesRoute,
   AdminParametrageUtilisateursRoute: AdminParametrageUtilisateursRoute,

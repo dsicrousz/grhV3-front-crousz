@@ -5,7 +5,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import type { AttributionIndividuelle } from '@/types/attribution-individuelle'
 import type { CreateAttributionIndividuelleDto } from '@/types/attribution-individuelle'
 import { AttributionIndividuelleService } from '@/services/attribution-individuelle.service'
+import { AttributionGlobaleService, AttributionFonctionnelleService } from '@/services/attribution.service'
 import { RubriqueService } from '@/services/rubrique.service'
+import { EmployeService } from '@/services/employe.service'
 
 const { Title, Text } = Typography
 
@@ -28,6 +30,28 @@ export const EmployeAttributions = ({ employeId }: EmployeAttributionsProps) => 
   const { data: rubriques = [], isLoading: isLoadingRubriques } = useQuery({
     queryKey: ['rubriques'],
     queryFn: () => RubriqueService.getAll()
+  })
+
+  const { data: attributionsGlobales = [], isLoading: isLoadingGlobales } = useQuery({
+    queryKey: ['attributions-globales', employeId],
+    queryFn: () => AttributionGlobaleService.getByEmploye(employeId),
+    enabled: !!employeId
+  })
+
+  const { data: attributionsFonctionnellesData = [], isLoading: isLoadingFonctionnelles } = useQuery({
+    queryKey: ['attributions-fonctionnelles', employeId],
+    queryFn: () => AttributionFonctionnelleService.getByEmploye(employeId),
+    enabled: !!employeId
+  })
+
+  // Corriger la structure de données : le backend retourne un tableau imbriqué
+  const attributionsFonctionnelles = Array.isArray(attributionsFonctionnellesData[0]) ? attributionsFonctionnellesData[0] : attributionsFonctionnellesData
+
+
+  const { data: employe, isLoading: isLoadingEmploye } = useQuery({
+    queryKey: ['employe', employeId],
+    queryFn: () => EmployeService.getOne(employeId),
+    enabled: !!employeId
   })
 
   const createMutation = useMutation({
@@ -85,9 +109,40 @@ export const EmployeAttributions = ({ employeId }: EmployeAttributionsProps) => 
     }
   }
 
+  // Filtrer les attributions globales par type de contrat de l'employé
+  const getEffectiveGlobalAttributions = () => {
+    // Obtenir le type de contrat actif de l'employé
+    const employeContractType = employe?.contrat_actif?.type
+    
+    return attributionsGlobales.filter((attribution: any) => {
+      if (!attribution || !attribution._id) return false
+      
+      // Vérifier si l'attribution correspond au type de contrat de l'employé
+      // Si attribution.type_contrat est undefined, elle s'applique à tous les types de contrats
+      const matchesContractType = !attribution.type_contrat || attribution.type_contrat === employeContractType
+      
+      return matchesContractType
+    })
+  }
+
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center mb-4">
+      {/* Carte récapitulative avec valeur totale */}
+      <Card className="bg-blue-50 border-blue-200">
+        <div className="flex justify-between items-center">
+          <div>
+            <Title level={5} className="mb-2! text-blue-800">Récapitulatif des attributions</Title>
+            <div className="text-sm text-gray-600 space-y-1">
+              <div>• {attributions.length} attribution(s) individuelle(s)</div>
+              <div>• {getEffectiveGlobalAttributions().length} attribution(s) globale(s) effectives</div>
+              <div>• {attributionsFonctionnelles.length} attribution(s) fonctionnelle(s)</div>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* Attributions individuelles */}
+      <div className="flex justify-between items-center my-4">
         <Title level={5} className="mb-0!">Attributions individuelles</Title>
         <Button 
           type="primary" 
@@ -102,17 +157,20 @@ export const EmployeAttributions = ({ employeId }: EmployeAttributionsProps) => 
         {isLoadingAttributions ? (
           <Spin />
         ) : attributions.length === 0 ? (
-          <Text type="secondary">Aucune attribution</Text>
+          <Text type="secondary">Aucune attribution individuelle</Text>
         ) : (
           attributions.map((attribution) => (
             <Card key={attribution._id} size="small" className="bg-gray-50">
               <div className="flex justify-between items-start">
-                <div>
+                <div className="flex-1">
                   <Text strong>
                     {rubriques.find(r => r._id === attribution.rubrique._id)?.libelle}
                   </Text>
                   <div className="text-gray-500 text-sm">
                     {attribution.rubrique.formule}
+                  </div>
+                  <div className="text-blue-600 font-semibold mt-1">
+                    {attribution.valeur_par_defaut?.toLocaleString()} FCFA
                   </div>
                 </div>
                 <Space>
@@ -145,6 +203,96 @@ export const EmployeAttributions = ({ employeId }: EmployeAttributionsProps) => 
               </div>
             </Card>
           ))
+        )}
+      </div>
+
+      {/* Attributions globales */}
+      <Title level={5} className="mb-4!">Attributions globales</Title>
+      <div className="space-y-4">
+        {isLoadingGlobales || isLoadingEmploye ? (
+          <Spin />
+        ) : getEffectiveGlobalAttributions().length === 0 ? (
+          <Text type="secondary">Aucune attribution globale effective</Text>
+        ) : (
+          getEffectiveGlobalAttributions().map((attribution: any) => (
+            attribution && attribution._id ? (
+              <Card key={attribution._id} size="small" className="bg-green-50">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <Text strong>
+                      {(() => {
+                        const rubriqueId = typeof attribution.rubrique === 'string' ? attribution.rubrique : attribution.rubrique?._id
+                        const rubrique = rubriques.find(r => r._id === rubriqueId)
+                        return rubrique?.libelle
+                      })()}
+                    </Text>
+                    <div className="text-gray-500 text-sm">
+                      {(() => {
+                        const rubriqueId = typeof attribution.rubrique === 'string' ? attribution.rubrique : attribution.rubrique?._id
+                        const rubrique = rubriques.find(r => r._id === rubriqueId)
+                        return rubrique?.formule
+                      })()}
+                    </div>
+                    {/* Ne pas afficher la valeur des attributions globales */}
+                  </div>
+                  <div className="text-green-600 text-sm font-medium">
+                    Globale
+                  </div>
+                </div>
+              </Card>
+            ) : null
+          ))
+        )}
+      </div>
+
+      {/* Attributions fonctionnelles */}
+      <Title level={5} className="mb-4!">Attributions fonctionnelles</Title>
+      <div className="space-y-4">
+        {(() => {
+          console.log('RENDER - Loading:', isLoadingFonctionnelles)
+          console.log('RENDER - Length:', attributionsFonctionnelles.length)
+          console.log('RENDER - Data:', attributionsFonctionnelles)
+          console.log('RENDER - First element:', attributionsFonctionnelles[0])
+          console.log('RENDER - Type of data:', typeof attributionsFonctionnelles)
+          console.log('RENDER - Is array:', Array.isArray(attributionsFonctionnelles))
+          return null
+        })()}
+        {isLoadingFonctionnelles ? (
+          <Spin />
+        ) : attributionsFonctionnelles.length === 0 ? (
+          <Text type="secondary">Aucune attribution fonctionnelle</Text>
+        ) : (
+          attributionsFonctionnelles.map((attribution: any, index: number) => {
+            console.log(`MAP - Attribution ${index}:`, attribution)
+            console.log(`MAP - Has _id:`, !!attribution?._id)
+            console.log(`MAP - Condition result:`, attribution && attribution._id)
+            
+            return attribution && attribution._id ? (
+              <Card key={attribution._id} size="small" className="bg-purple-50">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <Text strong>
+                      {(() => {
+                        const rubriqueId = typeof attribution.rubrique === 'string' ? attribution.rubrique : attribution.rubrique?._id
+                        const rubrique = rubriques.find(r => r._id === rubriqueId)
+                        return rubrique?.libelle
+                      })()}
+                    </Text>
+                    <div className="text-gray-500 text-sm">
+                      {(() => {
+                        const rubriqueId = typeof attribution.rubrique === 'string' ? attribution.rubrique : attribution.rubrique?._id
+                        const rubrique = rubriques.find(r => r._id === rubriqueId)
+                        return rubrique?.formule
+                      })()}
+                    </div>
+                  </div>
+                  <div className="text-purple-600 text-sm font-medium">
+                    Fonctionnelle
+                  </div>
+                </div>
+              </Card>
+            ) : null
+          })
         )}
       </div>
 

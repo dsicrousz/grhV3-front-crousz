@@ -33,6 +33,10 @@ class AttributionFonctionnelleServiceClass extends Service {
   async delete(id: string): Promise<void> {
     return super.delete(id)
   }
+
+  async getByEmploye(id: string): Promise<AttributionFonctionnelle[]> {
+    return this.api.get(`${this.ressource}/byemploye/${id}`).then(res => res.data)
+  }
 }
 
 class AttributionGlobaleServiceClass extends Service {
@@ -58,6 +62,10 @@ class AttributionGlobaleServiceClass extends Service {
 
   async delete(id: string): Promise<void> {
     return super.delete(id)
+  }
+
+  async getByEmploye(id: string): Promise<AttributionGlobale[]> {
+    return this.api.get(`${this.ressource}/byemploye/${id}`).then(res => res.data)
   }
 }
 

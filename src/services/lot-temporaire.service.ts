@@ -31,8 +31,8 @@ class LotTemporaireServiceClass extends Service {
     return this.api.patch(`${this.ressource}/${id}/publish`).then(res => res.data)
   }
 
-  async generate(id: string): Promise<Lot> {
-    return this.api.post(`${this.ressource}/generate/${id}`).then(res => res.data)
+  async generate(id: string, postes?: string[]): Promise<Lot> {
+    return this.api.post(`${this.ressource}/generate/${id}`, { postes: postes || [] }).then(res => res.data)
   }
 
   async submit(id: string): Promise<Lot> {
@@ -57,6 +57,18 @@ class LotTemporaireServiceClass extends Service {
 
   async reject(id: string): Promise<Lot> {
     return this.api.patch(`${this.ressource}/reject/${id}`).then(res => res.data)
+  }
+
+  async unpublish(id: string): Promise<Lot> {
+    return this.api.patch(`${this.ressource}/${id}/unpublish`).then(res => res.data)
+  }
+
+  async transmit(id: string): Promise<Lot> {
+    return this.api.patch(`${this.ressource}/transmit/${id}`).then(res => res.data)
+  }
+
+  async untransmit(id: string): Promise<Lot> {
+    return this.api.patch(`${this.ressource}/untransmit/${id}`).then(res => res.data)
   }
 }
 

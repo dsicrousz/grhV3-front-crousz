@@ -1,7 +1,7 @@
 import Api from './Api'
 import { Service } from './Service'
 import type { Contrat, CreateContratDto, UpdateContratDto, TerminerContratDto } from '@/types/contrat'
-import type { TypeContrat, MotifTerminaison } from '@/types/contrat'
+import type { TypeContrat } from '@/types/contrat'
 
 class ContratServiceClass extends Service {
   constructor() {
@@ -40,7 +40,7 @@ class ContratServiceClass extends Service {
     return this.api.patch(`/${this.ressource}/terminer/${id}`, data).then(res => res.data)
   }
 
-  async findTerminaisons(motif?: MotifTerminaison, annee?: number): Promise<Contrat[]> {
+  async findTerminaisons(motif?: string, annee?: number): Promise<Contrat[]> {
     const params = new URLSearchParams()
     if (motif) params.append('motif', motif)
     if (annee) params.append('annee', annee.toString())

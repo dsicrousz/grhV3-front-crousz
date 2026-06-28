@@ -1,22 +1,11 @@
 import type { Categorie } from './categorie'
 import type { Poste } from './poste'
+import type { MotifRupture } from './motif-rupture'
 
 export enum TypeContrat {
   CDI = 'CDI',
   CDD = 'CDD',
   TEMPORAIRE = 'TEMPORAIRE',
-}
-
-export enum MotifTerminaison {
-  DEMISSION = 'DEMISSION',
-  LICENCIEMENT_ABUSIF = 'LICENCIEMENT_ABUSIF',
-  LICENCIEMENT_ECONOMIQUE = 'LICENCIEMENT_ECONOMIQUE',
-  LICENCIEMENT_DISCIPLINAIRE = 'LICENCIEMENT_DISCIPLINAIRE',
-  RETRAITE = 'RETRAITE',
-  DECES = 'DECES',
-  FIN_CDD = 'FIN_CDD',
-  RUPTURE_CONVENTIONNELLE = 'RUPTURE_CONVENTIONNELLE',
-  AUTRE = 'AUTRE',
 }
 
 export interface Contrat {
@@ -32,7 +21,7 @@ export interface Contrat {
   categorie?: Categorie | string
   matricule_de_solde?: string
   nombre_de_parts?: number
-  motif_terminaison?: MotifTerminaison
+  motif_terminaison?: MotifRupture | string
   createdAt?: string
   updatedAt?: string
 }
@@ -63,6 +52,6 @@ export interface UpdateContratDto {
 }
 
 export interface TerminerContratDto {
-  motif_terminaison: MotifTerminaison
+  motif_terminaison: string
   date_fin?: string
 }

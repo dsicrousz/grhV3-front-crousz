@@ -64,9 +64,21 @@ export function useEmployeMutations(onSuccess?: () => void) {
     },
   })
 
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => EmployeService.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['employes'] })
+      onSuccess?.()
+    },
+    onError: (error: Error) => {
+      message.error(error.message || 'Erreur lors de la suppression')
+    },
+  })
+
   return {
     createMutation,
     updateMutation,
-    isPending: createMutation.isPending || updateMutation.isPending,
+    deleteMutation,
+    isPending: createMutation.isPending || updateMutation.isPending || deleteMutation.isPending,
   }
 }

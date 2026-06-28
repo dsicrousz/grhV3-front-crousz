@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Table, Space, Button, Tooltip, Modal, Form, Input, Popconfirm, Tag, message, Card, Steps } from 'antd'
-import { Plus, Pencil, Trash2, Eye, Check, FileText, Send, X, Clock, Undo2 } from 'lucide-react'
+import { Table, Space, Button, Tooltip, Modal, Form, Input, Popconfirm, Tag, message, Card, Spin, Alert } from 'antd'
+import { Plus, Pencil, Trash2, Eye, Check, FileText, Send, SendToBack, X, Clock, Undo2, Bell } from 'lucide-react'
 import { LotCddService } from '@/services/lot-cdd.service'
 import { StateLot } from '@/types/lot'
 import type { Lot, CreateLotDto } from '@/types/lot'
@@ -91,6 +91,39 @@ function LotsCddPage() {
     },
     onError: () => {
       message.error('Erreur lors de la publication du lot CDD')
+    }
+  })
+
+  const unpublishMutation = useMutation({
+    mutationFn: (id: string) => LotCddService.unpublish(id),
+    onSuccess: () => {
+      message.success('Lot CDD dépublié avec succès')
+      queryClient.invalidateQueries({ queryKey: ['lots-cdd'] })
+    },
+    onError: () => {
+      message.error('Erreur lors de la dépublication du lot CDD')
+    }
+  })
+
+  const transmitMutation = useMutation({
+    mutationFn: (id: string) => LotCddService.transmit(id),
+    onSuccess: () => {
+      message.success('Lot CDD transmis avec succès')
+      queryClient.invalidateQueries({ queryKey: ['lots-cdd'] })
+    },
+    onError: () => {
+      message.error('Erreur lors de la transmission du lot CDD')
+    }
+  })
+
+  const untransmitMutation = useMutation({
+    mutationFn: (id: string) => LotCddService.untransmit(id),
+    onSuccess: () => {
+      message.success('Transmission annulée avec succès')
+      queryClient.invalidateQueries({ queryKey: ['lots-cdd'] })
+    },
+    onError: () => {
+      message.error('Erreur lors de l\'annulation de la transmission')
     }
   })
 
@@ -225,14 +258,17 @@ function LotsCddPage() {
       title: 'Libellé',
       dataIndex: 'libelle',
       key: 'libelle',
+      width: 160,
+      ellipsis: true,
       render: (libelle) => <Text strong>{libelle}</Text>
     },
     {
       title: 'Période',
       key: 'periode',
+      width: 200,
       render: (_, record) => (
-        <Text type="secondary">
-          Du {dayjs(record.debut).format('DD/MM/YYYY')} au {dayjs(record.fin).format('DD/MM/YYYY')}
+        <Text type="secondary" className="whitespace-nowrap">
+          {dayjs(record.debut).format('DD/MM/YY')} → {dayjs(record.fin).format('DD/MM/YY')}
         </Text>
       )
     },
@@ -240,31 +276,51 @@ function LotsCddPage() {
       title: 'État',
       dataIndex: 'etat',
       key: 'etat',
+      width: 160,
       render: (etat: StateLot) => (
-        <Tag color={getStateColor(etat)}>{etat}</Tag>
+        <Tag color={getStateColor(etat)} className="whitespace-nowrap">{etat}</Tag>
+      )
+    },
+    {
+      title: 'Publié',
+      dataIndex: 'isPublished',
+      key: 'isPublished',
+      width: 80,
+      render: (isPublished: boolean) => (
+        <Tag color={isPublished ? 'success' : 'default'}>
+          {isPublished ? 'Oui' : 'Non'}
+        </Tag>
       )
     },
     {
       title: 'Progression',
       key: 'progression',
-      render: (_, record) => (
-        <Steps
-          size="small"
-          current={getStateStep(record.etat)}
-          titlePlacement="vertical"
-          items={[
-            { title: 'BROUILLON' },
-            { title: 'SOUMIS' },
-            { title: 'EN COURS DE VALIDATION' },
-            { title: 'VALIDE' }
-          ]}
-        />
-      )
+      width: 200,
+      render: (_, record) => {
+        const steps = ['BROUILLON', 'SOUMIS', 'EN COURS', 'VALIDÉ']
+        const current = getStateStep(record.etat)
+        return (
+          <div className="flex items-center gap-1">
+            {steps.map((step, i) => (
+              <div key={step} className="flex items-center gap-1">
+                <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                  i < current ? 'bg-green-500' : i === current ? 'bg-blue-500' : 'bg-gray-200'
+                }`} />
+                <span className={`text-xs hidden lg:inline whitespace-nowrap ${
+                  i === current ? 'text-blue-600 font-semibold' : i < current ? 'text-green-600' : 'text-gray-400'
+                }`}>{step}</span>
+                {i < steps.length - 1 && <div className="w-3 h-px bg-gray-200 flex-shrink-0 hidden lg:block" />}
+              </div>
+            ))}
+          </div>
+        )
+      }
     },
     {
       title: 'Actions',
       key: 'actions',
-      width: 200,
+      width: 180,
+      fixed: 'right' as const,
       render: (_, record: Lot) => (
         <Space>
           <Tooltip title="Voir le lot">
@@ -310,8 +366,12 @@ function LotsCddPage() {
                     <Button
                       type="text"
                       size="small"
-                      icon={<FileText className="w-4 h-4" />}
+                      icon={generateMutation.isPending && generateMutation.variables === record._id ? 
+                        <Spin size="small" /> : 
+                        <FileText className="w-4 h-4" />
+                      }
                       onClick={() => generateMutation.mutate(record._id)}
+                      disabled={generateMutation.isPending}
                     />
                   </Tooltip>
                   <Tooltip title="Soumettre">
@@ -387,14 +447,64 @@ function LotsCddPage() {
               </Tooltip>
             </>
           )}
+          {session?.user.role === USER_ROLE.ADMIN && record.etat === StateLot.VALIDE && (
+            <Popconfirm
+              title="Invalider ce lot ?"
+              description="Le lot repassera à l'état précédent."
+              onConfirm={() => rejectMutation.mutate(record._id)}
+              okText="Invalider"
+              cancelText="Annuler"
+              okButtonProps={{ danger: true }}
+            >
+              <Tooltip title="Invalider">
+                <Button
+                  type="text"
+                  size="small"
+                  danger
+                  icon={<X className="w-4 h-4" />}
+                />
+              </Tooltip>
+            </Popconfirm>
+          )}
 
-          {record.etat === StateLot.VALIDE && !record.isPublished && (
+          {record.etat === StateLot.VALIDE && !record.isPublished && session?.user.role === USER_ROLE.CSA && (
             <Tooltip title="Publier">
               <Button
                 type="text"
                 size="small"
-                icon={<FileText className="w-4 h-4" />}
+                icon={<Bell className="w-4 h-4" />}
                 onClick={() => publishMutation.mutate(record._id)}
+              />
+            </Tooltip>
+          )}
+          {record.etat === StateLot.VALIDE && record.isPublished && session?.user.role === USER_ROLE.CSA && (
+            <Tooltip title="Dépublier">
+              <Button
+                type="text"
+                size="small"
+                icon={<Bell className="w-4 h-4" />}
+                onClick={() => unpublishMutation.mutate(record._id)}
+              />
+            </Tooltip>
+          )}
+          {record.isPublished && !record.isTransmitted && session?.user.role === USER_ROLE.RH && (
+            <Tooltip title="Transmettre">
+              <Button
+                type="text"
+                size="small"
+                icon={<SendToBack className="w-4 h-4" />}
+                onClick={() => transmitMutation.mutate(record._id)}
+              />
+            </Tooltip>
+          )}
+          {record.isPublished && record.isTransmitted && session?.user.role === USER_ROLE.RH && (
+            <Tooltip title="Annuler la transmission">
+              <Button
+                type="text"
+                size="small"
+                danger
+                icon={<SendToBack className="w-4 h-4" />}
+                onClick={() => untransmitMutation.mutate(record._id)}
               />
             </Tooltip>
           )}
@@ -405,6 +515,39 @@ function LotsCddPage() {
 
   return (
     <div className="space-y-6">
+      {submitMutation.isPending && (
+        <Alert title="Soumission en cours..." description="Le lot est en cours de soumission." type="info" showIcon icon={<Spin size="small" />} banner />
+      )}
+      {cancelSubmitMutation.isPending && (
+        <Alert title="Annulation de la soumission..." description="La soumission du lot est en cours d'annulation." type="warning" showIcon icon={<Spin size="small" />} banner />
+      )}
+      {setWaitingMutation.isPending && (
+        <Alert title="Mise en attente de validation..." description="Le lot est envoyé en attente de validation." type="info" showIcon icon={<Spin size="small" />} banner />
+      )}
+      {cancelWaitingMutation.isPending && (
+        <Alert title="Annulation de la mise en attente..." description="La mise en attente du lot est annulée." type="warning" showIcon icon={<Spin size="small" />} banner />
+      )}
+      {validateMutation.isPending && (
+        <Alert title="Validation en cours..." description="Le lot est en cours de validation." type="success" showIcon icon={<Spin size="small" />} banner />
+      )}
+      {rejectMutation.isPending && (
+        <Alert title="Rejet / Invalidation en cours..." description="Le lot est en cours de rejet ou d'invalidation." type="error" showIcon icon={<Spin size="small" />} banner />
+      )}
+      {publishMutation.isPending && (
+        <Alert title="Publication en cours..." description="Le lot est en cours de publication." type="info" showIcon icon={<Spin size="small" />} banner />
+      )}
+      {unpublishMutation.isPending && (
+        <Alert title="Dépublication en cours..." description="Le lot est en cours de dépublication." type="warning" showIcon icon={<Spin size="small" />} banner />
+      )}
+      {transmitMutation.isPending && (
+        <Alert title="Transmission en cours..." description="Le lot est en cours de transmission." type="info" showIcon icon={<Spin size="small" />} banner />
+      )}
+      {untransmitMutation.isPending && (
+        <Alert title="Annulation de la transmission..." description="La transmission du lot est en cours d'annulation." type="warning" showIcon icon={<Spin size="small" />} banner />
+      )}
+      {generateMutation.isPending && (
+        <Alert title="Génération des bulletins en cours..." description="Veuillez patienter, cette opération peut prendre quelques instants." type="info" showIcon icon={<Spin size="small" />} banner />
+      )}
       <div className="flex justify-between items-center">
         <div>
           <Title level={4} className="mb-0! text-orange-600">Lots CDD</Title>
@@ -430,6 +573,7 @@ function LotsCddPage() {
           dataSource={lots}
           loading={isLoading}
           rowKey="_id"
+          scroll={{ x: 'max-content' }}
           pagination={{ pageSize: 10 }}
         />
       </Card>

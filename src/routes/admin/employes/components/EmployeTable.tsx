@@ -1,5 +1,5 @@
-import { Table, Space, Typography, Tooltip, Button, Tag, Input } from 'antd'
-import { Eye, Pencil } from 'lucide-react'
+import { Table, Typography, Button, Tag, Input, Popconfirm, message, Dropdown } from 'antd'
+import { Eye, Pencil, Trash2, MoreHorizontal } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import type { ColumnsType } from 'antd/es/table'
 import type { Employe } from '@/types/employe'
@@ -16,6 +16,7 @@ interface EmployeTableProps {
   searchText: string
   onSearchChange: (value: string) => void
   onEdit: (employe: Employe) => void
+  onDelete: (employe: Employe) => void
 }
 
 export function EmployeTable({
@@ -25,6 +26,7 @@ export function EmployeTable({
   searchText,
   onSearchChange,
   onEdit,
+  onDelete,
 }: EmployeTableProps) {
   const getPosteName = (poste: Poste | string | undefined): string => {
     if (!poste) return ''
@@ -164,32 +166,78 @@ export function EmployeTable({
     {
       title: 'Actions',
       key: 'actions',
-      width: 120,
+      width: 80,
       align: 'center',
-      render: (_, record) => (
-        <Space>
-          <Tooltip title="Voir">
-            <Link
-              to="/admin/employes/$employeeId"
-              params={{ employeeId: record._id }}
-            >
-              <Button
-                type="text"
-                size="small"
-                icon={<Eye className="w-4 h-4" />}
-              />
-            </Link>
-          </Tooltip>
-          <Tooltip title="Modifier">
+      render: (_, record) => {
+        const handleDelete = () => {
+          onDelete(record)
+          message.success(`Employé ${record.nom} ${record.prenom} supprimé avec succès`)
+        }
+
+        const menuItems = [
+          {
+            key: 'view',
+            label: (
+              <Link
+                to="/admin/employes/$employeeId"
+                params={{ employeeId: record._id }}
+                className="flex items-center gap-2"
+              >
+                <Eye className="w-4 h-4" />
+                Voir
+              </Link>
+            ),
+          },
+          {
+            key: 'edit',
+            label: (
+              <button
+                onClick={() => onEdit(record)}
+                className="flex items-center gap-2 w-full text-left hover:bg-gray-50 px-2 py-1 rounded"
+              >
+                <Pencil className="w-4 h-4" />
+                Modifier
+              </button>
+            ),
+          },
+          {
+            type: 'divider' as const,
+          },
+          {
+            key: 'delete',
+            label: (
+              <Popconfirm
+                title="Supprimer l'employé"
+                description={`Êtes-vous sûr de vouloir supprimer ${record.nom} ${record.prenom} ?`}
+                onConfirm={handleDelete}
+                okText="Supprimer"
+                cancelText="Annuler"
+                okButtonProps={{ danger: true }}
+              >
+                <button className="flex items-center gap-2 w-full text-left text-red-600 hover:bg-red-50 px-2 py-1 rounded">
+                  <Trash2 className="w-4 h-4" />
+                  Supprimer
+                </button>
+              </Popconfirm>
+            ),
+          },
+        ]
+
+        return (
+          <Dropdown
+            menu={{ items: menuItems }}
+            trigger={['click']}
+            placement="bottomRight"
+          >
             <Button
               type="text"
               size="small"
-              icon={<Pencil className="w-4 h-4" />}
-              onClick={() => onEdit(record)}
+              icon={<MoreHorizontal className="w-4 h-4" />}
+              className="text-gray-400 hover:text-gray-600"
             />
-          </Tooltip>
-        </Space>
-      ),
+          </Dropdown>
+        )
+      },
     },
   ]
 

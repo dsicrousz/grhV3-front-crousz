@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { Typography, Card } from 'antd'
-import { FileText, Building2, Users, Settings, UserCog, Briefcase } from 'lucide-react'
+import { FileText, Building2, Users, Settings, UserCog, Briefcase, FileX2, Palette, KeyRound } from 'lucide-react'
+import { useSession } from '@/auth/auth-client'
+import { USER_ROLE } from '@/types/user.roles'
 
 const { Title, Text } = Typography
 
@@ -51,10 +53,38 @@ const parametrageItems = [
     icon: FileText,
     path: '/admin/parametrage/attributions-individuelles',
     color: 'bg-teal-100 text-teal-600',
-  }
+  },
+  {
+    title: 'Motifs de rupture',
+    description: 'Gérer les motifs de rupture de contrat',
+    icon: FileX2,
+    path: '/admin/parametrage/motifs-rupture',
+    color: 'bg-red-100 text-red-600',
+  },
+  {
+    title: 'Couleurs bulletins',
+    description: 'Paramétrer la couleur des bulletins de paie par année',
+    icon: Palette,
+    path: '/admin/parametrage/parametres-bulletins',
+    color: 'bg-violet-100 text-violet-600',
+  },
+]
+
+const adminOnlyItems = [
+  {
+    title: 'Clés API',
+    description: 'Créer et gérer les clés d\'authentification pour les intégrations externes',
+    icon: KeyRound,
+    path: '/admin/parametrage/api-keys',
+    color: 'bg-gray-900 text-white',
+    disabled: false,
+  },
 ]
 
 function ParametragePage() {
+  const { data: session } = useSession()
+  const isAdmin = session?.user?.role === USER_ROLE.ADMIN
+
   return (
     <div className="p-6">
       {/* Header */}
@@ -70,7 +100,7 @@ function ParametragePage() {
 
       {/* Grid of settings */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {parametrageItems.map((item) => (
+        {[...parametrageItems, ...(isAdmin ? adminOnlyItems : [])].map((item) => (
           <Link
             key={item.path}
             to={item.disabled ? '#' : item.path}

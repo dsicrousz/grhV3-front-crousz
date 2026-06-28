@@ -2,7 +2,7 @@ export enum StateLot {
   BROUILLON = 'BROUILLON',
   WAITING1 = 'SOUMIS',
   WAITING2 = 'EN COURS DE VALIDATION',
-  VALIDE = 'VALIDÉ'
+  VALIDE = 'VALIDE'
 }
 
 export interface Lot {
@@ -12,6 +12,7 @@ export interface Lot {
   fin: string
   etat: StateLot
   isPublished: boolean,
+  isTransmitted: boolean,
   url?: string,
   createdAt?: string
   updatedAt?: string

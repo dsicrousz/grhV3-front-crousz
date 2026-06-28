@@ -34,7 +34,7 @@ class LotServiceClass extends Service {
   }
 
   async publish(id: string): Promise<Lot> {
-    return this.api.patch(`${this.ressource}/${id}/publish`).then(res => res.data)
+    return this.api.patch(`${this.ressource}/publish/${id}`).then(res => res.data)
   }
 
   async generate(id: string): Promise<Lot> {
@@ -67,6 +67,18 @@ class LotServiceClass extends Service {
 
   async getStatistiquesByPeriode(params: LotStatistiquesPeriodeParams): Promise<LotStatistiquesPeriodeResponse> {
     return this.api.get(`${this.ressource}/statistiques/periode`, { params }).then(res => res.data)
+  }
+
+  async unpublish(id: string): Promise<Lot> {
+    return this.api.patch(`${this.ressource}/unpublish/${id}`).then(res => res.data)
+  }
+
+  async transmit(id: string): Promise<Lot> {
+    return this.api.patch(`${this.ressource}/transmit/${id}`).then(res => res.data)
+  }
+
+  async untransmit(id: string): Promise<Lot> {
+    return this.api.patch(`${this.ressource}/untransmit/${id}`).then(res => res.data)
   }
 }
 

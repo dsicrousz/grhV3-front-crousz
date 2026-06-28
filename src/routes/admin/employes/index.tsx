@@ -28,8 +28,6 @@ function EmployesPage() {
     queryFn: () => EmployeService.getAllAgregated(),
   })
 
-  console.log(employes)
-
   const { data: categories = [] } = useQuery({
     queryKey: ['categories'],
     queryFn: () => CategorieService.getAll(),
@@ -56,7 +54,7 @@ function EmployesPage() {
   })
 
   // Mutations
-  const { createMutation, updateMutation, isPending } = useEmployeMutations(() => {
+  const { createMutation, updateMutation, deleteMutation, isPending } = useEmployeMutations(() => {
     handleCloseModal()
   })
 
@@ -91,6 +89,10 @@ function EmployesPage() {
     }
   }
 
+  const handleDelete = (employe: Employe) => {
+    deleteMutation.mutate(employe._id)
+  }
+
   // Valeurs initiales du formulaire
   const initialFormValues = useMemo(() => {
     if (!editingEmploye) return undefined
@@ -119,6 +121,7 @@ function EmployesPage() {
           searchText={searchText}
           onSearchChange={setSearchText}
           onEdit={handleOpenModal}
+          onDelete={handleDelete}
         />
       </Card>
 

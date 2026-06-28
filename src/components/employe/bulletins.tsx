@@ -40,12 +40,12 @@ export const EmployeBulletins = ({ employeId }: EmployeBulletinsProps) => {
     enabled: !!employeId && contratActif !== undefined
   })
 
-  const formatMontant = (montant: number) => {
+  const formatMontant = (montant: number | null | undefined) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
       currency: 'XAF',
       minimumFractionDigits: 0
-    }).format(montant)
+    }).format(montant ?? 0)
   }
 
   const columns: ColumnsType<Bulletin> = [

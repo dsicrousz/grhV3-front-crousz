@@ -6,6 +6,7 @@ import { Empty } from 'antd'
 import { LotCddService } from '@/services/lot-cdd.service'
 import { StateLot } from '@/types/lot'
 import dayjs from 'dayjs'
+import { env } from '@/env'
 const { Title, Text } = Typography
 
 export const Route = createFileRoute('/admin/lots-cdd/$lotId')({
@@ -20,6 +21,7 @@ function LotCddDetailsPage() {
     queryKey: ['lot-cdd', lotId],
     queryFn: () => LotCddService.getOne(lotId),
   })
+
 
   const getStateStep = (etat: StateLot) => {
     switch(etat) {
@@ -156,7 +158,7 @@ function LotCddDetailsPage() {
                 </Title>
                 <div className="border rounded-lg overflow-hidden" style={{ height: '600px' }}>
                   <iframe
-                    src={lot.url}
+                    src={env.VITE_R2_URL + '/' + lot.url}
                     width="100%"
                     height="100%"
                     title="PDF du lot CDD"
