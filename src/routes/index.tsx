@@ -55,7 +55,7 @@ function App() {
     try {
       await authClient.signIn.social({
         provider: 'google',
-        callbackURL: '/admin',
+        callbackURL: import.meta.env.VITE_APP_FRONTEND + '/admin',
       });
     } catch (error) {
       console.error('Google login error:', error);
