@@ -39,10 +39,12 @@ export type Action =
   | 'list'
   | 'generate'
   | 'validate'
+  | 'reject'
   | 'upload'
   | 'calculate'
   | 'transmit'
   | 'waiting'
+  | 'cancel_waiting'
   | 'publish'
   | 'close'
 
@@ -143,7 +145,7 @@ const rhStatements: RoleStatements = {
 const csaStatements: RoleStatements = {
   employe: ['read', 'list'],
   bulletin: ['read', 'list', 'validate'],
-  lot: ['read', 'update', 'list', 'calculate', 'close', 'publish', 'waiting'],
+  lot: ['read', 'update', 'list', 'calculate', 'close', 'publish', 'waiting', 'cancel_waiting', 'reject'],
   rubrique: ['read', 'list'],
   session: ['read', 'list'],
   document: ['read', 'list'],

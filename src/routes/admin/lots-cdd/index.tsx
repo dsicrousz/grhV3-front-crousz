@@ -397,56 +397,50 @@ function LotsCddPage() {
             </>
           )}
 
-          {/* Boutons pour le rôle CSA */}
-          {ability.can('update', 'lot') && (
-            <>
-              {record.etat === StateLot.WAITING1 && (
-                <Tooltip title="Mettre en cours de validation">
-                  <Button
-                    type="text"
-                    size="small"
-                    icon={<Clock className="w-4 h-4" />}
-                    onClick={() => setWaitingMutation.mutate(record._id)}
-                  />
-                </Tooltip>
-              )}
-              {record.etat === StateLot.WAITING2 && (
-                <Tooltip title="Annuler la mise en validation">
-                  <Button
-                    type="text"
-                    size="small"
-                    danger
-                    icon={<Undo2 className="w-4 h-4" />}
-                    onClick={() => cancelWaitingMutation.mutate(record._id)}
-                  />
-                </Tooltip>
-              )}
-            </>
+          {ability.can('waiting', 'lot') && record.etat === StateLot.WAITING1 && (
+            <Tooltip title="Mettre en cours de validation">
+              <Button
+                type="text"
+                size="small"
+                icon={<Clock className="w-4 h-4" />}
+                onClick={() => setWaitingMutation.mutate(record._id)}
+              />
+            </Tooltip>
+          )}
+          {ability.can('cancel_waiting', 'lot') && record.etat === StateLot.WAITING2 && (
+            <Tooltip title="Annuler la mise en validation">
+              <Button
+                type="text"
+                size="small"
+                danger
+                icon={<Undo2 className="w-4 h-4" />}
+                onClick={() => cancelWaitingMutation.mutate(record._id)}
+              />
+            </Tooltip>
           )}
 
-          {/* Boutons pour le rôle Admin */}
           {ability.can('validate', 'lot') && record.etat === StateLot.WAITING2 && (
-            <>
-              <Tooltip title="Valider">
-                <Button
-                  type="text"
-                  size="small"
-                  icon={<Check className="w-4 h-4" />}
-                  onClick={() => validateMutation.mutate(record._id)}
-                />
-              </Tooltip>
-              <Tooltip title="Rejeter">
-                <Button
-                  type="text"
-                  size="small"
-                  danger
-                  icon={<X className="w-4 h-4" />}
-                  onClick={() => rejectMutation.mutate(record._id)}
-                />
-              </Tooltip>
-            </>
+            <Tooltip title="Valider">
+              <Button
+                type="text"
+                size="small"
+                icon={<Check className="w-4 h-4" />}
+                onClick={() => validateMutation.mutate(record._id)}
+              />
+            </Tooltip>
           )}
-          {ability.can('validate', 'lot') && record.etat === StateLot.VALIDE && (
+          {ability.can('reject', 'lot') && record.etat === StateLot.WAITING2 && (
+            <Tooltip title="Rejeter">
+              <Button
+                type="text"
+                size="small"
+                danger
+                icon={<X className="w-4 h-4" />}
+                onClick={() => rejectMutation.mutate(record._id)}
+              />
+            </Tooltip>
+          )}
+          {ability.can('reject', 'lot') && record.etat === StateLot.VALIDE && (
             <Popconfirm
               title="Invalider ce lot ?"
               description="Le lot repassera à l'état précédent."
