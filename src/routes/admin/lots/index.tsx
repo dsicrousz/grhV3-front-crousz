@@ -45,8 +45,7 @@ import type {
   LotStatistiquesRubrique,
 } from '@/types/lot'
 import dayjs from 'dayjs'
-import { USER_ROLE } from '@/types/user.roles'
-import { useSession } from '@/auth/auth-client'
+import { useAbility } from '@/auth/ability-context'
 import type { ColumnsType } from 'antd/es/table'
 import { exportToExcel } from '@/lib/export-utils'
 
@@ -60,7 +59,7 @@ export const Route = createFileRoute('/admin/lots/')({
 const formatCurrency = (value?: number) => Number(value ?? 0).toLocaleString('fr-FR')
 
 function LotsPage() {
-  const { data: session } = useSession()
+  const ability = useAbility()
   const navigate = Route.useNavigate()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingLot, setEditingLot] = useState<Lot | null>(null)
@@ -581,7 +580,7 @@ function LotsPage() {
               onClick={() => navigate({ to: '/admin/lots/$lotId', params: { lotId: record._id } })}
             />
           </Tooltip>
-          {session?.user.role === USER_ROLE.RH && (
+          {ability.can('create', 'lot') && (
             <>
               {record.etat === StateLot.BROUILLON && (
                 <>
@@ -636,7 +635,7 @@ function LotsPage() {
               )}
             </>
           )}
-          {session?.user.role === USER_ROLE.CSA && (
+          {ability.can('update', 'lot') && (
             <>
               {record.etat === StateLot.WAITING1 && (
                 <Tooltip title="Mettre en cours de validation">
@@ -661,7 +660,7 @@ function LotsPage() {
               )}
             </>
           )}
-          {session?.user.role === USER_ROLE.ADMIN && record.etat === StateLot.WAITING2 && (
+          {ability.can('validate', 'lot') && record.etat === StateLot.WAITING2 && (
             <>
               <Tooltip title="Valider">
                 <Button
@@ -682,7 +681,7 @@ function LotsPage() {
               </Tooltip>
             </>
           )}
-          {session?.user.role === USER_ROLE.ADMIN && record.etat === StateLot.VALIDE && (
+          {ability.can('validate', 'lot') && record.etat === StateLot.VALIDE && (
             <Popconfirm
               title="Invalider ce lot ?"
               description="Le lot repassera à l'état précédent."
@@ -701,7 +700,7 @@ function LotsPage() {
               </Tooltip>
             </Popconfirm>
           )}
-          {record.etat === StateLot.VALIDE && !record.isPublished && session?.user.role === USER_ROLE.CSA && (
+          {record.etat === StateLot.VALIDE && !record.isPublished && ability.can('update', 'lot') && (
             <Tooltip title="Publier">
               <Button
                 type="text"
@@ -711,7 +710,7 @@ function LotsPage() {
               />
             </Tooltip>
           )}
-          {record.etat === StateLot.VALIDE && record.isPublished && session?.user.role === USER_ROLE.CSA && (
+          {record.etat === StateLot.VALIDE && record.isPublished && ability.can('update', 'lot') && (
             <Tooltip title="Dépublier">
               <Button
                 type="text"
@@ -721,7 +720,7 @@ function LotsPage() {
               />
             </Tooltip>
           )}
-          {record.isPublished && !record.isTransmitted && session?.user.role === USER_ROLE.RH && (
+          {record.isPublished && !record.isTransmitted && ability.can('create', 'lot') && (
             <Tooltip title="Transmettre">
               <Button
                 type="text"
@@ -731,7 +730,7 @@ function LotsPage() {
               />
             </Tooltip>
           )}
-          {record.isPublished && record.isTransmitted && session?.user.role === USER_ROLE.RH && (
+          {record.isPublished && record.isTransmitted && ability.can('create', 'lot') && (
             <Tooltip title="Annuler la transmission">
               <Button
                 type="text"
@@ -806,7 +805,7 @@ function LotsPage() {
             </Title>
             <Text type="secondary">Gestion des lots de paie CDI et statistiques consolidées</Text>
           </div>
-          {session?.user.role === USER_ROLE.RH && (
+          {ability.can('create', 'lot') && (
             <Button
               type="primary"
               style={{ backgroundColor: '#16a34a', borderColor: '#16a34a' }}

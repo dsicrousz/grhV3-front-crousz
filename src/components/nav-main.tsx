@@ -16,25 +16,21 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
 import { Link } from "@tanstack/react-router"
-import { useSession } from "@/auth/auth-client"
 
 export function NavMain({
   items,
 }: {
   items: {
     title: string
-    url: string,
-    roles?: string[],
+    url?: string
     icon?: LucideIcon
     isActive?: boolean
     items?: {
       title: string
-      url: string,
-      roles?: string[],
+      url: string
     }[]
   }[]
 }) {
-  const { data: sessionData } = useSession();
   return (
     <SidebarGroup>
       <SidebarGroupLabel>GRH CROUS/Z</SidebarGroupLabel>
@@ -43,7 +39,6 @@ export function NavMain({
           <Collapsible
             key={item.title}
             asChild
-            disabled={!item.roles || !item.roles.includes(sessionData?.user?.role!)}
             defaultOpen={item.isActive}
             className="group/collapsible"
           >

@@ -351,6 +351,18 @@
   resolved "https://registry.yarnpkg.com/@better-fetch/fetch/-/fetch-1.1.21.tgz#2b4990e73c46b0ae5e66b247083610ff8c37bddc"
   integrity sha512-/ImESw0sskqlVR94jB+5+Pxjf+xBwDZF/N5+y2/q4EqD7IARUTSpPfIo8uf39SYpCxyOCtbyYpUrZ3F/k0zT4A==
 
+"@casl/ability@^7.0.0":
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/@casl/ability/-/ability-7.0.0.tgz#fdbf43aea64796ffed676e33b4153f2d50a5c376"
+  integrity sha512-QhwRflkTucpdS2uw1XScrzLWbgLYJGvPoq2Xm5OjeRci3dwtPixxnjUKJ04Ss1ivNS9tZQ8y4sjWeelWsrwo4g==
+  dependencies:
+    "@ucast/mongo2js" "^2.0.0"
+
+"@casl/react@^7.0.0":
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/@casl/react/-/react-7.0.0.tgz#0df8035f80e874c579d55b9ee2cc2319e12c3d3a"
+  integrity sha512-TfSujWNo4IosHoYZpkGdKXwlKdUBeJCm5CxaApjsOeyNFRfXcGWhHkikK4b6D0L+HgiRiizE7PxHhpc7lv3Z/g==
+
 "@csstools/color-helpers@^6.0.2":
   version "6.0.2"
   resolved "https://registry.yarnpkg.com/@csstools/color-helpers/-/color-helpers-6.0.2.tgz#82c59fd30649cf0b4d3c82160489748666e6550b"
@@ -2279,6 +2291,34 @@
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/@types/use-sync-external-store/-/use-sync-external-store-0.0.6.tgz#60be8d21baab8c305132eb9cb912ed497852aadc"
   integrity sha512-zFDAD+tlpf2r4asuHEj0XH6pY6i0g5NeAHPn+15wk3BV6JA69eERFXC1gyGThDkVa1zCyKr5jox1+2LbV/AMLg==
+
+"@ucast/core@2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@ucast/core/-/core-2.0.0.tgz#fafbd125571e987940d8392015710cfe1fd0b035"
+  integrity sha512-4XVx6LzPXZGvnZO5jp39cm/G4UvuwvEdtmg+9+4+zl6uFkCcB7UJacvtMYeBE56GJVT99Zqy6Pii7dGJq3Kz9Q==
+
+"@ucast/js@4.0.1":
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/@ucast/js/-/js-4.0.1.tgz#c3d2843a6178f3a6b61945db966357780078e377"
+  integrity sha512-9O5xPBvwEWQk2WvO69Eh2WJB8QljVZ2vRVdFvfnKjlZwWXcYxp1lqLBhwXBU1AtuSgCvKhJPkXdjKJggUmAmQQ==
+  dependencies:
+    "@ucast/core" "2.0.0"
+
+"@ucast/mongo2js@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@ucast/mongo2js/-/mongo2js-2.0.0.tgz#7a7f7b401e4345da0b517debe39b591bc8cdd6e6"
+  integrity sha512-vNBZzRnsfLr/TSxEoxz6W6hHQ5tmWsfEeC0nCq5z8RezC1AqIRy3cfHm8AGvlGtcn+cTSFQcZremfqnz6wm+nQ==
+  dependencies:
+    "@ucast/core" "2.0.0"
+    "@ucast/js" "4.0.1"
+    "@ucast/mongo" "3.0.0"
+
+"@ucast/mongo@3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@ucast/mongo/-/mongo-3.0.0.tgz#46b7d2b21731272c8c40f5db4afb346cefaf2202"
+  integrity sha512-kwuSH+kdB4GCR0LGhy/PEDm4PCflur89AlK82kNiYD0FvsA8A/p+0sx7m+/R8mMFAlmlkAd3VXp7sM/cLLYWYg==
+  dependencies:
+    "@ucast/core" "2.0.0"
 
 "@use-symbology-scanner/core@1.1.0":
   version "1.1.0"

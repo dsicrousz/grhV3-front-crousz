@@ -1,8 +1,12 @@
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
+import { ConfigProvider } from 'antd'
+import frFR from 'antd/locale/fr_FR'
+import './config/dayjs.config'
 
 import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx'
+import { AbilityProvider } from './auth/ability-context'
 
 // Import the generated route tree
 import { routeTree } from './routeTree.gen'
@@ -38,9 +42,13 @@ if (rootElement && !rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement)
   root.render(
     <StrictMode>
-      <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
-        <RouterProvider router={router} />
-      </TanStackQueryProvider.Provider>
+      <ConfigProvider locale={frFR}>
+        <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
+          <AbilityProvider>
+            <RouterProvider router={router} />
+          </AbilityProvider>
+        </TanStackQueryProvider.Provider>
+      </ConfigProvider>
     </StrictMode>,
   )
 }

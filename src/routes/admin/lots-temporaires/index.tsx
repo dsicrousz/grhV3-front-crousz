@@ -10,8 +10,7 @@ import type { Lot, CreateLotDto } from '@/types/lot'
 import { Typography } from 'antd'
 import { DatePicker } from 'antd'
 import dayjs from 'dayjs'
-import { USER_ROLE } from '@/types/user.roles'
-import { useSession } from '@/auth/auth-client'
+import { useAbility } from '@/auth/ability-context'
 import type { ColumnsType } from 'antd/es/table'
 
 const { Title, Text } = Typography
@@ -22,7 +21,7 @@ export const Route = createFileRoute('/admin/lots-temporaires/')({
 })
 
 function LotsTemporairesPage() {
-  const { data: session } = useSession()
+  const ability = useAbility()
   const navigate = Route.useNavigate()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingLot, setEditingLot] = useState<Lot | null>(null)
@@ -366,7 +365,7 @@ function LotsTemporairesPage() {
           </Tooltip>
 
           {/* Boutons pour le rôle RH */}
-          {session?.user.role === USER_ROLE.RH && (
+          {ability.can('create', 'lot') && (
             <>
               {record.etat === StateLot.BROUILLON && (
                 <>
@@ -432,7 +431,7 @@ function LotsTemporairesPage() {
           )}
 
           {/* Boutons pour le rôle CSA */}
-          {session?.user.role === USER_ROLE.CSA && (
+          {ability.can('update', 'lot') && (
             <>
               {record.etat === StateLot.WAITING1 && (
                 <Tooltip title="Mettre en cours de validation">
@@ -459,7 +458,7 @@ function LotsTemporairesPage() {
           )}
 
           {/* Boutons pour le rôle Admin */}
-          {session?.user.role === USER_ROLE.ADMIN && record.etat === StateLot.WAITING2 && (
+          {ability.can('validate', 'lot') && record.etat === StateLot.WAITING2 && (
             <>
               <Tooltip title="Valider">
                 <Button
@@ -480,7 +479,7 @@ function LotsTemporairesPage() {
               </Tooltip>
             </>
           )}
-          {session?.user.role === USER_ROLE.ADMIN && record.etat === StateLot.VALIDE && (
+          {ability.can('validate', 'lot') && record.etat === StateLot.VALIDE && (
             <Popconfirm
               title="Invalider ce lot ?"
               description="Le lot repassera à l'état précédent."
@@ -500,7 +499,7 @@ function LotsTemporairesPage() {
             </Popconfirm>
           )}
 
-          {record.etat === StateLot.VALIDE && !record.isPublished && session?.user.role === USER_ROLE.CSA && (
+          {record.etat === StateLot.VALIDE && !record.isPublished && ability.can('update', 'lot') && (
             <Tooltip title="Publier">
               <Button
                 type="text"
@@ -510,7 +509,7 @@ function LotsTemporairesPage() {
               />
             </Tooltip>
           )}
-          {record.etat === StateLot.VALIDE && record.isPublished && session?.user.role === USER_ROLE.CSA && (
+          {record.etat === StateLot.VALIDE && record.isPublished && ability.can('update', 'lot') && (
             <Tooltip title="Dépublier">
               <Button
                 type="text"
@@ -520,7 +519,7 @@ function LotsTemporairesPage() {
               />
             </Tooltip>
           )}
-          {record.isPublished && !record.isTransmitted && session?.user.role === USER_ROLE.RH && (
+          {record.isPublished && !record.isTransmitted && ability.can('create', 'lot') && (
             <Tooltip title="Transmettre">
               <Button
                 type="text"
@@ -530,7 +529,7 @@ function LotsTemporairesPage() {
               />
             </Tooltip>
           )}
-          {record.isPublished && record.isTransmitted && session?.user.role === USER_ROLE.RH && (
+          {record.isPublished && record.isTransmitted && ability.can('create', 'lot') && (
             <Tooltip title="Annuler la transmission">
               <Button
                 type="text"

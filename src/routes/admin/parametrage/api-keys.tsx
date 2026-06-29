@@ -22,7 +22,7 @@ import {
 import { Plus, Trash2, Key, Copy, Eye, EyeOff, RefreshCw } from 'lucide-react'
 import type { ColumnsType } from 'antd/es/table'
 import { authClient } from '@/auth/auth-client'
-import { USER_ROLE } from '@/types/user.roles'
+import { defineAbilityFor } from '@/auth/abilities'
 import dayjs from 'dayjs'
 
 type ApiKey = NonNullable<Awaited<ReturnType<typeof authClient.apiKey.list>>['data']>['apiKeys'][number]
@@ -33,7 +33,8 @@ const { Title, Text } = Typography
 export const Route = createFileRoute('/admin/parametrage/api-keys')({
   beforeLoad: async () => {
     const session = await authClient.getSession()
-    if (session.data?.user?.role !== USER_ROLE.ADMIN) {
+    const ability = defineAbilityFor(session.data?.user?.role || '')
+    if (!ability.can('create', 'session')) {
       throw redirect({ to: '/admin' })
     }
   },

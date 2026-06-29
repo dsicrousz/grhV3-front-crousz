@@ -18,211 +18,164 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { useSession } from "@/auth/auth-client"
-import { USER_ROLE } from "@/types/user.roles"
+import { useAbility } from "@/auth/ability-context"
+import type { Action, Subject } from "@/auth/abilities"
 import { Avatar } from "antd"
 
-// This is sample data.
-const data = {
+type NavItem = {
+  title: string
+  url: string
+  I?: Action
+  a?: Subject
+  items?: NavItem[]
+}
+
+type NavSection = {
+  title: string
+  I?: Action
+  a?: Subject
+  icon: typeof Menu
+  isActive: boolean
+  items: NavItem[]
+}
+
+const data: { navMain: NavSection[] } = {
   navMain: [
     {
       title: "Tableau de bord",
-      roles: [USER_ROLE.ADMIN, USER_ROLE.RH,USER_ROLE.CSA],
+      I: 'read',
+      a: 'employe',
       icon: Menu,
       isActive: true,
       items: [
-        {
-          title: "Tableau de bord",
-          url: "/admin",
-          roles: [USER_ROLE.ADMIN,USER_ROLE.RH,USER_ROLE.CSA],
-        },
+        { title: "Tableau de bord", url: "/admin", I: 'read', a: 'employe' },
       ],
     },
     {
       title: "Employés",
-      roles: [USER_ROLE.RH],
+      I: 'read',
+      a: 'employe',
       icon: Users2,
       isActive: true,
       items: [
-        {
-          title: "Liste des employés",
-          url: "/admin/employes",
-          roles: [USER_ROLE.ADMIN,USER_ROLE.RH,USER_ROLE.CSA],
-        },
+        { title: "Liste des employés", url: "/admin/employes", I: 'list', a: 'employe' },
       ],
     },
     {
       title: "Sites",
-      roles: [USER_ROLE.RH,USER_ROLE.ADMIN,USER_ROLE.CSA],
+      I: 'read',
+      a: 'site',
       icon: MapPin,
       isActive: false,
       items: [
-        {
-          title: "Gestion des sites",
-          url: "/admin/sites",
-          roles: [USER_ROLE.RH,USER_ROLE.ADMIN,USER_ROLE.CSA],
-        },
+        { title: "Gestion des sites", url: "/admin/sites", I: 'list', a: 'site' },
       ],
     },
     {
       title: "Nominations",
-      roles: [USER_ROLE.RH,USER_ROLE.ADMIN,USER_ROLE.CSA],
+      I: 'read',
+      a: 'nomination',
       icon: Award,
       isActive: true,
       items: [
-        {
-          title: "Gestion des nominations",
-          url: "/admin/nominations",
-          roles: [USER_ROLE.RH,USER_ROLE.ADMIN,USER_ROLE.CSA],
-        },
+        { title: "Gestion des nominations", url: "/admin/nominations", I: 'list', a: 'nomination' },
       ],
     },
     {
       title: "Lots de bulletins",
-      roles: [USER_ROLE.RH,USER_ROLE.ADMIN,USER_ROLE.CSA],
+      I: 'read',
+      a: 'lot',
       icon: ListTodo,
       isActive: true,
       items: [
-        {
-          title: "Lots CDI",
-          url: "/admin/lots",
-          roles: [USER_ROLE.RH,USER_ROLE.ADMIN,USER_ROLE.CSA],
-        },
-        {
-          title: "Lots CDD",
-          url: "/admin/lots-cdd",
-          roles: [USER_ROLE.RH,USER_ROLE.ADMIN,USER_ROLE.CSA],
-        },
-        {
-          title: "Lots Temporaires",
-          url: "/admin/lots-temporaires",
-          roles: [USER_ROLE.RH,USER_ROLE.ADMIN,USER_ROLE.CSA],
-        },
+        { title: "Lots CDI", url: "/admin/lots", I: 'list', a: 'lot' },
+        { title: "Lots CDD", url: "/admin/lots-cdd", I: 'list', a: 'lot' },
+        { title: "Lots Temporaires", url: "/admin/lots-temporaires", I: 'list', a: 'lot' },
       ],
     },
     {
       title: "Absences & Congés",
-      roles: [USER_ROLE.RH,USER_ROLE.ADMIN,USER_ROLE.CSA],
+      I: 'read',
+      a: 'absence',
       icon: CalendarDays,
       isActive: true,
       items: [
-        {
-          title: "Gestion des absences",
-          url: "/admin/absences",
-          roles: [USER_ROLE.RH,USER_ROLE.ADMIN,USER_ROLE.CSA],
-        },
-        {
-          title: "Gestion des congés",
-          url: "/admin/conges",
-          roles: [USER_ROLE.RH,USER_ROLE.ADMIN,USER_ROLE.CSA],
-        },
-        {
-          title: "Calendrier",
-          url: "/admin/calendrier",
-          roles: [USER_ROLE.RH,USER_ROLE.ADMIN,USER_ROLE.CSA],
-        },
+        { title: "Gestion des absences", url: "/admin/absences", I: 'list', a: 'absence' },
+        { title: "Gestion des congés", url: "/admin/conges", I: 'list', a: 'conge' },
+        { title: "Calendrier", url: "/admin/calendrier", I: 'read', a: 'absence' },
       ],
     },
     {
       title: "Reporting",
-      roles: [USER_ROLE.RH,USER_ROLE.ADMIN,USER_ROLE.CSA],
+      I: 'read',
+      a: 'reporting',
       icon: BarChart3,
       isActive: false,
       items: [
-        {
-          title: "Statistiques avancées",
-          url: "/admin/reporting",
-          roles: [USER_ROLE.RH,USER_ROLE.ADMIN,USER_ROLE.CSA],
-        },
+        { title: "Statistiques avancées", url: "/admin/reporting", I: 'list', a: 'reporting' },
       ],
     },
     {
       title: "Paramétrage",
-      roles: [USER_ROLE.ADMIN,USER_ROLE.RH,USER_ROLE.CSA],
+      I: 'read',
+      a: 'rubrique',
       icon: Settings,
       isActive: false,
       items: [
-        {
-          title: "Utilisateurs",
-          url: "/admin/parametrage/utilisateurs",
-          roles: [USER_ROLE.ADMIN],
-        },
-        {
-          title: "Rubriques de paie",
-          url: "/admin/parametrage/rubriques",
-          roles: [USER_ROLE.ADMIN,USER_ROLE.RH,USER_ROLE.CSA],
-        },
-        {
-          title: "Categories",
-          url: "/admin/parametrage/categories",
-          roles: [USER_ROLE.ADMIN,USER_ROLE.RH,USER_ROLE.CSA],
-        },
+        { title: "Utilisateurs", url: "/admin/parametrage/utilisateurs", I: 'create', a: 'session' },
+        { title: "Rubriques de paie", url: "/admin/parametrage/rubriques", I: 'list', a: 'rubrique' },
+        { title: "Categories", url: "/admin/parametrage/categories", I: 'list', a: 'categorie' },
         {
           title: "Attributions",
           url: "/admin/parametrage/attributions",
-          roles: [USER_ROLE.ADMIN,USER_ROLE.RH,USER_ROLE.CSA],
+          I: 'list',
+          a: 'attribution',
           items: [
-            {
-              title: "Attributions fonctionnelles",
-              url: "/admin/parametrage/attributions",
-              roles: [USER_ROLE.ADMIN,USER_ROLE.RH,USER_ROLE.CSA],
-            },
+            { title: "Attributions fonctionnelles", url: "/admin/parametrage/attributions", I: 'list', a: 'attribution' },
           ],
         },
-         {
-              title: "Attributions individuelles",
-              url: "/admin/parametrage/attributions-individuelles",
-              roles: [USER_ROLE.ADMIN,USER_ROLE.RH,USER_ROLE.CSA],
-            },
-            {
-              title: "Exclusions spécifiques",
-              url: "/admin/parametrage/exclusions",
-              roles: [USER_ROLE.ADMIN,USER_ROLE.RH,USER_ROLE.CSA],
-            },
-        {
-          title: "Fonctions",
-          url: "/admin/parametrage/fonctions",
-          roles: [USER_ROLE.ADMIN,USER_ROLE.RH,USER_ROLE.CSA],
-        },
-        {
-          title: "Postes",
-          url: "/admin/parametrage/postes",
-          roles: [USER_ROLE.ADMIN,USER_ROLE.RH,USER_ROLE.CSA],
-        },
-        {
-          title: "Divisions & Services",
-          url: "/admin/parametrage/divisions",
-          roles: [USER_ROLE.ADMIN,USER_ROLE.RH,USER_ROLE.CSA],
-        },
-        {
-          title: "Tous les paramètres",
-          url: "/admin/parametrage",
-          roles: [USER_ROLE.ADMIN,USER_ROLE.RH,USER_ROLE.CSA],
-        },
+        { title: "Attributions individuelles", url: "/admin/parametrage/attributions-individuelles", I: 'list', a: 'attribution' },
+        { title: "Exclusions spécifiques", url: "/admin/parametrage/exclusions", I: 'list', a: 'exclusion' },
+        { title: "Fonctions", url: "/admin/parametrage/fonctions", I: 'list', a: 'fonction' },
+        { title: "Postes", url: "/admin/parametrage/postes", I: 'list', a: 'poste' },
+        { title: "Divisions & Services", url: "/admin/parametrage/divisions", I: 'list', a: 'division' },
+        { title: "Tous les paramètres", url: "/admin/parametrage", I: 'read', a: 'rubrique' },
       ],
     },
   ],
-  
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: sessionData } = useSession();  
-  // Adapter les données de session au format attendu par NavUser
+  const ability = useAbility();
+
   const user = sessionData?.user ? {
     name: sessionData.user.name,
     email: sessionData.user.email,
     avatar: sessionData.user.image || '',
   } : undefined;
 
-  // Filtrer les éléments de navigation selon les rôles de l'utilisateur
-  const userRoles = sessionData?.user?.role;
+  const filterItems = (items: NavItem[]): NavItem[] =>
+    items.filter((item) => {
+      if (!item.I || !item.a) return true
+      if (!ability.can(item.I, item.a)) return false
+      if (item.items) {
+        item.items = filterItems(item.items)
+        return item.items.length > 0
+      }
+      return true
+    })
+
   const filteredNavMain = data.navMain
-    .filter((item: any) => !item.roles || item.roles.some((role: string) => userRoles === role))
-    .map((item: any) => ({
-      ...item,
-      items: item.items?.filter((subItem: any) => 
-        !subItem.roles || subItem.roles.some((role: string) => userRoles === role)
-      ),
-    }));
+    .filter((section) => {
+      if (!section.I || !section.a) return true
+      return ability.can(section.I, section.a)
+    })
+    .map((section) => ({
+      ...section,
+      items: filterItems(section.items),
+    }))
+    .filter((section) => section.items.length > 0);
   
   return (
     <Sidebar collapsible="icon" {...props}>

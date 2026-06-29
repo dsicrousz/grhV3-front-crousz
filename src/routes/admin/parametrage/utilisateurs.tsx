@@ -369,7 +369,7 @@ function UtilisateursPage() {
             name="role"
             label="Rôle"
             rules={[{ required: true, message: 'Le rôle est requis' }]}
-            initialValue={USER_ROLE.USER}
+            initialValue={USER_ROLE.DSI}
           >
             <Select
              role="select"

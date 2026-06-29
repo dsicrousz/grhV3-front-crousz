@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { Typography, Card } from 'antd'
 import { FileText, Building2, Users, Settings, UserCog, Briefcase, FileX2, Palette, KeyRound } from 'lucide-react'
-import { useSession } from '@/auth/auth-client'
-import { USER_ROLE } from '@/types/user.roles'
+import { useAbility } from '@/auth/ability-context'
+import type { Action, Subject } from '@/auth/abilities'
 
 const { Title, Text } = Typography
 
@@ -10,13 +10,26 @@ export const Route = createFileRoute('/admin/parametrage/')({
   component: ParametragePage,
 })
 
-const parametrageItems = [
+type ParamItem = {
+  title: string
+  description: string
+  icon: typeof FileText
+  path: string
+  color: string
+  disabled?: boolean
+  I?: Action
+  a?: Subject
+}
+
+const parametrageItems: ParamItem[] = [
   {
     title: 'Utilisateurs',
     description: 'Gérer les comptes et les permissions des utilisateurs',
     icon: UserCog,
     path: '/admin/parametrage/utilisateurs',
     color: 'bg-blue-100 text-blue-600',
+    I: 'create',
+    a: 'session',
   },
   {
     title: 'Rubriques de paie',
@@ -24,6 +37,8 @@ const parametrageItems = [
     icon: FileText,
     path: '/admin/parametrage/rubriques',
     color: 'bg-teal-100 text-teal-600',
+    I: 'list',
+    a: 'rubrique',
   },
   {
     title: 'Fonctions',
@@ -31,6 +46,8 @@ const parametrageItems = [
     icon: Briefcase,
     path: '/admin/parametrage/fonctions',
     color: 'bg-amber-100 text-amber-600',
+    I: 'list',
+    a: 'fonction',
   },
   {
     title: 'Divisions & Services',
@@ -38,6 +55,8 @@ const parametrageItems = [
     icon: Building2,
     path: '/admin/parametrage/divisions',
     color: 'bg-purple-100 text-purple-600',
+    I: 'list',
+    a: 'division',
   },
   {
     title: 'Catégories employés',
@@ -45,7 +64,6 @@ const parametrageItems = [
     icon: Users,
     path: '/admin/parametrage/categories',
     color: 'bg-indigo-100 text-indigo-600',
-    disabled: true,
   },
   {
     title:'Attributions Individuelles',
@@ -53,6 +71,8 @@ const parametrageItems = [
     icon: FileText,
     path: '/admin/parametrage/attributions-individuelles',
     color: 'bg-teal-100 text-teal-600',
+    I: 'list',
+    a: 'attribution',
   },
   {
     title: 'Motifs de rupture',
@@ -60,6 +80,8 @@ const parametrageItems = [
     icon: FileX2,
     path: '/admin/parametrage/motifs-rupture',
     color: 'bg-red-100 text-red-600',
+    I: 'list',
+    a: 'motifRupture',
   },
   {
     title: 'Couleurs bulletins',
@@ -67,23 +89,32 @@ const parametrageItems = [
     icon: Palette,
     path: '/admin/parametrage/parametres-bulletins',
     color: 'bg-violet-100 text-violet-600',
+    I: 'list',
+    a: 'parametreBulletin',
   },
 ]
 
-const adminOnlyItems = [
+const restrictedItems: ParamItem[] = [
   {
     title: 'Clés API',
     description: 'Créer et gérer les clés d\'authentification pour les intégrations externes',
     icon: KeyRound,
     path: '/admin/parametrage/api-keys',
     color: 'bg-gray-900 text-white',
-    disabled: false,
+    I: 'create',
+    a: 'session',
   },
 ]
 
 function ParametragePage() {
-  const { data: session } = useSession()
-  const isAdmin = session?.user?.role === USER_ROLE.ADMIN
+  const ability = useAbility()
+
+  const allItems = [...parametrageItems, ...restrictedItems]
+  const visibleItems = allItems.filter((item) => {
+    if (item.disabled) return true
+    if (!item.I || !item.a) return true
+    return ability.can(item.I, item.a)
+  })
 
   return (
     <div className="p-6">
@@ -100,7 +131,7 @@ function ParametragePage() {
 
       {/* Grid of settings */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {[...parametrageItems, ...(isAdmin ? adminOnlyItems : [])].map((item) => (
+        {visibleItems.map((item) => (
           <Link
             key={item.path}
             to={item.disabled ? '#' : item.path}

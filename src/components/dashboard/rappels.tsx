@@ -35,7 +35,7 @@ const typeIcons = {
 }
 
 const typeLabels = {
-  cdd_expiration: 'Fin CDD',
+  cdd_expiration: 'Fin Contrat',
   anniversaire: 'Anniversaire',
   conge_en_attente: 'Congé en attente',
   conge_non_pris: 'Congé non utilisé',
@@ -169,7 +169,7 @@ export function DashboardRappels() {
     result.sort((a, b) => severityOrder[a.severity] - severityOrder[b.severity])
 
     return result
-  }, [employes, conges])
+  }, [employes.length, conges.length])
 
   if (rappels.length === 0) {
     return (
