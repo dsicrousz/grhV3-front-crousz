@@ -123,6 +123,7 @@ const data: { navMain: NavSection[] } = {
       isActive: false,
       items: [
         { title: "Utilisateurs", url: "/admin/parametrage/utilisateurs", I: 'create', a: 'session' },
+        { title: "Audit des sessions", url: "/admin/parametrage/audits", I: 'read', a: 'session' },
         { title: "Rubriques de paie", url: "/admin/parametrage/rubriques", I: 'list', a: 'rubrique' },
         { title: "Categories", url: "/admin/parametrage/categories", I: 'list', a: 'categorie' },
         {

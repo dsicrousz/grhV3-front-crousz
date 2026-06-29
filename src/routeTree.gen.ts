@@ -34,6 +34,7 @@ import { Route as AdminParametrageFonctionsRouteImport } from './routes/admin/pa
 import { Route as AdminParametrageExclusionsRouteImport } from './routes/admin/parametrage/exclusions'
 import { Route as AdminParametrageDivisionsRouteImport } from './routes/admin/parametrage/divisions'
 import { Route as AdminParametrageCategoriesRouteImport } from './routes/admin/parametrage/categories'
+import { Route as AdminParametrageAuditsRouteImport } from './routes/admin/parametrage/audits'
 import { Route as AdminParametrageAttributionsIndividuellesRouteImport } from './routes/admin/parametrage/attributions-individuelles'
 import { Route as AdminParametrageAttributionsRouteImport } from './routes/admin/parametrage/attributions'
 import { Route as AdminParametrageApiKeysRouteImport } from './routes/admin/parametrage/api-keys'
@@ -176,6 +177,11 @@ const AdminParametrageCategoriesRoute =
     path: '/parametrage/categories',
     getParentRoute: () => AdminRoute,
   } as any)
+const AdminParametrageAuditsRoute = AdminParametrageAuditsRouteImport.update({
+  id: '/parametrage/audits',
+  path: '/parametrage/audits',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminParametrageAttributionsIndividuellesRoute =
   AdminParametrageAttributionsIndividuellesRouteImport.update({
     id: '/parametrage/attributions-individuelles',
@@ -234,6 +240,7 @@ export interface FileRoutesByFullPath {
   '/admin/parametrage/api-keys': typeof AdminParametrageApiKeysRoute
   '/admin/parametrage/attributions': typeof AdminParametrageAttributionsRoute
   '/admin/parametrage/attributions-individuelles': typeof AdminParametrageAttributionsIndividuellesRoute
+  '/admin/parametrage/audits': typeof AdminParametrageAuditsRoute
   '/admin/parametrage/categories': typeof AdminParametrageCategoriesRoute
   '/admin/parametrage/divisions': typeof AdminParametrageDivisionsRoute
   '/admin/parametrage/exclusions': typeof AdminParametrageExclusionsRoute
@@ -267,6 +274,7 @@ export interface FileRoutesByTo {
   '/admin/parametrage/api-keys': typeof AdminParametrageApiKeysRoute
   '/admin/parametrage/attributions': typeof AdminParametrageAttributionsRoute
   '/admin/parametrage/attributions-individuelles': typeof AdminParametrageAttributionsIndividuellesRoute
+  '/admin/parametrage/audits': typeof AdminParametrageAuditsRoute
   '/admin/parametrage/categories': typeof AdminParametrageCategoriesRoute
   '/admin/parametrage/divisions': typeof AdminParametrageDivisionsRoute
   '/admin/parametrage/exclusions': typeof AdminParametrageExclusionsRoute
@@ -302,6 +310,7 @@ export interface FileRoutesById {
   '/admin/parametrage/api-keys': typeof AdminParametrageApiKeysRoute
   '/admin/parametrage/attributions': typeof AdminParametrageAttributionsRoute
   '/admin/parametrage/attributions-individuelles': typeof AdminParametrageAttributionsIndividuellesRoute
+  '/admin/parametrage/audits': typeof AdminParametrageAuditsRoute
   '/admin/parametrage/categories': typeof AdminParametrageCategoriesRoute
   '/admin/parametrage/divisions': typeof AdminParametrageDivisionsRoute
   '/admin/parametrage/exclusions': typeof AdminParametrageExclusionsRoute
@@ -338,6 +347,7 @@ export interface FileRouteTypes {
     | '/admin/parametrage/api-keys'
     | '/admin/parametrage/attributions'
     | '/admin/parametrage/attributions-individuelles'
+    | '/admin/parametrage/audits'
     | '/admin/parametrage/categories'
     | '/admin/parametrage/divisions'
     | '/admin/parametrage/exclusions'
@@ -371,6 +381,7 @@ export interface FileRouteTypes {
     | '/admin/parametrage/api-keys'
     | '/admin/parametrage/attributions'
     | '/admin/parametrage/attributions-individuelles'
+    | '/admin/parametrage/audits'
     | '/admin/parametrage/categories'
     | '/admin/parametrage/divisions'
     | '/admin/parametrage/exclusions'
@@ -405,6 +416,7 @@ export interface FileRouteTypes {
     | '/admin/parametrage/api-keys'
     | '/admin/parametrage/attributions'
     | '/admin/parametrage/attributions-individuelles'
+    | '/admin/parametrage/audits'
     | '/admin/parametrage/categories'
     | '/admin/parametrage/divisions'
     | '/admin/parametrage/exclusions'
@@ -603,6 +615,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminParametrageCategoriesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/parametrage/audits': {
+      id: '/admin/parametrage/audits'
+      path: '/parametrage/audits'
+      fullPath: '/admin/parametrage/audits'
+      preLoaderRoute: typeof AdminParametrageAuditsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/parametrage/attributions-individuelles': {
       id: '/admin/parametrage/attributions-individuelles'
       path: '/parametrage/attributions-individuelles'
@@ -672,6 +691,7 @@ interface AdminRouteChildren {
   AdminParametrageApiKeysRoute: typeof AdminParametrageApiKeysRoute
   AdminParametrageAttributionsRoute: typeof AdminParametrageAttributionsRoute
   AdminParametrageAttributionsIndividuellesRoute: typeof AdminParametrageAttributionsIndividuellesRoute
+  AdminParametrageAuditsRoute: typeof AdminParametrageAuditsRoute
   AdminParametrageCategoriesRoute: typeof AdminParametrageCategoriesRoute
   AdminParametrageDivisionsRoute: typeof AdminParametrageDivisionsRoute
   AdminParametrageExclusionsRoute: typeof AdminParametrageExclusionsRoute
@@ -706,6 +726,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminParametrageAttributionsRoute: AdminParametrageAttributionsRoute,
   AdminParametrageAttributionsIndividuellesRoute:
     AdminParametrageAttributionsIndividuellesRoute,
+  AdminParametrageAuditsRoute: AdminParametrageAuditsRoute,
   AdminParametrageCategoriesRoute: AdminParametrageCategoriesRoute,
   AdminParametrageDivisionsRoute: AdminParametrageDivisionsRoute,
   AdminParametrageExclusionsRoute: AdminParametrageExclusionsRoute,

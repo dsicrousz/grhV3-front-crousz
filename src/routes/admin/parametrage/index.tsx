@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { Typography, Card } from 'antd'
-import { FileText, Building2, Users, Settings, UserCog, Briefcase, FileX2, Palette, KeyRound } from 'lucide-react'
+import { FileText, Building2, Users, Settings, UserCog, Briefcase, FileX2, Palette, KeyRound, ScrollText } from 'lucide-react'
 import { useAbility } from '@/auth/ability-context'
 import type { Action, Subject } from '@/auth/abilities'
 
@@ -102,6 +102,15 @@ const restrictedItems: ParamItem[] = [
     path: '/admin/parametrage/api-keys',
     color: 'bg-gray-900 text-white',
     I: 'create',
+    a: 'session',
+  },
+  {
+    title: 'Audit des sessions',
+    description: 'Consulter l\'historique des connexions et déconnexions',
+    icon: ScrollText,
+    path: '/admin/parametrage/audits',
+    color: 'bg-rose-100 text-rose-600',
+    I: 'read',
     a: 'session',
   },
 ]
