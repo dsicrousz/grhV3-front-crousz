@@ -41,6 +41,9 @@ export type Action =
   | 'validate'
   | 'upload'
   | 'calculate'
+  | 'transmit'
+  | 'waiting'
+  | 'publish'
   | 'close'
 
 export type AppAbility = MongoAbility<[Action, Subject]>
@@ -78,14 +81,14 @@ const dsiStatements: RoleStatements = {
 }
 
 const adminStatements: RoleStatements = {
-  employe: ['create', 'read', 'update', 'delete', 'list'],
-  bulletin: ['create', 'read', 'update', 'delete', 'list', 'generate', 'validate'],
-  lot: ['create', 'read', 'update', 'delete', 'list', 'calculate', 'close'],
+  employe: ['read', 'list'],
+  bulletin: ['create', 'read', 'update', 'delete', 'list', 'validate'],
+  lot: ['read', 'update', 'delete', 'list', 'calculate', 'close','validate'],
   rubrique: ['create', 'read', 'update', 'delete', 'list'],
   session: ['create', 'read', 'update', 'delete', 'list', 'close'],
   document: ['create', 'read', 'update', 'delete', 'list', 'upload'],
   nomination: ['create', 'read', 'update', 'delete', 'list'],
-  attribution: ['create', 'read', 'update', 'delete', 'list'],
+  attribution: ['read', 'update', 'delete', 'list'],
   contrat: ['create', 'read', 'update', 'delete', 'list'],
   conge: ['create', 'read', 'update', 'delete', 'list', 'validate'],
   absence: ['create', 'read', 'update', 'delete', 'list', 'validate'],
@@ -110,7 +113,7 @@ const adminStatements: RoleStatements = {
 const rhStatements: RoleStatements = {
   employe: ['create', 'read', 'update', 'delete', 'list'],
   bulletin: ['create', 'read', 'update', 'list', 'generate', 'validate'],
-  lot: ['read', 'list', 'delete', 'update', 'create', 'calculate', 'close'],
+  lot: ['read', 'list', 'delete', 'update', 'create', 'calculate', 'close','transmit'],
   rubrique: ['read', 'list'],
   session: ['read', 'list'],
   document: ['create', 'read', 'update', 'delete', 'list', 'upload'],
@@ -140,7 +143,7 @@ const rhStatements: RoleStatements = {
 const csaStatements: RoleStatements = {
   employe: ['read', 'list'],
   bulletin: ['read', 'list', 'validate'],
-  lot: ['read', 'update', 'list', 'calculate', 'close'],
+  lot: ['read', 'update', 'list', 'calculate', 'close', 'publish', 'waiting'],
   rubrique: ['read', 'list'],
   session: ['read', 'list'],
   document: ['read', 'list'],

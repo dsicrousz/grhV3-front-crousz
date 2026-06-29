@@ -635,7 +635,7 @@ function LotsPage() {
               )}
             </>
           )}
-          {ability.can('update', 'lot') && (
+          {ability.can('waiting', 'lot') && (
             <>
               {record.etat === StateLot.WAITING1 && (
                 <Tooltip title="Mettre en cours de validation">
@@ -700,7 +700,7 @@ function LotsPage() {
               </Tooltip>
             </Popconfirm>
           )}
-          {record.etat === StateLot.VALIDE && !record.isPublished && ability.can('update', 'lot') && (
+          {record.etat === StateLot.VALIDE && !record.isPublished && ability.can('publish', 'lot') && (
             <Tooltip title="Publier">
               <Button
                 type="text"
@@ -710,7 +710,7 @@ function LotsPage() {
               />
             </Tooltip>
           )}
-          {record.etat === StateLot.VALIDE && record.isPublished && ability.can('update', 'lot') && (
+          {record.etat === StateLot.VALIDE && record.isPublished && ability.can('publish', 'lot') && (
             <Tooltip title="Dépublier">
               <Button
                 type="text"
@@ -720,7 +720,7 @@ function LotsPage() {
               />
             </Tooltip>
           )}
-          {record.isPublished && !record.isTransmitted && ability.can('create', 'lot') && (
+          {record.isPublished && !record.isTransmitted && ability.can('transmit', 'lot') && (
             <Tooltip title="Transmettre">
               <Button
                 type="text"
@@ -730,7 +730,7 @@ function LotsPage() {
               />
             </Tooltip>
           )}
-          {record.isPublished && record.isTransmitted && ability.can('create', 'lot') && (
+          {record.isPublished && record.isTransmitted && ability.can('transmit', 'lot') && (
             <Tooltip title="Annuler la transmission">
               <Button
                 type="text"
