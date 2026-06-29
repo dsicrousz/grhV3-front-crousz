@@ -85,7 +85,7 @@ const dsiStatements: RoleStatements = {
 const adminStatements: RoleStatements = {
   employe: ['read', 'list'],
   bulletin: ['create', 'read', 'update', 'delete', 'list', 'validate'],
-  lot: ['read', 'update', 'delete', 'list', 'calculate', 'close','validate'],
+  lot: ['read', 'update', 'delete', 'list', 'calculate', 'close','validate','reject'],
   rubrique: ['create', 'read', 'update', 'delete', 'list'],
   session: ['create', 'read', 'update', 'delete', 'list', 'close'],
   document: ['create', 'read', 'update', 'delete', 'list', 'upload'],
@@ -145,7 +145,7 @@ const rhStatements: RoleStatements = {
 const csaStatements: RoleStatements = {
   employe: ['read', 'list'],
   bulletin: ['read', 'list', 'validate'],
-  lot: ['read', 'update', 'list', 'calculate', 'close', 'publish', 'waiting', 'cancel_waiting', 'reject'],
+  lot: ['read', 'update', 'list', 'calculate', 'close', 'publish', 'waiting', 'cancel_waiting'],
   rubrique: ['read', 'list'],
   session: ['read', 'list'],
   document: ['read', 'list'],
