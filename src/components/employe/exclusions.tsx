@@ -6,6 +6,7 @@ import type { ExclusionSpecifique } from '@/types/exclusion-specifique'
 import type { CreateExclusionSpecifiqueDto } from '@/types/exclusion-specifique'
 import { ExclusionSpecifiqueService } from '@/services/exclusion-specifique.service'
 import { RubriqueService } from '@/services/rubrique.service'
+import { useAbility } from '@/auth/ability-context'
 
 const { Title, Text } = Typography
 
@@ -14,6 +15,7 @@ interface EmployeExclusionsProps {
 }
 
 export const EmployeExclusions = ({ employeId }: EmployeExclusionsProps) => {
+  const ability = useAbility()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingExclusion, setEditingExclusion] = useState<ExclusionSpecifique | null>(null)
   const [form] = Form.useForm()
@@ -89,13 +91,15 @@ export const EmployeExclusions = ({ employeId }: EmployeExclusionsProps) => {
     <div className="space-y-4">
       <div className="flex justify-between items-center mb-4">
         <Title level={5} className="mb-0!">Exclusions spécifiques</Title>
-        <Button 
-          type="primary" 
-          icon={<Plus className="w-4 h-4" />}
-          onClick={() => setIsModalOpen(true)}
-        >
-          Nouvelle exclusion
-        </Button>
+        {ability.can('create', 'exclusion') && (
+          <Button 
+            type="primary" 
+            icon={<Plus className="w-4 h-4" />}
+            onClick={() => setIsModalOpen(true)}
+          >
+            Nouvelle exclusion
+          </Button>
+        )}
       </div>
 
       <div className="space-y-4">
@@ -116,31 +120,35 @@ export const EmployeExclusions = ({ employeId }: EmployeExclusionsProps) => {
                   </div>
                 </div>
                 <Space>
-                  <Button
-                    type="text"
-                    size="small"
-                    icon={<Pencil className="w-4 h-4" />}
-                    onClick={() => {
-                      setEditingExclusion(exclusion)
-                      form.setFieldsValue(exclusion)
-                      setIsModalOpen(true)
-                    }}
-                  />
-                  <Popconfirm
-                    title="Supprimer cette exclusion ?"
-                    description="Cette action est irréversible."
-                    onConfirm={() => deleteMutation.mutate(exclusion._id)}
-                    okText="Supprimer"
-                    cancelText="Annuler"
-                    okButtonProps={{ danger: true }}
-                  >
+                  {ability.can('update', 'exclusion') && (
                     <Button
                       type="text"
                       size="small"
-                      danger
-                      icon={<Trash2 className="w-4 h-4" />}
+                      icon={<Pencil className="w-4 h-4" />}
+                      onClick={() => {
+                        setEditingExclusion(exclusion)
+                        form.setFieldsValue(exclusion)
+                        setIsModalOpen(true)
+                      }}
                     />
-                  </Popconfirm>
+                  )}
+                  {ability.can('delete', 'exclusion') && (
+                    <Popconfirm
+                      title="Supprimer cette exclusion ?"
+                      description="Cette action est irréversible."
+                      onConfirm={() => deleteMutation.mutate(exclusion._id)}
+                      okText="Supprimer"
+                      cancelText="Annuler"
+                      okButtonProps={{ danger: true }}
+                    >
+                      <Button
+                        type="text"
+                        size="small"
+                        danger
+                        icon={<Trash2 className="w-4 h-4" />}
+                      />
+                    </Popconfirm>
+                  )}
                 </Space>
               </div>
             </Card>

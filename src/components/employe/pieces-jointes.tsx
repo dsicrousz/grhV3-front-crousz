@@ -6,6 +6,7 @@ import type { PieceJointe } from '@/types/piece-jointe'
 import { TypePieceJointe } from '@/types/piece-jointe'
 import type { CreatePieceJointeDto } from '@/types/piece-jointe'
 import { PieceJointeService } from '@/services/piece-jointe.service'
+import { useAbility } from '@/auth/ability-context'
 import dayjs from 'dayjs'
 
 const { Title, Text } = Typography
@@ -69,6 +70,7 @@ const isExpiringSoon = (date?: string, days = 30) => {
 }
 
 export const EmployePiecesJointes = ({ employeId }: EmployePiecesJointesProps) => {
+  const ability = useAbility()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [filterType, setFilterType] = useState<TypePieceJointe | null>(null)
@@ -174,17 +176,19 @@ export const EmployePiecesJointes = ({ employeId }: EmployePiecesJointesProps) =
             </Tag>
           )}
         </div>
-        <Button
-          type="primary"
-          icon={<Plus className="w-4 h-4" />}
-          onClick={() => {
-            setSelectedFile(null)
-            form.resetFields()
-            setIsModalOpen(true)
-          }}
-        >
-          Ajouter un document
-        </Button>
+        {ability.can('create', 'pieceJointe') && (
+          <Button
+            type="primary"
+            icon={<Plus className="w-4 h-4" />}
+            onClick={() => {
+              setSelectedFile(null)
+              form.resetFields()
+              setIsModalOpen(true)
+            }}
+          >
+            Ajouter un document
+          </Button>
+        )}
       </div>
 
       {/* Filtres */}
@@ -303,23 +307,25 @@ export const EmployePiecesJointes = ({ employeId }: EmployePiecesJointesProps) =
                         </Tooltip>
                       </>
                     )}
-                    <Popconfirm
-                      title="Supprimer cette pièce jointe ?"
-                      description="Cette action est irréversible."
-                      onConfirm={() => deleteMutation.mutate(piece._id)}
-                      okText="Supprimer"
-                      cancelText="Annuler"
-                      okButtonProps={{ danger: true }}
-                    >
-                      <Tooltip title="Supprimer">
-                        <Button
-                          type="text"
-                          size="small"
-                          danger
-                          icon={<Trash2 className="w-4 h-4" />}
-                        />
-                      </Tooltip>
-                    </Popconfirm>
+                    {ability.can('delete', 'pieceJointe') && (
+                      <Popconfirm
+                        title="Supprimer cette pièce jointe ?"
+                        description="Cette action est irréversible."
+                        onConfirm={() => deleteMutation.mutate(piece._id)}
+                        okText="Supprimer"
+                        cancelText="Annuler"
+                        okButtonProps={{ danger: true }}
+                      >
+                        <Tooltip title="Supprimer">
+                          <Button
+                            type="text"
+                            size="small"
+                            danger
+                            icon={<Trash2 className="w-4 h-4" />}
+                          />
+                        </Tooltip>
+                      </Popconfirm>
+                    )}
                   </Space>
                 </div>
               </Card>

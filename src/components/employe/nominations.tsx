@@ -7,6 +7,7 @@ import type { CreateNominationDto } from '@/types/nomination'
 import { NominationService } from '@/services/nomination.service'
 import { DivisionService, ServiceService } from '@/services/division.service'
 import { FonctionService } from '@/services/fonction.service'
+import { useAbility } from '@/auth/ability-context'
 import dayjs from 'dayjs'
 
 const { Title, Text } = Typography
@@ -16,6 +17,7 @@ interface EmployeNominationsProps {
 }
 
 export const EmployeNominations = ({ employeId }: EmployeNominationsProps) => {
+  const ability = useAbility()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingNomination, setEditingNomination] = useState<Nomination | null>(null)
   const [selectedDivision, setSelectedDivision] = useState<string | null>(null)
@@ -124,13 +126,15 @@ export const EmployeNominations = ({ employeId }: EmployeNominationsProps) => {
     <div className="space-y-4">
       <div className="flex justify-between items-center mb-4">
         <Title level={5} className="mb-0!">Nominations</Title>
-        <Button 
-          type="primary" 
-          icon={<Plus className="w-4 h-4" />}
-          onClick={() => setIsModalOpen(true)}
-        >
-          Nouvelle nomination
-        </Button>
+        {ability.can('create', 'nomination') && (
+          <Button 
+            type="primary" 
+            icon={<Plus className="w-4 h-4" />}
+            onClick={() => setIsModalOpen(true)}
+          >
+            Nouvelle nomination
+          </Button>
+        )}
       </div>
 
       <div className="mt-6">
@@ -204,21 +208,25 @@ export const EmployeNominations = ({ employeId }: EmployeNominationsProps) => {
                           )}
                         </div>
                         <Space size="small">
-                          <Button
-                            type="text"
-                            size="small"
-                            icon={<Pencil className="w-4 h-4 text-blue-500" />}
-                            onClick={() => handleEdit(nomination)}
-                          />
-                          <Button
-                            type="text"
-                            size="small"
-                            icon={nomination.est_active ? 
-                              <X className="w-4 h-4 text-red-500" /> : 
-                              <Check className="w-4 h-4 text-green-500" />
-                            }
-                            onClick={() => handleToggleActive(nomination)}
-                          />
+                          {ability.can('update', 'nomination') && (
+                            <Button
+                              type="text"
+                              size="small"
+                              icon={<Pencil className="w-4 h-4 text-blue-500" />}
+                              onClick={() => handleEdit(nomination)}
+                            />
+                          )}
+                          {ability.can('update', 'nomination') && (
+                            <Button
+                              type="text"
+                              size="small"
+                              icon={nomination.est_active ? 
+                                <X className="w-4 h-4 text-red-500" /> : 
+                                <Check className="w-4 h-4 text-green-500" />
+                              }
+                              onClick={() => handleToggleActive(nomination)}
+                            />
+                          )}
                         </Space>
                       </div>
                     </Card>

@@ -8,6 +8,7 @@ import { AttributionIndividuelleService } from '@/services/attribution-individue
 import { AttributionGlobaleService, AttributionFonctionnelleService } from '@/services/attribution.service'
 import { RubriqueService } from '@/services/rubrique.service'
 import { EmployeService } from '@/services/employe.service'
+import { useAbility } from '@/auth/ability-context'
 
 const { Title, Text } = Typography
 
@@ -16,6 +17,7 @@ interface EmployeAttributionsProps {
 }
 
 export const EmployeAttributions = ({ employeId }: EmployeAttributionsProps) => {
+  const ability = useAbility()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingAttribution, setEditingAttribution] = useState<AttributionIndividuelle | null>(null)
   const [form] = Form.useForm()
@@ -144,13 +146,15 @@ export const EmployeAttributions = ({ employeId }: EmployeAttributionsProps) => 
       {/* Attributions individuelles */}
       <div className="flex justify-between items-center my-4">
         <Title level={5} className="mb-0!">Attributions individuelles</Title>
-        <Button 
-          type="primary" 
-          icon={<Plus className="w-4 h-4" />}
-          onClick={() => setIsModalOpen(true)}
-        >
-          Nouvelle attribution
-        </Button>
+        {ability.can('create', 'affectation') && (
+          <Button 
+            type="primary" 
+            icon={<Plus className="w-4 h-4" />}
+            onClick={() => setIsModalOpen(true)}
+          >
+            Nouvelle attribution
+          </Button>
+        )}
       </div>
 
       <div className="space-y-4">
@@ -174,31 +178,35 @@ export const EmployeAttributions = ({ employeId }: EmployeAttributionsProps) => 
                   </div>
                 </div>
                 <Space>
-                  <Button
-                    type="text"
-                    size="small"
-                    icon={<Pencil className="w-4 h-4" />}
-                    onClick={() => {
-                      setEditingAttribution(attribution)
-                      form.setFieldsValue(attribution)
-                      setIsModalOpen(true)
-                    }}
-                  />
-                  <Popconfirm
-                    title="Supprimer cette attribution ?"
-                    description="Cette action est irréversible."
-                    onConfirm={() => deleteMutation.mutate(attribution._id)}
-                    okText="Supprimer"
-                    cancelText="Annuler"
-                    okButtonProps={{ danger: true }}
-                  >
+                  {ability.can('update', 'affectation') && (
                     <Button
                       type="text"
                       size="small"
-                      danger
-                      icon={<Trash2 className="w-4 h-4" />}
+                      icon={<Pencil className="w-4 h-4" />}
+                      onClick={() => {
+                        setEditingAttribution(attribution)
+                        form.setFieldsValue(attribution)
+                        setIsModalOpen(true)
+                      }}
                     />
-                  </Popconfirm>
+                  )}
+                  {ability.can('delete', 'affectation') && (
+                    <Popconfirm
+                      title="Supprimer cette attribution ?"
+                      description="Cette action est irréversible."
+                      onConfirm={() => deleteMutation.mutate(attribution._id)}
+                      okText="Supprimer"
+                      cancelText="Annuler"
+                      okButtonProps={{ danger: true }}
+                    >
+                      <Button
+                        type="text"
+                        size="small"
+                        danger
+                        icon={<Trash2 className="w-4 h-4" />}
+                      />
+                    </Popconfirm>
+                  )}
                 </Space>
               </div>
             </Card>

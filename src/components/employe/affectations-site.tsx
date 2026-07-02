@@ -8,6 +8,7 @@ import type { Division } from '@/types/division'
 import { AffectationSiteService } from '@/services/affectation-site.service'
 import { SiteService } from '@/services/site.service'
 import { DivisionService, ServiceService } from '@/services/division.service'
+import { useAbility } from '@/auth/ability-context'
 import dayjs from 'dayjs'
 
 const { Title, Text } = Typography
@@ -17,6 +18,7 @@ interface EmployeAffectationsSiteProps {
 }
 
 export const EmployeAffectationsSite = ({ employeId }: EmployeAffectationsSiteProps) => {
+  const ability = useAbility()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedDivision, setSelectedDivision] = useState<string | null>(null)
   const [editingAffectation, setEditingAffectation] = useState<AffectationSite | null>(null)
@@ -150,19 +152,21 @@ export const EmployeAffectationsSite = ({ employeId }: EmployeAffectationsSitePr
     <div className="space-y-4">
       <div className="flex justify-between items-center mb-4">
         <Title level={5} className="mb-0!">Affectations site</Title>
-        <Button
-          type="primary"
-          icon={<Plus className="w-4 h-4" />}
-          onClick={() => { 
-            setEditingAffectation(null)
-            form.resetFields()
-            setSelectedDivision(null)
-            setIsModalOpen(true) 
-          }}
-          disabled={!!affectationActive && !editingAffectation}
-        >
-          {affectationActive && !editingAffectation ? 'Affectation active existante' : 'Nouvelle affectation'}
-        </Button>
+        {ability.can('create', 'affectation') && (
+          <Button
+            type="primary"
+            icon={<Plus className="w-4 h-4" />}
+            onClick={() => { 
+              setEditingAffectation(null)
+              form.resetFields()
+              setSelectedDivision(null)
+              setIsModalOpen(true) 
+            }}
+            disabled={!!affectationActive && !editingAffectation}
+          >
+            {affectationActive && !editingAffectation ? 'Affectation active existante' : 'Nouvelle affectation'}
+          </Button>
+        )}
       </div>
 
       {isLoading ? (
@@ -184,33 +188,37 @@ export const EmployeAffectationsSite = ({ employeId }: EmployeAffectationsSitePr
               }
               extra={
                 <Space>
-                  <Tooltip title="Modifier">
-                    <Button
-                      size="small"
-                      icon={<Pencil className="w-3 h-3" />}
-                      onClick={() => {
-                        setEditingAffectation(affectationActive)
-                        form.setFieldsValue({
-                          site: typeof affectationActive.site === 'string' ? affectationActive.site : affectationActive.site._id,
-                          division: typeof affectationActive.division === 'string' ? affectationActive.division : affectationActive.division?._id,
-                          service: typeof affectationActive.service === 'string' ? affectationActive.service : affectationActive.service?._id,
-                          date_debut: dayjs(affectationActive.date_debut),
-                          date_fin: affectationActive.date_fin ? dayjs(affectationActive.date_fin) : undefined,
-                          description: affectationActive.description,
-                        })
-                        setSelectedDivision(typeof affectationActive.division === 'string' ? affectationActive.division : affectationActive.division?._id || null)
-                        setIsModalOpen(true)
-                      }}
-                    />
-                  </Tooltip>
-                  <Popconfirm
-                    title="Terminer cette affectation ?"
-                    onConfirm={() => terminerMutation.mutate(affectationActive._id)}
-                    okText="Terminer"
-                    cancelText="Annuler"
-                  >
-                    <Button size="small" icon={<Square className="w-3 h-3" />} danger>Terminer</Button>
-                  </Popconfirm>
+                  {ability.can('update', 'affectation') && (
+                    <Tooltip title="Modifier">
+                      <Button
+                        size="small"
+                        icon={<Pencil className="w-3 h-3" />}
+                        onClick={() => {
+                          setEditingAffectation(affectationActive)
+                          form.setFieldsValue({
+                            site: typeof affectationActive.site === 'string' ? affectationActive.site : affectationActive.site._id,
+                            division: typeof affectationActive.division === 'string' ? affectationActive.division : affectationActive.division?._id,
+                            service: typeof affectationActive.service === 'string' ? affectationActive.service : affectationActive.service?._id,
+                            date_debut: dayjs(affectationActive.date_debut),
+                            date_fin: affectationActive.date_fin ? dayjs(affectationActive.date_fin) : undefined,
+                            description: affectationActive.description,
+                          })
+                          setSelectedDivision(typeof affectationActive.division === 'string' ? affectationActive.division : affectationActive.division?._id || null)
+                          setIsModalOpen(true)
+                        }}
+                      />
+                    </Tooltip>
+                  )}
+                  {ability.can('update', 'affectation') && (
+                    <Popconfirm
+                      title="Terminer cette affectation ?"
+                      onConfirm={() => terminerMutation.mutate(affectationActive._id)}
+                      okText="Terminer"
+                      cancelText="Annuler"
+                    >
+                      <Button size="small" icon={<Square className="w-3 h-3" />} danger>Terminer</Button>
+                    </Popconfirm>
+                  )}
                 </Space>
               }
             >
@@ -267,17 +275,19 @@ export const EmployeAffectationsSite = ({ employeId }: EmployeAffectationsSitePr
                         {aff.date_fin && <span>au {dayjs(aff.date_fin).format('DD/MM/YYYY')}</span>}
                       </div>
                     </div>
-                    <Popconfirm
-                      title="Supprimer ?"
-                      onConfirm={() => deleteMutation.mutate(aff._id)}
-                      okText="Supprimer"
-                      cancelText="Annuler"
-                      okButtonProps={{ danger: true }}
-                    >
-                      <Tooltip title="Supprimer">
-                        <Button type="text" size="small" danger icon={<Trash2 className="w-4 h-4" />} />
-                      </Tooltip>
-                    </Popconfirm>
+                    {ability.can('delete', 'affectation') && (
+                      <Popconfirm
+                        title="Supprimer ?"
+                        onConfirm={() => deleteMutation.mutate(aff._id)}
+                        okText="Supprimer"
+                        cancelText="Annuler"
+                        okButtonProps={{ danger: true }}
+                      >
+                        <Tooltip title="Supprimer">
+                          <Button type="text" size="small" danger icon={<Trash2 className="w-4 h-4" />} />
+                        </Tooltip>
+                      </Popconfirm>
+                    )}
                   </div>
                 </Card>
               ))}

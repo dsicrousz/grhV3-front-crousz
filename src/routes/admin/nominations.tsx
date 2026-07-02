@@ -27,6 +27,7 @@ import { EmployeService } from '@/services/employe.service'
 import { DivisionService, ServiceService } from '@/services/division.service'
 import { FonctionService } from '@/services/fonction.service'
 import type { Employe } from '@/types/employe'
+import { useAbility } from '@/auth/ability-context'
 import type { Division, Service } from '@/types/division'
 import type { Fonction } from '@/types/fonction'
 import type { ColumnsType } from 'antd/es/table'
@@ -43,6 +44,8 @@ function NominationsPage() {
   const [editingNomination, setEditingNomination] = useState<Nomination | null>(null)
   const [form] = Form.useForm()
   const queryClient = useQueryClient()
+  const ability = useAbility()
+  
 
   // Filtres
   const [searchText, setSearchText] = useState('')
@@ -350,7 +353,7 @@ function NominationsPage() {
             <Text type="secondary">Gérez toutes les nominations des employés</Text>
           </div>
         </div>
-        <Button
+        {ability.can('create', 'nomination') && <Button
           type="primary"
           icon={<Plus className="w-4 h-4" />}
           onClick={() => {
@@ -361,7 +364,7 @@ function NominationsPage() {
           }}
         >
           Nouvelle nomination
-        </Button>
+        </Button>}
       </div>
 
       {/* Statistiques */}

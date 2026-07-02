@@ -12,6 +12,7 @@ import { PosteService } from '@/services/poste.service'
 import { EmployeService } from '@/services/employe.service'
 import { generateContratDecisionPDF } from '@/lib/contrat-decision-pdf'
 import type { Poste } from '@/types/poste'
+import { useAbility } from '@/auth/ability-context'
 import dayjs from 'dayjs'
 
 const { Title, Text } = Typography
@@ -27,6 +28,7 @@ const typeLabels: Record<TypeContrat, { label: string; color: string }> = {
 }
 
 export const EmployeContrats = ({ employeId }: EmployeContratsProps) => {
+  const ability = useAbility()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingContrat, setEditingContrat] = useState<Contrat | null>(null)
   const [selectedType, setSelectedType] = useState<TypeContrat | null>(null)
@@ -231,19 +233,21 @@ export const EmployeContrats = ({ employeId }: EmployeContratsProps) => {
     <div className="space-y-4">
       <div className="flex justify-between items-center mb-4">
         <Title level={5} className="mb-0!">Contrats</Title>
-        <Button
-          type="primary"
-          icon={<Plus className="w-4 h-4" />}
-          onClick={() => {
-            form.resetFields()
-            setEditingContrat(null)
-            setSelectedType(null)
-            setIsModalOpen(true)
-          }}
-          disabled={!!contratActif}
-        >
-          {contratActif ? 'Contrat actif existant' : 'Nouveau contrat'}
-        </Button>
+        {ability.can('create', 'contrat') && (
+          <Button
+            type="primary"
+            icon={<Plus className="w-4 h-4" />}
+            onClick={() => {
+              form.resetFields()
+              setEditingContrat(null)
+              setSelectedType(null)
+              setIsModalOpen(true)
+            }}
+            disabled={!!contratActif}
+          >
+            {contratActif ? 'Contrat actif existant' : 'Nouveau contrat'}
+          </Button>
+        )}
       </div>
 
       {isLoading ? (
@@ -277,21 +281,25 @@ export const EmployeContrats = ({ employeId }: EmployeContratsProps) => {
                       Imprimer décision
                     </Button>
                   )}
-                  <Button
-                    size="small"
-                    icon={<Pencil className="w-3 h-3" />}
-                    onClick={() => handleOpenEditModal(contratActif)}
-                  >
-                    Modifier
-                  </Button>
-                  <Button
-                    size="small"
-                    icon={<Square className="w-3 h-3" />}
-                    danger
-                    onClick={() => handleOpenTerminationModal(contratActif)}
-                  >
-                    Terminer
-                  </Button>
+                  {ability.can('update', 'contrat') && (
+                    <Button
+                      size="small"
+                      icon={<Pencil className="w-3 h-3" />}
+                      onClick={() => handleOpenEditModal(contratActif)}
+                    >
+                      Modifier
+                    </Button>
+                  )}
+                  {ability.can('update', 'contrat') && (
+                    <Button
+                      size="small"
+                      icon={<Square className="w-3 h-3" />}
+                      danger
+                      onClick={() => handleOpenTerminationModal(contratActif)}
+                    >
+                      Terminer
+                    </Button>
+                  )}
                 </Space>
               }
             >
@@ -363,18 +371,20 @@ export const EmployeContrats = ({ employeId }: EmployeContratsProps) => {
                           />
                         </Tooltip>
                       )}
-                      <Popconfirm
-                        title="Supprimer ce contrat ?"
-                        description="Cette action est irréversible."
-                        onConfirm={() => deleteMutation.mutate(contrat._id)}
-                        okText="Supprimer"
-                        cancelText="Annuler"
-                        okButtonProps={{ danger: true }}
-                      >
-                        <Tooltip title="Supprimer">
-                          <Button type="text" size="small" danger icon={<Trash2 className="w-4 h-4" />} />
-                        </Tooltip>
-                      </Popconfirm>
+                      {ability.can('delete', 'contrat') && (
+                        <Popconfirm
+                          title="Supprimer ce contrat ?"
+                          description="Cette action est irréversible."
+                          onConfirm={() => deleteMutation.mutate(contrat._id)}
+                          okText="Supprimer"
+                          cancelText="Annuler"
+                          okButtonProps={{ danger: true }}
+                        >
+                          <Tooltip title="Supprimer">
+                            <Button type="text" size="small" danger icon={<Trash2 className="w-4 h-4" />} />
+                          </Tooltip>
+                        </Popconfirm>
+                      )}
                     </Space>
                   </div>
                 </Card>
