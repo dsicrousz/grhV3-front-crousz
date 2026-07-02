@@ -579,7 +579,7 @@ function LotsTemporairesPage() {
           <Title level={4} className="mb-0! text-blue-600">Lots Temporaires</Title>
           <Text type="secondary">Gestion des lots de paie temporaires</Text>
         </div>
-        <Button
+       {ability.can('create', 'lot') && <Button
           type="primary"
           style={{ backgroundColor: '#2563eb', borderColor: '#2563eb' }}
           icon={<Plus className="w-4 h-4" />}
@@ -590,7 +590,7 @@ function LotsTemporairesPage() {
           }}
         >
           Nouveau lot temporaire
-        </Button>
+        </Button>}
       </div>
 
       <Card className="border-blue-200" style={{ borderColor: '#93c5fd' }}>

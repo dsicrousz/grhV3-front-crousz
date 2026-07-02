@@ -337,7 +337,7 @@ function LotsPage() {
       title: 'Rubrique',
       key: 'libelle',
       render: (_, record) => (
-        <Space direction="vertical" size={0}>
+        <Space orientation="vertical" size={0}>
           <Text strong>{record.libelle}</Text>
           {record.code && <Text type="secondary">{record.code}</Text>}
         </Space>
@@ -375,7 +375,7 @@ function LotsPage() {
       title: 'Lot',
       key: 'libelle',
       render: (_, record) => (
-        <Space direction="vertical" size={0}>
+        <Space orientation="vertical" size={0}>
           <Text strong>{record.libelle}</Text>
         </Space>
       ),

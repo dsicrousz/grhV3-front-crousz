@@ -23,6 +23,7 @@ import { Plus, Pencil, Trash2, Settings, FileText } from 'lucide-react'
 import type { Rubrique, CreateRubriqueDto } from '@/types/rubrique'
 import { TypeRubrique } from '@/types/rubrique'
 import { RubriqueService } from '@/services/rubrique.service'
+import { useAbility } from '@/auth/ability-context'
 import type { ColumnsType } from 'antd/es/table'
 
 const { Title, Text } = Typography
@@ -32,6 +33,7 @@ export const Route = createFileRoute('/admin/parametrage/rubriques')({
 })
 
 function RubriquesPage() {
+  const ability = useAbility()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingRubrique, setEditingRubrique] = useState<Rubrique | null>(null)
   const [searchText, setSearchText] = useState('')
@@ -214,31 +216,35 @@ function RubriquesPage() {
       align: 'center',
       render: (_, record) => (
         <Space size="small">
-          <Tooltip title="Modifier">
-            <Button
-              type="text"
-              size="small"
-              icon={<Pencil className="w-4 h-4" />}
-              onClick={() => handleOpenModal(record)}
-            />
-          </Tooltip>
-          <Popconfirm
-            title="Supprimer cette rubrique ?"
+          {ability.can('update', 'rubrique') && (
+            <Tooltip title="Modifier">
+              <Button
+                type="text"
+                size="small"
+                icon={<Pencil className="w-4 h-4" />}
+                onClick={() => handleOpenModal(record)}
+              />
+            </Tooltip>
+          )}
+          {ability.can('delete', 'rubrique') && (
+            <Popconfirm
+              title="Supprimer cette rubrique ?"
             description="Cette action est irréversible."
             onConfirm={() => deleteMutation.mutate(record._id)}
             okText="Supprimer"
             cancelText="Annuler"
             okButtonProps={{ danger: true }}
           >
-            <Tooltip title="Supprimer">
-              <Button
-                type="text"
-                size="small"
-                danger
-                icon={<Trash2 className="w-4 h-4" />}
-              />
-            </Tooltip>
-          </Popconfirm>
+              <Tooltip title="Supprimer">
+                <Button
+                  type="text"
+                  size="small"
+                  danger
+                  icon={<Trash2 className="w-4 h-4" />}
+                />
+              </Tooltip>
+            </Popconfirm>
+          )}
         </Space>
       ),
     },
@@ -257,14 +263,16 @@ function RubriquesPage() {
             <Text type="secondary">Gérez les rubriques utilisées dans les bulletins de paie</Text>
           </div>
         </div>
-        <Button
-          type="primary"
-          icon={<Plus className="w-4 h-4" />}
-          onClick={() => handleOpenModal()}
-          style={{ backgroundColor: '#0d9488' }}
-        >
-          Nouvelle rubrique
-        </Button>
+        {ability.can('create', 'rubrique') && (
+          <Button
+            type="primary"
+            icon={<Plus className="w-4 h-4" />}
+            onClick={() => handleOpenModal()}
+            style={{ backgroundColor: '#0d9488' }}
+          >
+            Nouvelle rubrique
+          </Button>
+        )}
       </div>
 
       {/* Table */}

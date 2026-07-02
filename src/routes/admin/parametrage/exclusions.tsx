@@ -20,6 +20,7 @@ import type { ExclusionSpecifique, CreateExclusionSpecifiqueDto } from '@/types/
 import { ExclusionSpecifiqueService } from '@/services/exclusion.service'
 import { EmployeService } from '@/services/employe.service'
 import { RubriqueService } from '@/services/rubrique.service'
+import { useAbility } from '@/auth/ability-context'
 import type { ColumnsType } from 'antd/es/table'
 
 const { Title, Text } = Typography
@@ -29,6 +30,7 @@ export const Route = createFileRoute('/admin/parametrage/exclusions')({
 })
 
 function ExclusionsPage() {
+  const ability = useAbility()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingExclusion, setEditingExclusion] = useState<ExclusionSpecifique | null>(null)
   const [searchText, setSearchText] = useState('')
@@ -163,31 +165,35 @@ function ExclusionsPage() {
       align: 'center',
       render: (_, record) => (
         <Space size="small">
-          <Tooltip title="Modifier">
-            <Button
-              type="text"
-              size="small"
-              icon={<Pencil className="w-4 h-4 text-blue-600" />}
-              onClick={() => handleOpenModal(record)}
-            />
-          </Tooltip>
-          <Popconfirm
-            title="Supprimer cette exclusion ?"
+          {ability.can('update', 'exclusion') && (
+            <Tooltip title="Modifier">
+              <Button
+                type="text"
+                size="small"
+                icon={<Pencil className="w-4 h-4 text-blue-600" />}
+                onClick={() => handleOpenModal(record)}
+              />
+            </Tooltip>
+          )}
+          {ability.can('delete', 'exclusion') && (
+            <Popconfirm
+              title="Supprimer cette exclusion ?"
             description="Cette action est irréversible."
             onConfirm={() => deleteMutation.mutate(record._id)}
             okText="Supprimer"
             cancelText="Annuler"
             okButtonProps={{ danger: true }}
           >
-            <Tooltip title="Supprimer">
-              <Button
-                type="text"
-                size="small"
-                danger
-                icon={<Trash2 className="w-4 h-4" />}
-              />
-            </Tooltip>
-          </Popconfirm>
+              <Tooltip title="Supprimer">
+                <Button
+                  type="text"
+                  size="small"
+                  danger
+                  icon={<Trash2 className="w-4 h-4" />}
+                />
+              </Tooltip>
+            </Popconfirm>
+          )}
         </Space>
       ),
     },
@@ -206,14 +212,16 @@ function ExclusionsPage() {
             <Text type="secondary">Gérez les exclusions de rubriques par employé</Text>
           </div>
         </div>
-        <Button
-          type="primary"
-          icon={<Plus className="w-4 h-4" />}
-          onClick={() => handleOpenModal()}
-          style={{ backgroundColor: '#0d9488' }}
-        >
-          Nouvelle exclusion
-        </Button>
+        {ability.can('create', 'exclusion') && (
+          <Button
+            type="primary"
+            icon={<Plus className="w-4 h-4" />}
+            onClick={() => handleOpenModal()}
+            style={{ backgroundColor: '#0d9488' }}
+          >
+            Nouvelle exclusion
+          </Button>
+        )}
       </div>
 
       {/* Table */}

@@ -546,7 +546,7 @@ function LotsCddPage() {
           <Title level={4} className="mb-0! text-orange-600">Lots CDD</Title>
           <Text type="secondary">Gestion des lots de paie CDD</Text>
         </div>
-        <Button
+       {ability.can('create', 'lot') && <Button
           type="primary"
           style={{ backgroundColor: '#f97316', borderColor: '#f97316' }}
           icon={<Plus className="w-4 h-4" />}
@@ -557,7 +557,7 @@ function LotsCddPage() {
           }}
         >
           Nouveau lot CDD
-        </Button>
+        </Button>}
       </div>
 
       <Card className="border-orange-200" style={{ borderColor: '#fdba74' }}>

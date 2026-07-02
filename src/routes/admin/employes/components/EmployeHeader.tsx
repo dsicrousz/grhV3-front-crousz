@@ -2,15 +2,17 @@ import { Button, Space, Typography } from 'antd'
 import { Plus, Users2, Download } from 'lucide-react'
 import { exportToExcel, exportToCSV, employeExportColumns } from '@/lib/export-utils'
 import type { Employe } from '@/types/employe'
+import type { AppAbility } from '@/auth/abilities'
 
 const { Title, Text } = Typography
 
 interface EmployeHeaderProps {
   employes: Employe[]
   onAddClick: () => void
+  ability: AppAbility
 }
 
-export function EmployeHeader({ employes, onAddClick }: EmployeHeaderProps) {
+export function EmployeHeader({ employes, onAddClick, ability }: EmployeHeaderProps) {
   return (
     <div className="flex items-center justify-between mb-6">
       <div className="flex items-center gap-3">
@@ -35,14 +37,16 @@ export function EmployeHeader({ employes, onAddClick }: EmployeHeaderProps) {
         >
           CSV
         </Button>
-        <Button
-          type="primary"
-          icon={<Plus className="w-4 h-4" />}
-          onClick={onAddClick}
-          style={{ backgroundColor: '#0d9488' }}
-        >
-          Nouvel employé
-        </Button>
+        {ability.can('create', 'employe') && (
+          <Button
+            type="primary"
+            icon={<Plus className="w-4 h-4" />}
+            onClick={onAddClick}
+            style={{ backgroundColor: '#0d9488' }}
+          >
+            Nouvel employé
+          </Button>
+        )}
       </Space>
     </div>
   )

@@ -17,6 +17,7 @@ import {
 import { Plus, Pencil, Trash2, Briefcase } from 'lucide-react'
 import type { Poste, CreatePosteDto, UpdatePosteDto } from '@/types/poste'
 import { PosteService } from '@/services/poste.service'
+import { useAbility } from '@/auth/ability-context'
 import type { ColumnsType } from 'antd/es/table'
 
 const { Title, Text } = Typography
@@ -26,6 +27,7 @@ export const Route = createFileRoute('/admin/parametrage/postes')({
 })
 
 function PostesPage() {
+  const ability = useAbility()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingPoste, setEditingPoste] = useState<Poste | null>(null)
   const [searchText, setSearchText] = useState('')
@@ -119,31 +121,35 @@ function PostesPage() {
       align: 'center',
       render: (_, record) => (
         <Space size="small">
-          <Tooltip title="Modifier">
-            <Button
-              type="text"
-              size="small"
-              icon={<Pencil className="w-4 h-4" />}
-              onClick={() => handleOpenModal(record)}
-            />
-          </Tooltip>
-          <Popconfirm
-            title="Supprimer ce poste ?"
+          {ability.can('update', 'poste') && (
+            <Tooltip title="Modifier">
+              <Button
+                type="text"
+                size="small"
+                icon={<Pencil className="w-4 h-4" />}
+                onClick={() => handleOpenModal(record)}
+              />
+            </Tooltip>
+          )}
+          {ability.can('delete', 'poste') && (
+            <Popconfirm
+              title="Supprimer ce poste ?"
             description="Cette action est irréversible."
             onConfirm={() => deleteMutation.mutate(record._id)}
             okText="Supprimer"
             cancelText="Annuler"
             okButtonProps={{ danger: true }}
           >
-            <Tooltip title="Supprimer">
-              <Button
-                type="text"
-                size="small"
-                danger
-                icon={<Trash2 className="w-4 h-4" />}
-              />
-            </Tooltip>
-          </Popconfirm>
+              <Tooltip title="Supprimer">
+                <Button
+                  type="text"
+                  size="small"
+                  danger
+                  icon={<Trash2 className="w-4 h-4" />}
+                />
+              </Tooltip>
+            </Popconfirm>
+          )}
         </Space>
       ),
     },
@@ -162,14 +168,16 @@ function PostesPage() {
               <Text type="secondary" className="text-sm">Créer et gérer les postes de l'organisation</Text>
             </div>
           </div>
-          <Button
-            type="primary"
-            icon={<Plus className="w-4 h-4" />}
-            onClick={() => handleOpenModal()}
-            style={{ backgroundColor: '#0d9488', borderColor: '#0d9488' }}
-          >
-            Nouveau Poste
-          </Button>
+          {ability.can('create', 'poste') && (
+            <Button
+              type="primary"
+              icon={<Plus className="w-4 h-4" />}
+              onClick={() => handleOpenModal()}
+              style={{ backgroundColor: '#0d9488', borderColor: '#0d9488' }}
+            >
+              Nouveau Poste
+            </Button>
+          )}
         </div>
 
         <Card>

@@ -17,6 +17,7 @@ import {
 import { Plus, Pencil, Trash2, Briefcase } from 'lucide-react'
 import type { Fonction, CreateFonctionDto, UpdateFonctionDto } from '@/types/fonction'
 import { FonctionService } from '@/services/fonction.service'
+import { useAbility } from '@/auth/ability-context'
 import type { ColumnsType } from 'antd/es/table'
 
 const { Title, Text } = Typography
@@ -26,6 +27,7 @@ export const Route = createFileRoute('/admin/parametrage/fonctions')({
 })
 
 function FonctionsPage() {
+  const ability = useAbility()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingFonction, setEditingFonction] = useState<Fonction | null>(null)
   const [searchText, setSearchText] = useState('')
@@ -119,31 +121,35 @@ function FonctionsPage() {
       align: 'center',
       render: (_, record) => (
         <Space size="small">
-          <Tooltip title="Modifier">
-            <Button
-              type="text"
-              size="small"
-              icon={<Pencil className="w-4 h-4" />}
-              onClick={() => handleOpenModal(record)}
-            />
-          </Tooltip>
-          <Popconfirm
-            title="Supprimer cette fonction ?"
+          {ability.can('update', 'fonction') && (
+            <Tooltip title="Modifier">
+              <Button
+                type="text"
+                size="small"
+                icon={<Pencil className="w-4 h-4" />}
+                onClick={() => handleOpenModal(record)}
+              />
+            </Tooltip>
+          )}
+          {ability.can('delete', 'fonction') && (
+            <Popconfirm
+              title="Supprimer cette fonction ?"
             description="Cette action est irréversible."
             onConfirm={() => deleteMutation.mutate(record._id)}
             okText="Supprimer"
             cancelText="Annuler"
             okButtonProps={{ danger: true }}
           >
-            <Tooltip title="Supprimer">
-              <Button
-                type="text"
-                size="small"
-                danger
-                icon={<Trash2 className="w-4 h-4" />}
-              />
-            </Tooltip>
-          </Popconfirm>
+              <Tooltip title="Supprimer">
+                <Button
+                  type="text"
+                  size="small"
+                  danger
+                  icon={<Trash2 className="w-4 h-4" />}
+                />
+              </Tooltip>
+            </Popconfirm>
+          )}
         </Space>
       ),
     },
@@ -162,14 +168,16 @@ function FonctionsPage() {
             <Text type="secondary">Gérez les fonctions des employés</Text>
           </div>
         </div>
-        <Button
-          type="primary"
-          icon={<Plus className="w-4 h-4" />}
-          onClick={() => handleOpenModal()}
-          style={{ backgroundColor: '#0d9488' }}
-        >
-          Nouvelle fonction
-        </Button>
+        {ability.can('create', 'fonction') && (
+          <Button
+            type="primary"
+            icon={<Plus className="w-4 h-4" />}
+            onClick={() => handleOpenModal()}
+            style={{ backgroundColor: '#0d9488' }}
+          >
+            Nouvelle fonction
+          </Button>
+        )}
       </div>
 
       {/* Table */}

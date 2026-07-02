@@ -18,6 +18,7 @@ import {
 import { Plus, Pencil, Trash2, Palette } from 'lucide-react'
 import type { ParametreBulletin, CreateParametreBulletinDto, UpdateParametreBulletinDto } from '@/types/parametre-bulletin'
 import { ParametreBulletinService } from '@/services/parametre-bulletin.service'
+import { useAbility } from '@/auth/ability-context'
 import type { ColumnsType } from 'antd/es/table'
 
 const { Title, Text } = Typography
@@ -27,6 +28,7 @@ export const Route = createFileRoute('/admin/parametrage/parametres-bulletins')(
 })
 
 function ParametresBulletinsPage() {
+  const ability = useAbility()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingParam, setEditingParam] = useState<ParametreBulletin | null>(null)
   const [form] = Form.useForm()
@@ -145,31 +147,35 @@ function ParametresBulletinsPage() {
       align: 'center',
       render: (_, record) => (
         <Space size="small">
-          <Tooltip title="Modifier">
-            <Button
-              type="text"
-              size="small"
-              icon={<Pencil className="w-4 h-4" />}
-              onClick={() => handleOpenModal(record)}
-            />
-          </Tooltip>
-          <Popconfirm
-            title="Supprimer ce paramètre ?"
+          {ability.can('update', 'parametreBulletin') && (
+            <Tooltip title="Modifier">
+              <Button
+                type="text"
+                size="small"
+                icon={<Pencil className="w-4 h-4" />}
+                onClick={() => handleOpenModal(record)}
+              />
+            </Tooltip>
+          )}
+          {ability.can('delete', 'parametreBulletin') && (
+            <Popconfirm
+              title="Supprimer ce paramètre ?"
             description="Cette action est irréversible."
             onConfirm={() => deleteMutation.mutate(record._id)}
             okText="Supprimer"
             cancelText="Annuler"
             okButtonProps={{ danger: true }}
           >
-            <Tooltip title="Supprimer">
-              <Button
-                type="text"
-                size="small"
-                danger
-                icon={<Trash2 className="w-4 h-4" />}
-              />
-            </Tooltip>
-          </Popconfirm>
+              <Tooltip title="Supprimer">
+                <Button
+                  type="text"
+                  size="small"
+                  danger
+                  icon={<Trash2 className="w-4 h-4" />}
+                />
+              </Tooltip>
+            </Popconfirm>
+          )}
         </Space>
       ),
     },
@@ -187,14 +193,16 @@ function ParametresBulletinsPage() {
             <Text type="secondary">Définissez la couleur d'impression des bulletins de paie par année</Text>
           </div>
         </div>
-        <Button
-          type="primary"
-          icon={<Plus className="w-4 h-4" />}
-          onClick={() => handleOpenModal()}
-          style={{ backgroundColor: '#7c3aed' }}
-        >
-          Nouveau paramètre
-        </Button>
+        {ability.can('create', 'parametreBulletin') && (
+          <Button
+            type="primary"
+            icon={<Plus className="w-4 h-4" />}
+            onClick={() => handleOpenModal()}
+            style={{ backgroundColor: '#7c3aed' }}
+          >
+            Nouveau paramètre
+          </Button>
+        )}
       </div>
 
       <Card>

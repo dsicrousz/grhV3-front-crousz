@@ -28,6 +28,7 @@ import { TypeContrat } from '@/types/contrat'
 import { AttributionFonctionnelleService, AttributionGlobaleService } from '@/services/attribution.service'
 import { FonctionService } from '@/services/fonction.service'
 import { RubriqueService } from '@/services/rubrique.service'
+import { useAbility } from '@/auth/ability-context'
 import type { ColumnsType } from 'antd/es/table'
 
 const { Title, Text } = Typography
@@ -38,6 +39,7 @@ export const Route = createFileRoute('/admin/parametrage/attributions')({
 })
 
 function AttributionsPage() {
+  const ability = useAbility()
   const [activeTab, setActiveTab] = useState('fonctionnelle')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [searchTextFonctionnelle, setSearchTextFonctionnelle] = useState('')
@@ -189,23 +191,25 @@ function AttributionsPage() {
       align: 'center',
       render: (_, record) => (
         <Space size="small">
-          <Popconfirm
-            title="Supprimer cette attribution ?"
-            description="Cette action est irréversible."
-            onConfirm={() => deleteFonctionnelleMutation.mutate(record._id)}
-            okText="Supprimer"
-            cancelText="Annuler"
-            okButtonProps={{ danger: true }}
-          >
-            <Tooltip title="Supprimer">
-              <Button
-                type="text"
-                size="small"
-                danger
-                icon={<Trash2 className="w-4 h-4" />}
-              />
-            </Tooltip>
-          </Popconfirm>
+          {ability.can('delete', 'attribution') && (
+            <Popconfirm
+              title="Supprimer cette attribution ?"
+              description="Cette action est irréversible."
+              onConfirm={() => deleteFonctionnelleMutation.mutate(record._id)}
+              okText="Supprimer"
+              cancelText="Annuler"
+              okButtonProps={{ danger: true }}
+            >
+              <Tooltip title="Supprimer">
+                <Button
+                  type="text"
+                  size="small"
+                  danger
+                  icon={<Trash2 className="w-4 h-4" />}
+                />
+              </Tooltip>
+            </Popconfirm>
+          )}
         </Space>
       ),
     },
@@ -240,31 +244,35 @@ function AttributionsPage() {
       align: 'center',
       render: (_, record) => (
         <Space size="small">
-          <Tooltip title="Modifier">
-            <Button
-              type="text"
-              size="small"
-              icon={<Pencil className="w-4 h-4" />}
-              onClick={() => handleOpenModal(record)}
-            />
-          </Tooltip>
-          <Popconfirm
-            title="Supprimer cette attribution ?"
-            description="Cette action est irréversible."
-            onConfirm={() => deleteGlobaleMutation.mutate(record._id)}
-            okText="Supprimer"
-            cancelText="Annuler"
-            okButtonProps={{ danger: true }}
-          >
-            <Tooltip title="Supprimer">
+          {ability.can('update', 'attribution') && (
+            <Tooltip title="Modifier">
               <Button
                 type="text"
                 size="small"
-                danger
-                icon={<Trash2 className="w-4 h-4" />}
+                icon={<Pencil className="w-4 h-4" />}
+                onClick={() => handleOpenModal(record)}
               />
             </Tooltip>
-          </Popconfirm>
+          )}
+          {ability.can('delete', 'attribution') && (
+            <Popconfirm
+              title="Supprimer cette attribution ?"
+              description="Cette action est irréversible."
+              onConfirm={() => deleteGlobaleMutation.mutate(record._id)}
+              okText="Supprimer"
+              cancelText="Annuler"
+              okButtonProps={{ danger: true }}
+            >
+              <Tooltip title="Supprimer">
+                <Button
+                  type="text"
+                  size="small"
+                  danger
+                  icon={<Trash2 className="w-4 h-4" />}
+                />
+              </Tooltip>
+            </Popconfirm>
+          )}
         </Space>
       ),
     },
@@ -283,14 +291,16 @@ function AttributionsPage() {
             <Text type="secondary">Gérez les attributions de rubriques</Text>
           </div>
         </div>
-        <Button
-          type="primary"
-          icon={<Plus className="w-4 h-4" />}
-          onClick={() => handleOpenModal()}
-          style={{ backgroundColor: '#0d9488' }}
-        >
-          Nouvelle attribution
-        </Button>
+        {ability.can('create', 'attribution') && (
+          <Button
+            type="primary"
+            icon={<Plus className="w-4 h-4" />}
+            onClick={() => handleOpenModal()}
+            style={{ backgroundColor: '#0d9488' }}
+          >
+            Nouvelle attribution
+          </Button>
+        )}
       </div>
 
       {/* Tabs & Tables */}

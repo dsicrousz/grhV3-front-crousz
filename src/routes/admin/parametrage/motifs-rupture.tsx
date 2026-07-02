@@ -17,6 +17,7 @@ import {
 import { Plus, Pencil, Trash2, FileX2 } from 'lucide-react'
 import type { MotifRupture, CreateMotifRuptureDto, UpdateMotifRuptureDto } from '@/types/motif-rupture'
 import { MotifRuptureService } from '@/services/motif-rupture.service'
+import { useAbility } from '@/auth/ability-context'
 import type { ColumnsType } from 'antd/es/table'
 
 const { Title, Text } = Typography
@@ -26,6 +27,7 @@ export const Route = createFileRoute('/admin/parametrage/motifs-rupture')({
 })
 
 function MotifsRupturePage() {
+  const ability = useAbility()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingMotif, setEditingMotif] = useState<MotifRupture | null>(null)
   const [searchText, setSearchText] = useState('')
@@ -136,31 +138,35 @@ function MotifsRupturePage() {
       align: 'center',
       render: (_, record) => (
         <Space size="small">
-          <Tooltip title="Modifier">
-            <Button
-              type="text"
-              size="small"
-              icon={<Pencil className="w-4 h-4" />}
-              onClick={() => handleOpenModal(record)}
-            />
-          </Tooltip>
-          <Popconfirm
-            title="Supprimer ce motif ?"
+          {ability.can('update', 'motifRupture') && (
+            <Tooltip title="Modifier">
+              <Button
+                type="text"
+                size="small"
+                icon={<Pencil className="w-4 h-4" />}
+                onClick={() => handleOpenModal(record)}
+              />
+            </Tooltip>
+          )}
+          {ability.can('delete', 'motifRupture') && (
+            <Popconfirm
+              title="Supprimer ce motif ?"
             description="Cette action est irréversible."
             onConfirm={() => deleteMutation.mutate(record._id)}
             okText="Supprimer"
             cancelText="Annuler"
             okButtonProps={{ danger: true }}
           >
-            <Tooltip title="Supprimer">
-              <Button
-                type="text"
-                size="small"
-                danger
-                icon={<Trash2 className="w-4 h-4" />}
-              />
-            </Tooltip>
-          </Popconfirm>
+              <Tooltip title="Supprimer">
+                <Button
+                  type="text"
+                  size="small"
+                  danger
+                  icon={<Trash2 className="w-4 h-4" />}
+                />
+              </Tooltip>
+            </Popconfirm>
+          )}
         </Space>
       ),
     },
@@ -178,14 +184,16 @@ function MotifsRupturePage() {
             <Text type="secondary">Gérez les motifs de rupture de contrat des employés</Text>
           </div>
         </div>
-        <Button
-          type="primary"
-          icon={<Plus className="w-4 h-4" />}
-          onClick={() => handleOpenModal()}
-          danger
-        >
-          Nouveau motif
-        </Button>
+        {ability.can('create', 'motifRupture') && (
+          <Button
+            type="primary"
+            icon={<Plus className="w-4 h-4" />}
+            onClick={() => handleOpenModal()}
+            danger
+          >
+            Nouveau motif
+          </Button>
+        )}
       </div>
 
       <Card>

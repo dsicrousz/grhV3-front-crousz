@@ -19,6 +19,7 @@ import {
 import { Plus, Pencil, Trash2, Users } from 'lucide-react'
 import type { Categorie, CreateCategorieDto, UpdateCategorieDto } from '@/types/categorie'
 import { CategorieService } from '@/services/categorie.service'
+import { useAbility } from '@/auth/ability-context'
 import type { ColumnsType } from 'antd/es/table'
 
 const { Title, Text } = Typography
@@ -28,6 +29,7 @@ export const Route = createFileRoute('/admin/parametrage/categories')({
 })
 
 function CategoriesPage() {
+  const ability = useAbility()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingCategorie, setEditingCategorie] = useState<Categorie | null>(null)
   const [searchText, setSearchText] = useState('')
@@ -124,6 +126,7 @@ function CategoriesPage() {
       render: (estCadre: boolean, record: Categorie) => (
         <Switch 
           checked={estCadre} 
+          disabled={!ability.can('update', 'categorie')}
           onChange={(checked) => updateMutation.mutate({ id: record._id, data: { estCadre: checked } })}
           size="small"
           checkedChildren="Oui"
@@ -145,31 +148,35 @@ function CategoriesPage() {
       align: 'center',
       render: (_, record) => (
         <Space size="small">
-          <Tooltip title="Modifier">
-            <Button
-              type="text"
-              size="small"
-              icon={<Pencil className="w-4 h-4" />}
-              onClick={() => handleOpenModal(record)}
-            />
-          </Tooltip>
-          <Popconfirm
-            title="Supprimer cette catégorie ?"
+          {ability.can('update', 'categorie') && (
+            <Tooltip title="Modifier">
+              <Button
+                type="text"
+                size="small"
+                icon={<Pencil className="w-4 h-4" />}
+                onClick={() => handleOpenModal(record)}
+              />
+            </Tooltip>
+          )}
+          {ability.can('delete', 'categorie') && (
+            <Popconfirm
+              title="Supprimer cette catégorie ?"
             description="Cette action est irréversible."
             onConfirm={() => deleteMutation.mutate(record._id)}
             okText="Supprimer"
             cancelText="Annuler"
             okButtonProps={{ danger: true }}
           >
-            <Tooltip title="Supprimer">
-              <Button
-                type="text"
-                size="small"
-                danger
-                icon={<Trash2 className="w-4 h-4" />}
-              />
-            </Tooltip>
-          </Popconfirm>
+              <Tooltip title="Supprimer">
+                <Button
+                  type="text"
+                  size="small"
+                  danger
+                  icon={<Trash2 className="w-4 h-4" />}
+                />
+              </Tooltip>
+            </Popconfirm>
+          )}
         </Space>
       ),
     },
@@ -188,14 +195,16 @@ function CategoriesPage() {
             <Text type="secondary">Gérez les catégories professionnelles</Text>
           </div>
         </div>
-        <Button
-          type="primary"
-          icon={<Plus className="w-4 h-4" />}
-          onClick={() => handleOpenModal()}
-          style={{ backgroundColor: '#0d9488' }}
-        >
-          Nouvelle catégorie
-        </Button>
+        {ability.can('create', 'categorie') && (
+          <Button
+            type="primary"
+            icon={<Plus className="w-4 h-4" />}
+            onClick={() => handleOpenModal()}
+            style={{ backgroundColor: '#0d9488' }}
+          >
+            Nouvelle catégorie
+          </Button>
+        )}
       </div>
 
       {/* Table */}

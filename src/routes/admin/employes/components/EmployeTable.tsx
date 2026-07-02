@@ -6,6 +6,7 @@ import type { Employe } from '@/types/employe'
 import type { Categorie } from '@/types/categorie'
 import { TypeContrat } from '@/types/contrat'
 import type { Poste } from '@/types/poste'
+import type { AppAbility } from '@/auth/abilities'
 
 const { Text } = Typography
 
@@ -17,6 +18,7 @@ interface EmployeTableProps {
   onSearchChange: (value: string) => void
   onEdit: (employe: Employe) => void
   onDelete: (employe: Employe) => void
+  ability: AppAbility
 }
 
 export function EmployeTable({
@@ -27,6 +29,7 @@ export function EmployeTable({
   onSearchChange,
   onEdit,
   onDelete,
+  ability,
 }: EmployeTableProps) {
   const getPosteName = (poste: Poste | string | undefined): string => {
     if (!poste) return ''
@@ -188,7 +191,7 @@ export function EmployeTable({
               </Link>
             ),
           },
-          {
+          ability.can('update', 'employe') && {
             key: 'edit',
             label: (
               <button
@@ -200,10 +203,10 @@ export function EmployeTable({
               </button>
             ),
           },
-          {
+          (ability.can('update', 'employe') || ability.can('delete', 'employe')) && {
             type: 'divider' as const,
           },
-          {
+          ability.can('delete', 'employe') && {
             key: 'delete',
             label: (
               <Popconfirm
@@ -221,7 +224,7 @@ export function EmployeTable({
               </Popconfirm>
             ),
           },
-        ]
+        ].filter(Boolean) as any
 
         return (
           <Dropdown

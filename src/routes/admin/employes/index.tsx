@@ -12,12 +12,14 @@ import dayjs from 'dayjs'
 
 import { EmployeHeader, EmployeTable, EmployeStatistics, CreateEmployeModal } from './components'
 import { useEmployeMutations } from './hooks/useEmployeMutations'
+import { useAbility } from '@/auth/ability-context'
 
 export const Route = createFileRoute('/admin/employes/')({
   component: EmployesPage,
 })
 
 function EmployesPage() {
+  const ability = useAbility()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingEmploye, setEditingEmploye] = useState<Employe | null>(null)
   const [searchText, setSearchText] = useState('')
@@ -111,6 +113,7 @@ function EmployesPage() {
       <EmployeHeader 
         employes={employes} 
         onAddClick={() => handleOpenModal()} 
+        ability={ability}
       />
 
       <Card>
@@ -122,6 +125,7 @@ function EmployesPage() {
           onSearchChange={setSearchText}
           onEdit={handleOpenModal}
           onDelete={handleDelete}
+          ability={ability}
         />
       </Card>
 

@@ -27,6 +27,7 @@ import type {
   UpdateServiceDto 
 } from '@/types/division'
 import { DivisionService, ServiceService } from '@/services/division.service'
+import { useAbility } from '@/auth/ability-context'
 import type { DataNode } from 'antd/es/tree'
 
 const { Title, Text } = Typography
@@ -36,6 +37,7 @@ export const Route = createFileRoute('/admin/parametrage/divisions')({
 })
 
 function DivisionsPage() {
+  const ability = useAbility()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalType, setModalType] = useState<'division' | 'service'>('division')
   const [editingDivision, setEditingDivision] = useState<Division | null>(null)
@@ -247,13 +249,13 @@ function DivisionsPage() {
           <Dropdown
             menu={{
               items: [
-                {
+                ability.can('update', 'division') && {
                   key: 'edit',
                   label: <span className="text-blue-600">Modifier</span>,
                   icon: <Pencil className="w-4 h-4 text-blue-600" />,
                   onClick: () => handleOpenModal('division', division)
                 },
-                {
+                ability.can('create', 'division') && {
                   key: 'add-division',
                   label: <span className="text-purple-600">Ajouter une sous-division</span>,
                   icon: <FolderTree className="w-4 h-4 text-purple-600" />,
@@ -261,7 +263,7 @@ function DivisionsPage() {
                     handleOpenModal('division',{nom:'',parent:division._id})
                   }
                 },
-                {
+                ability.can('create', 'service') && {
                   key: 'add-service',
                   label: <span className="text-teal-600">Ajouter un service</span>,
                   icon: <Building2 className="w-4 h-4 text-teal-600" />,
@@ -272,7 +274,7 @@ function DivisionsPage() {
                 {
                   type: 'divider'
                 },
-                {
+                ability.can('update', 'division') && {
                   key: 'toggle-active',
                   label: division.is_active !== false ? (
                     <span className="text-orange-600">Désactiver</span>
@@ -289,7 +291,7 @@ function DivisionsPage() {
                     is_active: division.is_active === false 
                   })
                 },
-                {
+                ability.can('delete', 'division') && {
                   key: 'delete',
                   label: <span className="text-red-600">Supprimer</span>,
                   icon: <Trash2 className="w-4 h-4 text-red-600" />,
@@ -302,7 +304,7 @@ function DivisionsPage() {
                     deleteDivisionMutation.mutate(division._id)
                   }
                 }
-              ]
+              ].filter(Boolean) as any
             }}
             trigger={['click']}
           >
@@ -331,7 +333,7 @@ function DivisionsPage() {
               <Dropdown
                 menu={{
                   items: [
-                    {
+                    ability.can('update', 'service') && {
                       key: 'edit',
                       label: <span className="text-blue-600">Modifier</span>,
                       icon: <Pencil className="w-4 h-4 text-blue-600" />,
@@ -340,7 +342,7 @@ function DivisionsPage() {
                     {
                       type: 'divider'
                     },
-                    {
+                    ability.can('update', 'service') && {
                       key: 'toggle-active',
                       label: service.is_active !== false ? (
                         <span className="text-orange-600">Désactiver</span>
@@ -357,14 +359,14 @@ function DivisionsPage() {
                         is_active: service.is_active === false 
                       })
                     },
-                    {
+                    ability.can('delete', 'service') && {
                       key: 'delete',
                       label: <span className="text-red-600">Supprimer</span>,
                       icon: <Trash2 className="w-4 h-4 text-red-600" />,
                       danger: true,
                       onClick: () => deleteServiceMutation.mutate(service._id)
                     }
-                  ]
+                  ].filter(Boolean) as any
                 }}
                 trigger={['click']}
               >
@@ -400,21 +402,25 @@ function DivisionsPage() {
           </div>
         </div>
         <Space>
-          <Button
-            type="primary"
-            icon={<Plus className="w-4 h-4" />}
-            onClick={() => handleOpenModal('service')}
-            style={{ backgroundColor: '#0d9488' }}
-          >
-            Nouveau service
-          </Button>
-          <Button
-            type="primary"
-            icon={<Plus className="w-4 h-4" />}
-            onClick={() => handleOpenModal('division')}
-          >
-            Nouvelle division
-          </Button>
+          {ability.can('create', 'service') && (
+            <Button
+              type="primary"
+              icon={<Plus className="w-4 h-4" />}
+              onClick={() => handleOpenModal('service')}
+              style={{ backgroundColor: '#0d9488' }}
+            >
+              Nouveau service
+            </Button>
+          )}
+          {ability.can('create', 'division') && (
+            <Button
+              type="primary"
+              icon={<Plus className="w-4 h-4" />}
+              onClick={() => handleOpenModal('division')}
+            >
+              Nouvelle division
+            </Button>
+          )}
         </Space>
       </div>
 
