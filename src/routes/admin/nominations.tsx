@@ -369,7 +369,7 @@ function NominationsPage() {
 
       {/* Statistiques */}
       <Row gutter={16} className="mb-6">
-        <Col xs={12} sm={6}>
+        <Col xs={12} sm={6} className="stagger-item">
           <Card size="small">
             <div className="text-center">
               <div className="text-2xl font-bold text-gray-700">{stats.total}</div>
@@ -377,7 +377,7 @@ function NominationsPage() {
             </div>
           </Card>
         </Col>
-        <Col xs={12} sm={6}>
+        <Col xs={12} sm={6} className="stagger-item">
           <Card size="small" className="border-l-4 border-l-green-500">
             <div className="text-center">
               <div className="text-2xl font-bold text-green-600">{stats.actives}</div>
@@ -385,7 +385,7 @@ function NominationsPage() {
             </div>
           </Card>
         </Col>
-        <Col xs={12} sm={6}>
+        <Col xs={12} sm={6} className="stagger-item">
           <Card size="small" className="border-l-4 border-l-gray-400">
             <div className="text-center">
               <div className="text-2xl font-bold text-gray-600">{stats.inactives}</div>
@@ -393,7 +393,7 @@ function NominationsPage() {
             </div>
           </Card>
         </Col>
-        <Col xs={12} sm={6}>
+        <Col xs={12} sm={6} className="stagger-item">
           <Card size="small" className="border-l-4 border-l-blue-500">
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-600">{stats.uniqueEmployes}</div>

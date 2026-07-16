@@ -72,7 +72,7 @@ export function EmployeStatistics({ employes }: EmployeStatisticsProps) {
       <Title level={5} className="mb-4">Statistiques des employés</Title>
       
       <Row gutter={[16, 16]} className="mb-6">
-        <Col xs={12} sm={6}>
+        <Col xs={12} sm={6} className="stagger-item">
           <Card size="small" className="text-center">
             <Statistic 
               title="Total" 
@@ -81,7 +81,7 @@ export function EmployeStatistics({ employes }: EmployeStatisticsProps) {
             />
           </Card>
         </Col>
-        <Col xs={12} sm={6}>
+        <Col xs={12} sm={6} className="stagger-item">
           <Card size="small" className="text-center">
             <Statistic 
               title="Actifs" 
@@ -91,7 +91,7 @@ export function EmployeStatistics({ employes }: EmployeStatisticsProps) {
             />
           </Card>
         </Col>
-        <Col xs={12} sm={6}>
+        <Col xs={12} sm={6} className="stagger-item">
           <Card size="small" className="text-center">
             <Statistic 
               title="Inactifs" 
@@ -101,7 +101,7 @@ export function EmployeStatistics({ employes }: EmployeStatisticsProps) {
             />
           </Card>
         </Col>
-        <Col xs={12} sm={6}>
+        <Col xs={12} sm={6} className="stagger-item">
           <Card size="small" className="text-center">
             <Statistic 
               title="Proche retraite (55+)" 

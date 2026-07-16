@@ -13,8 +13,10 @@ export enum TypeConge {
 
 export enum StatutDemandeConge {
   EN_ATTENTE = 'en_attente',
+  EN_COURS_VALIDATION = 'en_cours_validation',
   APPROUVEE = 'approuvee',
-  REJETEE = 'rejetee'
+  REJETEE = 'rejetee',
+  ANNULEE = 'annulee'
 }
 
 export interface Conge {
@@ -65,6 +67,8 @@ export interface CongeStats {
   total: number
   approuves: number
   enAttente: number
+  enCoursValidation: number
   rejetes: number
+  annulees: number
   joursUtilises: number
 }

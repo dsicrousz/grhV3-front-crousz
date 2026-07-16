@@ -206,7 +206,7 @@ export function DashboardRappels() {
           return (
             <div
               key={rappel.id}
-              className="flex items-start gap-3 p-3 rounded-lg transition-colors hover:opacity-90"
+              className="flex items-start gap-3 p-3 rounded-lg transition-all duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] hover:opacity-90 stagger-item"
               style={{
                 backgroundColor: config.bg,
                 borderLeft: `4px solid ${config.color}`,

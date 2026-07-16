@@ -20,7 +20,7 @@ import {
   Row,
   Col
 } from 'antd'
-import { Plus, Pencil, Trash2, Calendar, CheckCircle, XCircle, Clock, Palmtree, Baby, Stethoscope, GraduationCap, Briefcase, HelpCircle, Search, Filter, Umbrella, Download } from 'lucide-react'
+import { Plus, Pencil, Trash2, Calendar, CheckCircle, XCircle, Clock, Palmtree, Baby, Stethoscope, GraduationCap, Briefcase, HelpCircle, Search, Filter, Umbrella, Download, Send, Ban } from 'lucide-react'
 import { exportToExcel, exportToCSV, congeExportColumns } from '@/lib/export-utils'
 import type { Conge, CreateCongeDto, UpdateCongeDto } from '@/types/conge'
 import { TypeConge, StatutDemandeConge } from '@/types/conge'
@@ -28,6 +28,7 @@ import { CongeService } from '@/services/conge.service'
 import { EmployeService } from '@/services/employe.service'
 import type { Employe } from '@/types/employe'
 import type { ColumnsType } from 'antd/es/table'
+import { useAbility } from '@/auth/ability-context'
 import dayjs from 'dayjs'
 
 const { Title, Text } = Typography
@@ -50,11 +51,14 @@ const typeCongeLabels: Record<TypeConge, { label: string; color: string; icon: R
 
 const statutLabels: Record<StatutDemandeConge, { label: string; color: string; icon: React.ReactNode }> = {
   [StatutDemandeConge.EN_ATTENTE]: { label: 'En attente', color: 'orange', icon: <Clock className="w-3 h-3" /> },
+  [StatutDemandeConge.EN_COURS_VALIDATION]: { label: 'En cours de validation', color: 'blue', icon: <Send className="w-3 h-3" /> },
   [StatutDemandeConge.APPROUVEE]: { label: 'Approuvé', color: 'green', icon: <CheckCircle className="w-3 h-3" /> },
   [StatutDemandeConge.REJETEE]: { label: 'Rejeté', color: 'red', icon: <XCircle className="w-3 h-3" /> },
+  [StatutDemandeConge.ANNULEE]: { label: 'Annulé', color: 'default', icon: <Ban className="w-3 h-3" /> },
 }
 
 function CongesPage() {
+  const ability = useAbility()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingConge, setEditingConge] = useState<Conge | null>(null)
   const [form] = Form.useForm()
@@ -158,11 +162,17 @@ function CongesPage() {
     mutationFn: ({ id, statut }: { id: string; statut: StatutDemandeConge }) => 
       CongeService.validate(id, { statut }),
     onSuccess: (_, variables) => {
-      message.success(variables.statut === StatutDemandeConge.APPROUVEE ? 'Congé approuvé' : 'Congé rejeté')
+      const msgMap: Record<string, string> = {
+        [StatutDemandeConge.EN_COURS_VALIDATION]: 'Demande mise en validation',
+        [StatutDemandeConge.APPROUVEE]: 'Congé approuvé',
+        [StatutDemandeConge.REJETEE]: 'Congé rejeté',
+        [StatutDemandeConge.ANNULEE]: 'Demande annulée',
+      }
+      message.success(msgMap[variables.statut] || 'Statut mis à jour')
       queryClient.invalidateQueries({ queryKey: ['conges'] })
     },
     onError: () => {
-      message.error('Erreur lors de la validation')
+      message.error('Erreur lors de la mise à jour du statut')
     }
   })
 
@@ -231,7 +241,7 @@ function CongesPage() {
         return employe ? (
           <div>
             <div className="font-medium">{employe.prenom} {employe.nom}</div>
-            <div className="text-xs text-gray-500">{employe.contrat_actif?.matricule_de_solde || employe.code}</div>
+            <div className="text-xs text-gray-500">{employe.contrat_actif?.matricule_de_solde}</div>
           </div>
         ) : '-'
       },
@@ -307,54 +317,92 @@ function CongesPage() {
     {
       title: 'Actions',
       key: 'actions',
-      width: 180,
+      width: 200,
       render: (_, record) => (
         <Space size="small">
-          {record.statut === StatutDemandeConge.EN_ATTENTE && (
-            <>
-              <Tooltip title="Approuver">
-                <Button
-                  type="text"
-                  size="small"
-                  icon={<CheckCircle className="w-4 h-4 text-green-500" />}
-                  onClick={() => validateMutation.mutate({ id: record._id, statut: StatutDemandeConge.APPROUVEE })}
-                  loading={validateMutation.isPending}
-                />
-              </Tooltip>
-              <Tooltip title="Rejeter">
-                <Button
-                  type="text"
-                  size="small"
-                  icon={<XCircle className="w-4 h-4 text-red-500" />}
-                  onClick={() => validateMutation.mutate({ id: record._id, statut: StatutDemandeConge.REJETEE })}
-                  loading={validateMutation.isPending}
-                />
-              </Tooltip>
-            </>
-          )}
-          <Tooltip title="Modifier">
-            <Button
-              type="text"
-              size="small"
-              icon={<Pencil className="w-4 h-4 text-blue-500" />}
-              onClick={() => handleEdit(record)}
-            />
-          </Tooltip>
-          <Popconfirm
-            title="Supprimer ce congé ?"
-            onConfirm={() => deleteMutation.mutate(record._id)}
-            okText="Oui"
-            cancelText="Non"
-          >
-            <Tooltip title="Supprimer">
+          {/* RH: Mettre en validation (only on EN_ATTENTE) */}
+          {record.statut === StatutDemandeConge.EN_ATTENTE && ability.can('transmit', 'conge') && (
+            <Tooltip title="Mettre en validation">
               <Button
                 type="text"
                 size="small"
-                icon={<Trash2 className="w-4 h-4 text-red-500" />}
-                loading={deleteMutation.isPending}
+                icon={<Send className="w-4 h-4 text-blue-500" />}
+                onClick={() => validateMutation.mutate({ id: record._id, statut: StatutDemandeConge.EN_COURS_VALIDATION })}
+                loading={validateMutation.isPending}
               />
             </Tooltip>
-          </Popconfirm>
+          )}
+          {/* RH: Annuler (on EN_ATTENTE or EN_COURS_VALIDATION) */}
+          {(record.statut === StatutDemandeConge.EN_ATTENTE || record.statut === StatutDemandeConge.EN_COURS_VALIDATION) && ability.can('cancel_waiting', 'conge') && (
+            <Popconfirm
+              title="Annuler cette demande ?"
+              onConfirm={() => validateMutation.mutate({ id: record._id, statut: StatutDemandeConge.ANNULEE })}
+              okText="Oui"
+              cancelText="Non"
+            >
+              <Tooltip title="Annuler">
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<Ban className="w-4 h-4 text-gray-500" />}
+                  loading={validateMutation.isPending}
+                />
+              </Tooltip>
+            </Popconfirm>
+          )}
+          {/* ADMIN: Approuver (only on EN_COURS_VALIDATION) */}
+          {record.statut === StatutDemandeConge.EN_COURS_VALIDATION && ability.can('validate', 'conge') && (
+            <Tooltip title="Approuver">
+              <Button
+                type="text"
+                size="small"
+                icon={<CheckCircle className="w-4 h-4 text-green-500" />}
+                onClick={() => validateMutation.mutate({ id: record._id, statut: StatutDemandeConge.APPROUVEE })}
+                loading={validateMutation.isPending}
+              />
+            </Tooltip>
+          )}
+          {/* ADMIN: Rejeter (only on EN_COURS_VALIDATION) */}
+          {record.statut === StatutDemandeConge.EN_COURS_VALIDATION && ability.can('reject', 'conge') && (
+            <Tooltip title="Rejeter">
+              <Button
+                type="text"
+                size="small"
+                icon={<XCircle className="w-4 h-4 text-red-500" />}
+                onClick={() => validateMutation.mutate({ id: record._id, statut: StatutDemandeConge.REJETEE })}
+                loading={validateMutation.isPending}
+              />
+            </Tooltip>
+          )}
+          {/* Edit: only on EN_ATTENTE and RH with update permission */}
+          {record.statut === StatutDemandeConge.EN_ATTENTE && ability.can('update', 'conge') && (
+            <Tooltip title="Modifier">
+              <Button
+                type="text"
+                size="small"
+                icon={<Pencil className="w-4 h-4 text-blue-500" />}
+                onClick={() => handleEdit(record)}
+              />
+            </Tooltip>
+          )}
+          {/* Delete: only RH with delete permission */}
+          {ability.can('delete', 'conge') && (
+            <Popconfirm
+              title="Supprimer ce congé ?"
+              onConfirm={() => deleteMutation.mutate(record._id)}
+              okText="Oui"
+              cancelText="Non"
+            >
+              <Tooltip title="Supprimer">
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<Trash2 className="w-4 h-4 text-red-500" />}
+                  loading={deleteMutation.isPending}
+                />
+              </Tooltip>
+            </Popconfirm>
+          )}
         </Space>
       ),
     },
@@ -363,12 +411,14 @@ function CongesPage() {
   // Statistiques
   const stats = useMemo(() => {
     const enAttente = conges.filter(c => c.statut === StatutDemandeConge.EN_ATTENTE).length
+    const enCoursValidation = conges.filter(c => c.statut === StatutDemandeConge.EN_COURS_VALIDATION).length
     const approuves = conges.filter(c => c.statut === StatutDemandeConge.APPROUVEE).length
     const rejetes = conges.filter(c => c.statut === StatutDemandeConge.REJETEE).length
+    const annulees = conges.filter(c => c.statut === StatutDemandeConge.ANNULEE).length
     const totalJours = conges
       .filter(c => c.statut === StatutDemandeConge.APPROUVEE)
       .reduce((acc, c) => acc + c.nombre_jours, 0)
-    return { enAttente, approuves, rejetes, total: conges.length, totalJours }
+    return { enAttente, enCoursValidation, approuves, rejetes, annulees, total: conges.length, totalJours }
   }, [conges])
 
   return (
@@ -397,23 +447,25 @@ function CongesPage() {
           >
             CSV
           </Button>
-          <Button
-            type="primary"
-            icon={<Plus className="w-4 h-4" />}
-            onClick={() => {
-              setEditingConge(null)
-              form.resetFields()
-              setIsModalOpen(true)
-            }}
-          >
-            Nouveau congé
-          </Button>
+          {ability.can('create', 'conge') && (
+            <Button
+              type="primary"
+              icon={<Plus className="w-4 h-4" />}
+              onClick={() => {
+                setEditingConge(null)
+                form.resetFields()
+                setIsModalOpen(true)
+              }}
+            >
+              Nouveau congé
+            </Button>
+          )}
         </Space>
       </div>
 
       {/* Statistiques */}
       <Row gutter={16} className="mb-6">
-        <Col xs={12} sm={6} lg={4}>
+        <Col xs={12} sm={6} lg={3} className="stagger-item">
           <Card size="small">
             <div className="text-center">
               <div className="text-2xl font-bold text-gray-700">{stats.total}</div>
@@ -421,7 +473,7 @@ function CongesPage() {
             </div>
           </Card>
         </Col>
-        <Col xs={12} sm={6} lg={4}>
+        <Col xs={12} sm={6} lg={3} className="stagger-item">
           <Card size="small" className="border-l-4 border-l-orange-500">
             <div className="text-center">
               <div className="text-2xl font-bold text-orange-600">{stats.enAttente}</div>
@@ -429,7 +481,15 @@ function CongesPage() {
             </div>
           </Card>
         </Col>
-        <Col xs={12} sm={6} lg={4}>
+        <Col xs={12} sm={6} lg={3} className="stagger-item">
+          <Card size="small" className="border-l-4 border-l-blue-500">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-600">{stats.enCoursValidation}</div>
+              <div className="text-xs text-gray-500">En validation</div>
+            </div>
+          </Card>
+        </Col>
+        <Col xs={12} sm={6} lg={3} className="stagger-item">
           <Card size="small" className="border-l-4 border-l-green-500">
             <div className="text-center">
               <div className="text-2xl font-bold text-green-600">{stats.approuves}</div>
@@ -437,7 +497,7 @@ function CongesPage() {
             </div>
           </Card>
         </Col>
-        <Col xs={12} sm={6} lg={4}>
+        <Col xs={12} sm={6} lg={3} className="stagger-item">
           <Card size="small" className="border-l-4 border-l-red-500">
             <div className="text-center">
               <div className="text-2xl font-bold text-red-600">{stats.rejetes}</div>
@@ -445,10 +505,18 @@ function CongesPage() {
             </div>
           </Card>
         </Col>
-        <Col xs={24} sm={12} lg={8}>
-          <Card size="small" className="border-l-4 border-l-blue-500">
+        <Col xs={12} sm={6} lg={3} className="stagger-item">
+          <Card size="small" className="border-l-4 border-l-gray-400">
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">{stats.totalJours}</div>
+              <div className="text-2xl font-bold text-gray-600">{stats.annulees}</div>
+              <div className="text-xs text-gray-500">Annulés</div>
+            </div>
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} lg={6} className="stagger-item">
+          <Card size="small" className="border-l-4 border-l-cyan-500">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-cyan-600">{stats.totalJours}</div>
               <div className="text-xs text-gray-500">Jours approuvés</div>
             </div>
           </Card>

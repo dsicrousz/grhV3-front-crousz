@@ -1,12 +1,13 @@
 import {
-  ListTodo,
-  Menu,
-  Settings,
+  LayoutDashboard,
   Users2,
-  CalendarDays,
+  MapPin,
   Award,
+  FileText,
+  CalendarDays,
   BarChart3,
-  MapPin
+  Settings,
+  type LucideIcon,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -34,7 +35,7 @@ type NavSection = {
   title: string
   I?: Action
   a?: Subject
-  icon: typeof Menu
+  icon: LucideIcon
   isActive: boolean
   items: NavItem[]
 }
@@ -45,10 +46,10 @@ const data: { navMain: NavSection[] } = {
       title: "Tableau de bord",
       I: 'read',
       a: 'employe',
-      icon: Menu,
+      icon: LayoutDashboard,
       isActive: true,
       items: [
-        { title: "Tableau de bord", url: "/admin", I: 'read', a: 'employe' },
+        { title: "Vue d'ensemble", url: "/admin", I: 'read', a: 'employe' },
       ],
     },
     {
@@ -85,7 +86,7 @@ const data: { navMain: NavSection[] } = {
       title: "Lots de bulletins",
       I: 'read',
       a: 'lot',
-      icon: ListTodo,
+      icon: FileText,
       isActive: true,
       items: [
         { title: "Lots CDI", url: "/admin/lots", I: 'list', a: 'lot' },
@@ -125,7 +126,7 @@ const data: { navMain: NavSection[] } = {
         { title: "Utilisateurs", url: "/admin/parametrage/utilisateurs", I: 'create', a: 'session' },
         { title: "Audit des sessions", url: "/admin/parametrage/audits", I: 'read', a: 'session' },
         { title: "Rubriques de paie", url: "/admin/parametrage/rubriques", I: 'list', a: 'rubrique' },
-        { title: "Categories", url: "/admin/parametrage/categories", I: 'list', a: 'categorie' },
+        { title: "Catégories", url: "/admin/parametrage/categories", I: 'list', a: 'categorie' },
         {
           title: "Attributions",
           url: "/admin/parametrage/attributions",
@@ -181,8 +182,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarContent>
-        <div className="flex items-center justify-center">
-          <Avatar size={80} src="/logo.png" />
+        <div className="flex flex-col items-center justify-center py-4 border-b border-sidebar-border transition-all duration-200 ease-[cubic-bezier(0.23,1,0.32,1)]">
+          <Avatar size={64} src="/logo.png" />
+          <span className="mt-2 text-xs font-semibold text-sidebar-foreground tracking-tight group-data-[collapsible=icon]:hidden transition-opacity duration-200 ease-[cubic-bezier(0.23,1,0.32,1)]">
+            GRH CROUS/Z
+          </span>
         </div>
         <NavMain items={filteredNavMain} />
       </SidebarContent>

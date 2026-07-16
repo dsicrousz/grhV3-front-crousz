@@ -127,6 +127,7 @@ function EmployeDetailsPage() {
           <Button 
             icon={<ChevronLeft className="w-4 h-4" />}
             onClick={() => navigate({ to: '/admin/employes' })}
+            className="press-feedback"
           >
             Retour
           </Button>

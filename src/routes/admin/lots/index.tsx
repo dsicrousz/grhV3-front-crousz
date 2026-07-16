@@ -847,47 +847,47 @@ function LotsPage() {
           ) : stats ? (
             <Space direction="vertical" size="large" className="w-full">
               <Row gutter={[16, 16]}>
-                <Col xs={12} md={8} xl={4}>
+                <Col xs={12} md={8} xl={4} className="stagger-item">
                   <Card size="small">
                     <Statistic title="Lots" value={totalLots} />
                   </Card>
                 </Col>
-                <Col xs={12} md={8} xl={4}>
+                <Col xs={12} md={8} xl={4} className="stagger-item">
                   <Card size="small">
                     <Statistic title="Bulletins" value={totalBulletins} />
                   </Card>
                 </Col>
-                <Col xs={12} md={8} xl={4}>
+                <Col xs={12} md={8} xl={4} className="stagger-item">
                   <Card size="small">
                     <Statistic title="Effectif" value={stats.totaux.effectif} />
                   </Card>
                 </Col>
-                <Col xs={12} md={8} xl={4}>
+                <Col xs={12} md={8} xl={4} className="stagger-item">
                   <Card size="small">
                     <Statistic title="Brut" value={stats.totaux.brut} suffix="FCFA" formatter={(value) => formatCurrency(Number(value))} />
                   </Card>
                 </Col>
-                <Col xs={12} md={8} xl={4}>
+                <Col xs={12} md={8} xl={4} className="stagger-item">
                   <Card size="small">
                     <Statistic title="Net" value={stats.totaux.net} suffix="FCFA" formatter={(value) => formatCurrency(Number(value))} />
                   </Card>
                 </Col>
-                <Col xs={12} md={8} xl={4}>
+                <Col xs={12} md={8} xl={4} className="stagger-item">
                   <Card size="small">
                     <Statistic title="Total imposable" value={stats.totaux.totalIm} suffix="FCFA" formatter={(value) => formatCurrency(Number(value))} />
                   </Card>
                 </Col>
-                <Col xs={12} md={8} xl={4}>
+                <Col xs={12} md={8} xl={4} className="stagger-item">
                   <Card size="small">
                     <Statistic title="Total non imposable" value={stats.totaux.totalNI} suffix="FCFA" formatter={(value) => formatCurrency(Number(value))} />
                   </Card>
                 </Col>
-                <Col xs={12} md={8} xl={4}>
+                <Col xs={12} md={8} xl={4} className="stagger-item">
                   <Card size="small">
                     <Statistic title="Retenues" value={stats.totaux.totalRet} suffix="FCFA" formatter={(value) => formatCurrency(Number(value))} />
                   </Card>
                 </Col>
-                <Col xs={12} md={8} xl={4}>
+                <Col xs={12} md={8} xl={4} className="stagger-item">
                   <Card size="small">
                     <Statistic title="Part patronale" value={stats.totaux.totalPP} suffix="FCFA" formatter={(value) => formatCurrency(Number(value))} />
                   </Card>

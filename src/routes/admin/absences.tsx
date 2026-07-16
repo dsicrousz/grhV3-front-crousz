@@ -19,7 +19,7 @@ import {
   Row,
   Col
 } from 'antd'
-import { Plus, Pencil, Trash2, Calendar, CheckCircle, XCircle, Clock, Stethoscope, User, Users, HelpCircle, Search, Filter, CalendarDays, Printer, Download } from 'lucide-react'
+import { Plus, Pencil, Trash2, Calendar, CheckCircle, XCircle, Clock, Stethoscope, User, Users, HelpCircle, Search, Filter, CalendarDays, Printer, Download, Send, Ban } from 'lucide-react'
 import { exportToExcel, exportToCSV, absenceExportColumns } from '@/lib/export-utils'
 import pdfMake from 'pdfmake/build/pdfmake'
 import pdfFonts from 'pdfmake/build/vfs_fonts'
@@ -30,6 +30,7 @@ import { AbsenceService } from '@/services/absence.service'
 import { EmployeService } from '@/services/employe.service'
 import type { Employe } from '@/types/employe'
 import type { ColumnsType } from 'antd/es/table'
+import { useAbility } from '@/auth/ability-context'
 import dayjs from 'dayjs'
 
 pdfMake.vfs = pdfFonts.vfs as any
@@ -50,11 +51,14 @@ const typeAbsenceLabels: Record<TypeAbsence, { label: string; color: string; ico
 
 const statutLabels: Record<StatutDemande, { label: string; color: string; icon: React.ReactNode }> = {
   [StatutDemande.EN_ATTENTE]: { label: 'En attente', color: 'orange', icon: <Clock className="w-3 h-3" /> },
+  [StatutDemande.EN_COURS_VALIDATION]: { label: 'En cours de validation', color: 'blue', icon: <Send className="w-3 h-3" /> },
   [StatutDemande.APPROUVEE]: { label: 'Approuvée', color: 'green', icon: <CheckCircle className="w-3 h-3" /> },
   [StatutDemande.REJETEE]: { label: 'Rejetée', color: 'red', icon: <XCircle className="w-3 h-3" /> },
+  [StatutDemande.ANNULEE]: { label: 'Annulée', color: 'default', icon: <Ban className="w-3 h-3" /> },
 }
 
 function AbsencesPage() {
+  const ability = useAbility()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingAbsence, setEditingAbsence] = useState<Absence | null>(null)
   const [form] = Form.useForm()
@@ -154,25 +158,21 @@ function AbsencesPage() {
     }
   })
 
-  const approveMutation = useMutation({
-    mutationFn: (id: string) => AbsenceService.approve(id),
-    onSuccess: () => {
-      message.success('Absence approuvée')
+  const validateMutation = useMutation({
+    mutationFn: ({ id, statut }: { id: string; statut: StatutDemande }) => 
+      AbsenceService.validate(id, statut),
+    onSuccess: (_, variables) => {
+      const msgMap: Record<string, string> = {
+        [StatutDemande.EN_COURS_VALIDATION]: 'Demande mise en validation',
+        [StatutDemande.APPROUVEE]: 'Absence approuvée',
+        [StatutDemande.REJETEE]: 'Absence rejetée',
+        [StatutDemande.ANNULEE]: 'Demande annulée',
+      }
+      message.success(msgMap[variables.statut] || 'Statut mis à jour')
       queryClient.invalidateQueries({ queryKey: ['absences'] })
     },
     onError: () => {
-      message.error('Erreur lors de l\'approbation')
-    }
-  })
-
-  const rejectMutation = useMutation({
-    mutationFn: (id: string) => AbsenceService.reject(id),
-    onSuccess: () => {
-      message.success('Absence rejetée')
-      queryClient.invalidateQueries({ queryKey: ['absences'] })
-    },
-    onError: () => {
-      message.error('Erreur lors du rejet')
+      message.error('Erreur lors de la mise à jour du statut')
     }
   })
 
@@ -264,6 +264,15 @@ function AbsencesPage() {
           fontSize: 80,
           bold: true,
         }
+      } else if (absence.statut === StatutDemande.EN_COURS_VALIDATION) {
+        watermark = {
+          text: 'EN VALIDATION',
+          color: '#2196f3',
+          opacity: 0.1,
+          angle: 45,
+          fontSize: 80,
+          bold: true,
+        }
       } else if (absence.statut === StatutDemande.APPROUVEE) {
         watermark = {
           text: 'APPROUVÉ',
@@ -277,6 +286,15 @@ function AbsencesPage() {
         watermark = {
           text: 'REJETÉ',
           color: '#f44336',
+          opacity: 0.1,
+          angle: 45,
+          fontSize: 80,
+          bold: true,
+        }
+      } else if (absence.statut === StatutDemande.ANNULEE) {
+        watermark = {
+          text: 'ANNULÉ',
+          color: '#9e9e9e',
           opacity: 0.1,
           angle: 45,
           fontSize: 80,
@@ -510,7 +528,7 @@ function AbsencesPage() {
         return employe ? (
           <div>
             <div className="font-medium">{employe.prenom} {employe.nom}</div>
-            <div className="text-xs text-gray-500">{employe.contrat_actif?.matricule_de_solde || employe.code}</div>
+            <div className="text-xs text-gray-500">{employe.contrat_actif?.matricule_de_solde}</div>
           </div>
         ) : '-'
       },
@@ -586,31 +604,64 @@ function AbsencesPage() {
     {
       title: 'Actions',
       key: 'actions',
-      width: 180,
+      width: 200,
       render: (_, record) => (
         <Space size="small">
-          {record.statut === StatutDemande.EN_ATTENTE && (
-            <>
-              <Tooltip title="Approuver">
-                <Button
-                  type="text"
-                  size="small"
-                  icon={<CheckCircle className="w-4 h-4 text-green-500" />}
-                  onClick={() => approveMutation.mutate(record._id)}
-                  loading={approveMutation.isPending}
-                />
-              </Tooltip>
-              <Tooltip title="Rejeter">
-                <Button
-                  type="text"
-                  size="small"
-                  icon={<XCircle className="w-4 h-4 text-red-500" />}
-                  onClick={() => rejectMutation.mutate(record._id)}
-                  loading={rejectMutation.isPending}
-                />
-              </Tooltip>
-            </>
+          {/* RH: Mettre en validation (only on EN_ATTENTE) */}
+          {record.statut === StatutDemande.EN_ATTENTE && ability.can('transmit', 'absence') && (
+            <Tooltip title="Mettre en validation">
+              <Button
+                type="text"
+                size="small"
+                icon={<Send className="w-4 h-4 text-blue-500" />}
+                onClick={() => validateMutation.mutate({ id: record._id, statut: StatutDemande.EN_COURS_VALIDATION })}
+                loading={validateMutation.isPending}
+              />
+            </Tooltip>
           )}
+          {/* RH: Annuler (on EN_ATTENTE or EN_COURS_VALIDATION) */}
+          {(record.statut === StatutDemande.EN_ATTENTE || record.statut === StatutDemande.EN_COURS_VALIDATION) && ability.can('cancel_waiting', 'absence') && (
+            <Popconfirm
+              title="Annuler cette demande ?"
+              onConfirm={() => validateMutation.mutate({ id: record._id, statut: StatutDemande.ANNULEE })}
+              okText="Oui"
+              cancelText="Non"
+            >
+              <Tooltip title="Annuler">
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<Ban className="w-4 h-4 text-gray-500" />}
+                  loading={validateMutation.isPending}
+                />
+              </Tooltip>
+            </Popconfirm>
+          )}
+          {/* ADMIN: Approuver (only on EN_COURS_VALIDATION) */}
+          {record.statut === StatutDemande.EN_COURS_VALIDATION && ability.can('validate', 'absence') && (
+            <Tooltip title="Approuver">
+              <Button
+                type="text"
+                size="small"
+                icon={<CheckCircle className="w-4 h-4 text-green-500" />}
+                onClick={() => validateMutation.mutate({ id: record._id, statut: StatutDemande.APPROUVEE })}
+                loading={validateMutation.isPending}
+              />
+            </Tooltip>
+          )}
+          {/* ADMIN: Rejeter (only on EN_COURS_VALIDATION) */}
+          {record.statut === StatutDemande.EN_COURS_VALIDATION && ability.can('reject', 'absence') && (
+            <Tooltip title="Rejeter">
+              <Button
+                type="text"
+                size="small"
+                icon={<XCircle className="w-4 h-4 text-red-500" />}
+                onClick={() => validateMutation.mutate({ id: record._id, statut: StatutDemande.REJETEE })}
+                loading={validateMutation.isPending}
+              />
+            </Tooltip>
+          )}
+          {/* Print: always visible */}
           <Tooltip title="Imprimer">
             <Button
               type="text"
@@ -619,29 +670,35 @@ function AbsencesPage() {
               onClick={() => generateAbsencePDF(record)}
             />
           </Tooltip>
-          <Tooltip title="Modifier">
-            <Button
-              type="text"
-              size="small"
-              icon={<Pencil className="w-4 h-4 text-blue-500" />}
-              onClick={() => handleEdit(record)}
-            />
-          </Tooltip>
-          <Popconfirm
-            title="Supprimer cette absence ?"
-            onConfirm={() => deleteMutation.mutate(record._id)}
-            okText="Oui"
-            cancelText="Non"
-          >
-            <Tooltip title="Supprimer">
+          {/* Edit: only on EN_ATTENTE and RH with update permission */}
+          {record.statut === StatutDemande.EN_ATTENTE && ability.can('update', 'absence') && (
+            <Tooltip title="Modifier">
               <Button
                 type="text"
                 size="small"
-                icon={<Trash2 className="w-4 h-4 text-red-500" />}
-                loading={deleteMutation.isPending}
+                icon={<Pencil className="w-4 h-4 text-blue-500" />}
+                onClick={() => handleEdit(record)}
               />
             </Tooltip>
-          </Popconfirm>
+          )}
+          {/* Delete: only RH with delete permission */}
+          {ability.can('delete', 'absence') && (
+            <Popconfirm
+              title="Supprimer cette absence ?"
+              onConfirm={() => deleteMutation.mutate(record._id)}
+              okText="Oui"
+              cancelText="Non"
+            >
+              <Tooltip title="Supprimer">
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<Trash2 className="w-4 h-4 text-red-500" />}
+                  loading={deleteMutation.isPending}
+                />
+              </Tooltip>
+            </Popconfirm>
+          )}
         </Space>
       ),
     },
@@ -650,9 +707,11 @@ function AbsencesPage() {
   // Statistiques
   const stats = useMemo(() => {
     const enAttente = absences.filter(a => a.statut === StatutDemande.EN_ATTENTE).length
+    const enCoursValidation = absences.filter(a => a.statut === StatutDemande.EN_COURS_VALIDATION).length
     const approuvees = absences.filter(a => a.statut === StatutDemande.APPROUVEE).length
     const rejetees = absences.filter(a => a.statut === StatutDemande.REJETEE).length
-    return { enAttente, approuvees, rejetees, total: absences.length }
+    const annulees = absences.filter(a => a.statut === StatutDemande.ANNULEE).length
+    return { enAttente, enCoursValidation, approuvees, rejetees, annulees, total: absences.length }
   }, [absences])
 
   return (
@@ -681,23 +740,25 @@ function AbsencesPage() {
           >
             CSV
           </Button>
-          <Button
-            type="primary"
-            icon={<Plus className="w-4 h-4" />}
-            onClick={() => {
-              setEditingAbsence(null)
-              form.resetFields()
-              setIsModalOpen(true)
-            }}
-          >
-            Nouvelle absence
-          </Button>
+          {ability.can('create', 'absence') && (
+            <Button
+              type="primary"
+              icon={<Plus className="w-4 h-4" />}
+              onClick={() => {
+                setEditingAbsence(null)
+                form.resetFields()
+                setIsModalOpen(true)
+              }}
+            >
+              Nouvelle absence
+            </Button>
+          )}
         </Space>
       </div>
 
       {/* Statistiques */}
       <Row gutter={16} className="mb-6">
-        <Col xs={12} sm={6}>
+        <Col xs={12} sm={6} lg={4} className="stagger-item">
           <Card size="small">
             <div className="text-center">
               <div className="text-2xl font-bold text-gray-700">{stats.total}</div>
@@ -705,7 +766,7 @@ function AbsencesPage() {
             </div>
           </Card>
         </Col>
-        <Col xs={12} sm={6}>
+        <Col xs={12} sm={6} lg={4} className="stagger-item">
           <Card size="small" className="border-l-4 border-l-orange-500">
             <div className="text-center">
               <div className="text-2xl font-bold text-orange-600">{stats.enAttente}</div>
@@ -713,7 +774,15 @@ function AbsencesPage() {
             </div>
           </Card>
         </Col>
-        <Col xs={12} sm={6}>
+        <Col xs={12} sm={6} lg={4} className="stagger-item">
+          <Card size="small" className="border-l-4 border-l-blue-500">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-600">{stats.enCoursValidation}</div>
+              <div className="text-xs text-gray-500">En validation</div>
+            </div>
+          </Card>
+        </Col>
+        <Col xs={12} sm={6} lg={4} className="stagger-item">
           <Card size="small" className="border-l-4 border-l-green-500">
             <div className="text-center">
               <div className="text-2xl font-bold text-green-600">{stats.approuvees}</div>
@@ -721,11 +790,19 @@ function AbsencesPage() {
             </div>
           </Card>
         </Col>
-        <Col xs={12} sm={6}>
+        <Col xs={12} sm={6} lg={4} className="stagger-item">
           <Card size="small" className="border-l-4 border-l-red-500">
             <div className="text-center">
               <div className="text-2xl font-bold text-red-600">{stats.rejetees}</div>
               <div className="text-xs text-gray-500">Rejetées</div>
+            </div>
+          </Card>
+        </Col>
+        <Col xs={12} sm={6} lg={4} className="stagger-item">
+          <Card size="small" className="border-l-4 border-l-gray-400">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-gray-600">{stats.annulees}</div>
+              <div className="text-xs text-gray-500">Annulées</div>
             </div>
           </Card>
         </Col>

@@ -65,11 +65,11 @@ interface DashboardStats {
 }
 
 const QUICK_ACTIONS = [
-  { label: 'Nouvel employé', icon: Plus, to: '/admin/employes', color: 'bg-blue-500 hover:bg-blue-600' },
-  { label: 'Nouveau lot', icon: FileText, to: '/admin/lots', color: 'bg-emerald-500 hover:bg-emerald-600' },
-  { label: 'Nominations', icon: UserCheck, to: '/admin/nominations', color: 'bg-purple-500 hover:bg-purple-600' },
-  { label: 'Reporting', icon: BarChart3, to: '/admin/reporting', color: 'bg-amber-500 hover:bg-amber-600' },
-  { label: 'Paramétrage', icon: Settings, to: '/admin/parametrage', color: 'bg-slate-500 hover:bg-slate-600' },
+  { label: 'Nouvel employé', icon: Plus, to: '/admin/employes', color: 'bg-indigo-600 hover:bg-indigo-700' },
+  { label: 'Nouveau lot', icon: FileText, to: '/admin/lots', color: 'bg-blue-600 hover:bg-blue-700' },
+  { label: 'Nominations', icon: UserCheck, to: '/admin/nominations', color: 'bg-violet-600 hover:bg-violet-700' },
+  { label: 'Reporting', icon: BarChart3, to: '/admin/reporting', color: 'bg-cyan-600 hover:bg-cyan-700' },
+  { label: 'Paramétrage', icon: Settings, to: '/admin/parametrage', color: 'bg-slate-600 hover:bg-slate-700' },
 ] as const
 
 function getSalutation() {
@@ -254,11 +254,11 @@ function RouteComponent() {
       {/* Header avec salutation */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">{getSalutation()} 👋</h1>
-          <p className="text-muted-foreground">Vue d'ensemble de la gestion des ressources humaines</p>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">{getSalutation()} 👋</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">Tableau de bord · Vue d'ensemble des ressources humaines</p>
         </div>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Calendar className="h-4 w-4" />
+        <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 px-3 py-1.5 rounded-lg">
+          <Calendar className="h-4 w-4 text-indigo-500" />
           {dayjs().format('dddd D MMMM YYYY')}
         </div>
       </div>
@@ -271,7 +271,7 @@ function RouteComponent() {
             <Link
               key={action.to}
               to={action.to}
-              className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg text-white text-sm font-medium transition-colors ${action.color}`}
+              className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg text-white text-sm font-medium transition-all duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] press-feedback ${action.color}`}
             >
               <Icon className="h-4 w-4" />
               {action.label}
@@ -282,11 +282,11 @@ function RouteComponent() {
 
       {/* Statistiques principales — cards cliquables */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Link to="/admin/employes" className="group">
-          <Card className="hover:shadow-md transition-shadow cursor-pointer h-full border-l-4 border-l-blue-500">
+        <Link to="/admin/employes" className="group stagger-item">
+          <Card className="hover:shadow-md transition-all duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] cursor-pointer h-full border-l-4 border-l-indigo-500">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Employés</CardTitle>
-              <div className="p-2 rounded-lg bg-blue-50 text-blue-600">
+              <div className="p-2 rounded-lg bg-indigo-50 text-indigo-600">
                 <Users className="h-4 w-4" />
               </div>
             </CardHeader>
@@ -307,11 +307,11 @@ function RouteComponent() {
           </Card>
         </Link>
 
-        <Link to="/admin/parametrage/divisions" className="group">
-          <Card className="hover:shadow-md transition-shadow cursor-pointer h-full border-l-4 border-l-purple-500">
+        <Link to="/admin/parametrage/divisions" className="group stagger-item">
+          <Card className="hover:shadow-md transition-all duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] cursor-pointer h-full border-l-4 border-l-violet-500">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Divisions</CardTitle>
-              <div className="p-2 rounded-lg bg-purple-50 text-purple-600">
+              <div className="p-2 rounded-lg bg-violet-50 text-violet-600">
                 <Building2 className="h-4 w-4" />
               </div>
             </CardHeader>
@@ -326,11 +326,11 @@ function RouteComponent() {
           </Card>
         </Link>
 
-        <Link to="/admin/lots" className="group">
-          <Card className="hover:shadow-md transition-shadow cursor-pointer h-full border-l-4 border-l-emerald-500">
+        <Link to="/admin/lots" className="group stagger-item">
+          <Card className="hover:shadow-md transition-all duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] cursor-pointer h-full border-l-4 border-l-blue-500">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Lots de paie</CardTitle>
-              <div className="p-2 rounded-lg bg-emerald-50 text-emerald-600">
+              <div className="p-2 rounded-lg bg-blue-50 text-blue-600">
                 <FileText className="h-4 w-4" />
               </div>
             </CardHeader>
@@ -345,10 +345,10 @@ function RouteComponent() {
           </Card>
         </Link>
 
-        <Card className="border-l-4 border-l-pink-500">
+        <Card className="border-l-4 border-l-rose-500 stagger-item">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Répartition H/F</CardTitle>
-            <div className="p-2 rounded-lg bg-pink-50 text-pink-600">
+            <div className="p-2 rounded-lg bg-rose-50 text-rose-600">
               <TrendingUp className="h-4 w-4" />
             </div>
           </CardHeader>
@@ -357,7 +357,7 @@ function RouteComponent() {
               <span className="text-sm font-bold text-blue-600">{tauxHommes}%</span>
               <div className="flex-1 h-2 bg-pink-100 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-blue-500"
+                  className="h-full bg-blue-500 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]"
                   style={{ width: `${tauxHommes}%` }}
                 />
               </div>
@@ -372,7 +372,7 @@ function RouteComponent() {
 
       {/* Statuts des lots */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card className="border-l-4 border-l-gray-400">
+        <Card className="border-l-4 border-l-gray-400 stagger-item">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Brouillons</CardTitle>
             <AlertCircle className="h-4 w-4 text-gray-400" />
@@ -384,7 +384,7 @@ function RouteComponent() {
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-yellow-500">
+        <Card className="border-l-4 border-l-yellow-500 stagger-item">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Soumis</CardTitle>
             <Clock className="h-4 w-4 text-yellow-500" />
@@ -396,7 +396,7 @@ function RouteComponent() {
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-blue-500">
+        <Card className="border-l-4 border-l-blue-500 stagger-item">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">En validation</CardTitle>
             <Briefcase className="h-4 w-4 text-blue-500" />
@@ -408,7 +408,7 @@ function RouteComponent() {
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-green-500">
+        <Card className="border-l-4 border-l-green-500 stagger-item">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Validés</CardTitle>
             <CheckCircle2 className="h-4 w-4 text-green-500" />
@@ -427,7 +427,7 @@ function RouteComponent() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Cake className="h-5 w-5 text-pink-500" />
+              <Cake className="h-5 w-5 text-rose-500" />
               Anniversaires du mois
             </CardTitle>
             <CardDescription>
@@ -474,7 +474,7 @@ function RouteComponent() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <FileWarning className="h-5 w-5 text-orange-500" />
+              <FileWarning className="h-5 w-5 text-amber-500" />
               CDD arrivant à échéance
             </CardTitle>
             <CardDescription>
@@ -526,7 +526,7 @@ function RouteComponent() {
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle className="flex items-center gap-2">
-                <UserCheck className="h-5 w-5" />
+                <UserCheck className="h-5 w-5 text-indigo-500" />
                 Employés récents
               </CardTitle>
               <CardDescription>Les 5 derniers employés ajoutés</CardDescription>
@@ -579,7 +579,7 @@ function RouteComponent() {
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
+                <FileText className="h-5 w-5 text-blue-500" />
                 Lots récents
               </CardTitle>
               <CardDescription>Les 5 derniers lots de paie</CardDescription>
@@ -626,10 +626,10 @@ function RouteComponent() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Building2 className="h-5 w-5" />
+              <Building2 className="h-5 w-5 text-indigo-500" />
               Employés par division
             </CardTitle>
-            <CardDescription>Top 10 des divisions</CardDescription>
+            <CardDescription>Répartition du personnel par division</CardDescription>
           </CardHeader>
           <CardContent>
             {stats.employesParDivision.length === 0 ? (
@@ -645,11 +645,11 @@ function RouteComponent() {
                     <div className="flex items-center gap-2">
                       <div className="w-16 h-2 bg-gray-100 rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-blue-500 rounded-full"
+                          className="h-full bg-indigo-500 rounded-full transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]"
                           style={{ width: `${Math.min((item.count / (stats.employesParDivision[0]?.count || 1)) * 100, 100)}%` }}
                         />
                       </div>
-                      <span className="text-sm font-bold text-blue-600 w-8 text-right">{item.count}</span>
+                      <span className="text-sm font-bold text-indigo-600 w-8 text-right">{item.count}</span>
                     </div>
                   </div>
                 ))}
@@ -661,10 +661,10 @@ function RouteComponent() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
+              <Users className="h-5 w-5 text-cyan-500" />
               Employés par service
             </CardTitle>
-            <CardDescription>Top 10 des services</CardDescription>
+            <CardDescription>Répartition du personnel par service</CardDescription>
           </CardHeader>
           <CardContent>
             {stats.employesParService.length === 0 ? (
@@ -680,11 +680,11 @@ function RouteComponent() {
                     <div className="flex items-center gap-2">
                       <div className="w-16 h-2 bg-gray-100 rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-green-500 rounded-full"
+                          className="h-full bg-cyan-500 rounded-full transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]"
                           style={{ width: `${Math.min((item.count / (stats.employesParService[0]?.count || 1)) * 100, 100)}%` }}
                         />
                       </div>
-                      <span className="text-sm font-bold text-green-600 w-8 text-right">{item.count}</span>
+                      <span className="text-sm font-bold text-cyan-600 w-8 text-right">{item.count}</span>
                     </div>
                   </div>
                 ))}
@@ -696,10 +696,10 @@ function RouteComponent() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Briefcase className="h-5 w-5" />
+              <Briefcase className="h-5 w-5 text-violet-500" />
               Employés par fonction
             </CardTitle>
-            <CardDescription>Top 10 des fonctions</CardDescription>
+            <CardDescription>Répartition du personnel par fonction</CardDescription>
           </CardHeader>
           <CardContent>
             {stats.employesParFonction.length === 0 ? (
@@ -715,11 +715,11 @@ function RouteComponent() {
                     <div className="flex items-center gap-2">
                       <div className="w-16 h-2 bg-gray-100 rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-purple-500 rounded-full"
+                          className="h-full bg-violet-500 rounded-full transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]"
                           style={{ width: `${Math.min((item.count / (stats.employesParFonction[0]?.count || 1)) * 100, 100)}%` }}
                         />
                       </div>
-                      <span className="text-sm font-bold text-purple-600 w-8 text-right">{item.count}</span>
+                      <span className="text-sm font-bold text-violet-600 w-8 text-right">{item.count}</span>
                     </div>
                   </div>
                 ))}

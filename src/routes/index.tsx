@@ -2,7 +2,10 @@ import { authClient } from '@/auth/auth-client';
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
 import { Form, Input, Button, Typography, message } from 'antd';
 import { useState } from 'react';
-import { Users, Calendar, FileText, BarChart3, Shield, Clock, ArrowRight, Sparkles } from 'lucide-react';
+import {
+  Users, CalendarDays, FileText, BarChart3, Shield, Clock,
+  ArrowRight, Sparkles, UserCheck, Building2, MapPin, Award,
+} from 'lucide-react';
 
 const { Title, Text } = Typography;
 
@@ -65,23 +68,25 @@ function App() {
   };
 
   const features = [
-    { icon: Users, title: 'Gestion des employés', desc: 'Centralisez toutes les informations' },
-    { icon: Calendar, title: 'Congés & Absences', desc: 'Suivi automatisé des demandes' },
-    { icon: FileText, title: 'Documents RH', desc: 'Contrats et bulletins dématérialisés' },
-    { icon: BarChart3, title: 'Tableaux de bord', desc: 'Indicateurs RH en temps réel' },
+    { icon: Users, title: 'Gestion des employés', desc: 'Dossiers, contrats, affectations et historique de carrière centralisés.' },
+    { icon: CalendarDays, title: 'Congés & Absences', desc: 'Suivi des demandes, validation multi-niveaux et calendrier interactif.' },
+    { icon: FileText, title: 'Lots de bulletins', desc: 'Génération et validation des lots de paie CDI, CDD et temporaires.' },
+    { icon: Award, title: 'Nominations', desc: 'Gestion des nominations, promotions et attributions de fonctions.' },
+    { icon: Building2, title: 'Divisions & Services', desc: 'Organisation hiérarchique des divisions, services et postes.' },
+    { icon: BarChart3, title: 'Reporting RH', desc: 'Tableaux de bord et statistiques avancées en temps réel.' },
   ];
 
   return (
-    <div className="min-h-screen flex bg-slate-100">
+    <div className="min-h-screen flex bg-slate-50 page-enter">
       {/* Left Panel - Branding */}
-      <div className="hidden lg:flex lg:w-[55%] relative overflow-hidden bg-gradient-to-br from-teal-700 via-emerald-700 to-cyan-800">
+      <div className="hidden lg:flex lg:w-[56%] relative overflow-hidden bg-gradient-to-br from-indigo-900 via-indigo-800 to-blue-900">
         {/* Decorative shapes */}
         <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-white/5 blur-2xl" />
-        <div className="absolute -bottom-32 -left-32 w-[500px] h-[500px] rounded-full bg-cyan-400/10 blur-3xl" />
-        <div className="absolute top-1/3 left-1/2 w-72 h-72 rounded-full bg-emerald-300/10 blur-2xl" />
+        <div className="absolute -bottom-32 -left-32 w-[500px] h-[500px] rounded-full bg-indigo-400/10 blur-3xl" />
+        <div className="absolute top-1/3 left-1/2 w-72 h-72 rounded-full bg-blue-300/10 blur-2xl" />
 
         {/* Grid pattern */}
-        <div className="absolute inset-0 opacity-[0.07]">
+        <div className="absolute inset-0 opacity-[0.06]">
           <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
@@ -95,71 +100,87 @@ function App() {
         <div className="relative z-10 flex flex-col justify-between w-full p-12 xl:p-16 text-white">
           {/* Logo + heading */}
           <div>
-            <div className="flex items-center gap-3 mb-12">
+            <div className="flex items-center gap-3 mb-10">
               <div className="p-3 bg-white/15 rounded-2xl backdrop-blur-md ring-1 ring-white/20">
                 <Users className="w-7 h-7" />
               </div>
-              <span className="text-2xl font-bold tracking-tight">GRH Crouz</span>
+              <div>
+                <span className="text-2xl font-bold tracking-tight block">GRH CROUS/Z</span>
+                <span className="text-xs text-indigo-200/70 font-medium">Gestion des Ressources Humaines</span>
+              </div>
             </div>
 
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md ring-1 ring-white/15 mb-6">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-200" />
-              <span className="text-xs font-medium text-emerald-50">Plateforme RH moderne</span>
+              <Sparkles className="w-3.5 h-3.5 text-indigo-200" />
+              <span className="text-xs font-medium text-indigo-50">Plateforme RH intégrée</span>
             </div>
 
             <h1 className="text-4xl xl:text-5xl font-bold mb-5 leading-tight tracking-tight">
-              Gérez vos ressources humaines en toute simplicité
+              Pilotez vos ressources humaines avec efficacité
             </h1>
-            <p className="text-lg text-emerald-100/80 max-w-lg leading-relaxed">
-              Centralisez la gestion de vos équipes, congés, bulletins de paie et documents RH sur une seule plateforme.
+            <p className="text-lg text-indigo-100/80 max-w-lg leading-relaxed">
+              Gérez vos employés, congés, bulletins de paie, nominations et rapports RH sur une plateforme unique, sécurisée et intuitive.
             </p>
           </div>
 
           {/* Features grid */}
-          <div className="grid grid-cols-2 gap-3 mt-12">
+          <div className="grid grid-cols-3 gap-3 mt-12">
             {features.map((feature, index) => (
               <div
                 key={index}
-                className="group p-5 bg-white/8 rounded-2xl backdrop-blur-md ring-1 ring-white/10 transition-all hover:bg-white/12 hover:ring-white/20 hover:-translate-y-0.5"
+                className="group p-4 bg-white/8 rounded-xl backdrop-blur-md ring-1 ring-white/10 transition-all duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-white/12 hover:ring-white/20 hover:-translate-y-0.5 press-feedback"
               >
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 rounded-lg bg-white/10 group-hover:bg-white/15 transition-colors">
-                    <feature.icon className="w-5 h-5 text-emerald-200" />
-                  </div>
-                  <h3 className="font-semibold text-sm tracking-tight">{feature.title}</h3>
+                <div className="p-2 rounded-lg bg-white/10 group-hover:bg-white/15 transition-colors duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] mb-3 w-fit">
+                  <feature.icon className="w-5 h-5 text-indigo-200" />
                 </div>
-                <p className="text-xs text-emerald-200/70 leading-relaxed">{feature.desc}</p>
+                <h3 className="font-semibold text-sm tracking-tight mb-1">{feature.title}</h3>
+                <p className="text-xs text-indigo-200/60 leading-relaxed">{feature.desc}</p>
               </div>
             ))}
           </div>
 
           {/* Footer */}
-          <div className="flex items-center gap-2 text-emerald-200/50 text-xs mt-12">
-            <Shield className="w-3.5 h-3.5" />
-            <span>Données chiffrées • Conformité RGPD</span>
+          <div className="flex items-center gap-4 text-indigo-200/50 text-xs mt-12">
+            <div className="flex items-center gap-1.5">
+              <Shield className="w-3.5 h-3.5" />
+              <span>Données chiffrées</span>
+            </div>
+            <div className="w-1 h-1 rounded-full bg-indigo-300/30" />
+            <div className="flex items-center gap-1.5">
+              <UserCheck className="w-3.5 h-3.5" />
+              <span>Contrôle d'accès par rôles</span>
+            </div>
+            <div className="w-1 h-1 rounded-full bg-indigo-300/30" />
+            <div className="flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5" />
+              <span>Multi-sites</span>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Right Panel - Login form */}
-      <div className="w-full lg:w-[45%] flex items-center justify-center p-6 sm:p-8">
+      <div className="w-full lg:w-[44%] flex items-center justify-center p-6 sm:p-8">
         <div className="w-full max-w-[420px]">
           {/* Mobile logo */}
           <div className="lg:hidden flex items-center justify-center gap-2.5 mb-10">
-            <div className="p-2.5 bg-gradient-to-br from-teal-600 to-emerald-600 rounded-xl shadow-lg shadow-emerald-500/20">
+            <div className="p-2.5 bg-gradient-to-br from-indigo-600 to-blue-600 rounded-xl shadow-lg shadow-indigo-500/20">
               <Users className="w-6 h-6 text-white" />
             </div>
-            <span className="text-xl font-bold text-slate-800 tracking-tight">GRH Crouz</span>
+            <div>
+              <span className="text-xl font-bold text-slate-800 tracking-tight block">GRH CROUS/Z</span>
+              <span className="text-[10px] text-slate-500 font-medium">Gestion des Ressources Humaines</span>
+            </div>
           </div>
 
           {/* Card */}
-          <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/60 p-7 sm:p-9 ring-1 ring-slate-200/60">
+          <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/60 p-7 sm:p-9 ring-1 ring-slate-200/60 stagger-item">
             <div className="mb-7">
-              <Title level={3} style={{ marginBottom: 6, color: '#0f172a', fontWeight: 700, letterSpacing: '-0.02em' }}>
-                Bon retour 👋
+              <Title level={3} style={{ marginBottom: 6, color: '#1e1b4b', fontWeight: 700, letterSpacing: '-0.02em' }}>
+                Connexion
               </Title>
               <Text type="secondary" style={{ fontSize: 14 }}>
-                Connectez-vous à votre espace de gestion RH
+                Accédez à votre espace de gestion des ressources humaines
               </Text>
             </div>
 
@@ -209,7 +230,7 @@ function App() {
               >
                 <Input
                   prefix={<svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>}
-                  placeholder="nom@entreprise.com"
+                  placeholder="nom@crous-z.sn"
                   className="!rounded-xl !h-12"
                 />
               </Form.Item>
@@ -232,7 +253,7 @@ function App() {
                   htmlType="submit"
                   loading={loading}
                   block
-                  className="!h-12 !rounded-xl !text-[15px] !font-semibold !bg-gradient-to-r !from-teal-600 !to-emerald-600 !border-none hover:!opacity-90 !transition-all !shadow-lg !shadow-emerald-500/25"
+                  className="!h-12 !rounded-xl !text-[15px] !font-semibold !bg-gradient-to-r !from-indigo-600 !to-blue-600 !border-none hover:!opacity-90 !transition-all !shadow-lg !shadow-indigo-500/25"
                   icon={!loading && <ArrowRight className="w-4 h-4" />}
                   iconPosition="end"
                 >
@@ -256,7 +277,7 @@ function App() {
           </div>
 
           <p className="text-center text-slate-400 text-xs mt-8">
-            © {new Date().getFullYear()} GRH Crouz • Solution de gestion des ressources humaines
+            © {new Date().getFullYear()} GRH CROUS/Z • Plateforme de gestion des ressources humaines
           </p>
         </div>
       </div>

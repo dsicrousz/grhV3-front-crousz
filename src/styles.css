@@ -6,87 +6,87 @@
 
 body {
   @apply m-0;
-  font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
     'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.011em;
 }
 
 code {
   font-family:
-    source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+    'JetBrains Mono', source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.141 0.005 285.823);
+  --background: oklch(0.985 0.002 247);
+  --foreground: oklch(0.18 0.02 260);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.141 0.005 285.823);
+  --card-foreground: oklch(0.18 0.02 260);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.141 0.005 285.823);
-  --primary: oklch(0.21 0.006 285.885);
+  --popover-foreground: oklch(0.18 0.02 260);
+  --primary: oklch(0.45 0.18 263);
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.967 0.001 286.375);
-  --muted-foreground: oklch(0.552 0.016 285.938);
-  --accent: oklch(0.967 0.001 286.375);
-  --accent-foreground: oklch(0.21 0.006 285.885);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.577 0.245 27.325);
-  --border: oklch(0.92 0.004 286.32);
-  --input: oklch(0.92 0.004 286.32);
-  --ring: oklch(0.871 0.006 286.286);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
+  --secondary: oklch(0.96 0.01 250);
+  --secondary-foreground: oklch(0.3 0.03 260);
+  --muted: oklch(0.96 0.008 250);
+  --muted-foreground: oklch(0.52 0.02 258);
+  --accent: oklch(0.94 0.03 255);
+  --accent-foreground: oklch(0.35 0.12 263);
+  --destructive: oklch(0.55 0.22 27);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.91 0.008 250);
+  --input: oklch(0.91 0.008 250);
+  --ring: oklch(0.45 0.18 263);
+  --chart-1: oklch(0.45 0.18 263);
+  --chart-2: oklch(0.6 0.15 200);
+  --chart-3: oklch(0.7 0.15 160);
+  --chart-4: oklch(0.75 0.18 70);
+  --chart-5: oklch(0.6 0.2 350);
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.141 0.005 285.823);
-  --sidebar-primary: oklch(0.21 0.006 285.885);
+  --sidebar: oklch(0.98 0.005 255);
+  --sidebar-foreground: oklch(0.25 0.02 258);
+  --sidebar-primary: oklch(0.45 0.18 263);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.967 0.001 286.375);
-  --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
-  --sidebar-border: oklch(0.92 0.004 286.32);
-  --sidebar-ring: oklch(0.871 0.006 286.286);
+  --sidebar-accent: oklch(0.93 0.02 258);
+  --sidebar-accent-foreground: oklch(0.35 0.12 263);
+  --sidebar-border: oklch(0.9 0.008 255);
+  --sidebar-ring: oklch(0.45 0.18 263);
 }
 
 .dark {
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.141 0.005 285.823);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.141 0.005 285.823);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.21 0.006 285.885);
-  --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.274 0.006 286.033);
-  --muted-foreground: oklch(0.705 0.015 286.067);
-  --accent: oklch(0.274 0.006 286.033);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.274 0.006 286.033);
-  --input: oklch(0.274 0.006 286.033);
-  --ring: oklch(0.442 0.017 285.786);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.21 0.006 285.885);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.274 0.006 286.033);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.274 0.006 286.033);
-  --sidebar-ring: oklch(0.442 0.017 285.786);
+  --background: oklch(0.16 0.02 260);
+  --foreground: oklch(0.95 0.005 260);
+  --card: oklch(0.2 0.02 260);
+  --card-foreground: oklch(0.95 0.005 260);
+  --popover: oklch(0.2 0.02 260);
+  --popover-foreground: oklch(0.95 0.005 260);
+  --primary: oklch(0.6 0.18 263);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.27 0.03 260);
+  --secondary-foreground: oklch(0.95 0.005 260);
+  --muted: oklch(0.27 0.03 260);
+  --muted-foreground: oklch(0.68 0.02 258);
+  --accent: oklch(0.3 0.04 263);
+  --accent-foreground: oklch(0.85 0.08 263);
+  --destructive: oklch(0.5 0.2 25);
+  --destructive-foreground: oklch(0.95 0.02 25);
+  --border: oklch(0.3 0.02 260);
+  --input: oklch(0.3 0.02 260);
+  --ring: oklch(0.55 0.18 263);
+  --chart-1: oklch(0.55 0.2 263);
+  --chart-2: oklch(0.65 0.15 200);
+  --chart-3: oklch(0.7 0.15 160);
+  --chart-4: oklch(0.75 0.18 70);
+  --chart-5: oklch(0.6 0.2 350);
+  --sidebar: oklch(0.18 0.02 260);
+  --sidebar-foreground: oklch(0.9 0.01 258);
+  --sidebar-primary: oklch(0.55 0.18 263);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --sidebar-accent: oklch(0.25 0.03 260);
+  --sidebar-accent-foreground: oklch(0.85 0.08 263);
+  --sidebar-border: oklch(0.28 0.02 260);
+  --sidebar-ring: oklch(0.55 0.18 263);
 }
 
 @theme inline {
@@ -134,5 +134,376 @@ code {
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* ─── Emil Kowalski Design Engineering System ─── */
+
+/* Custom easing curves — stronger than built-in CSS easings */
+:root {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-button: cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+/* Button press feedback — scale(0.97) on :active */
+@layer utilities {
+  .press-feedback {
+    transition: transform 160ms var(--ease-button);
+  }
+  .press-feedback:active {
+    transform: scale(0.97);
+  }
+}
+
+/* Page entrance animation — subtle fade + slide up */
+@layer utilities {
+  .page-enter {
+    animation: page-enter 300ms var(--ease-out) both;
+  }
+  @keyframes page-enter {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* Stagger animation for cards/lists — 40ms between items */
+@layer utilities {
+  .stagger-item {
+    opacity: 0;
+    transform: translateY(8px);
+    animation: stagger-fade-in 300ms var(--ease-out) forwards;
+  }
+  .stagger-item:nth-child(1) { animation-delay: 0ms; }
+  .stagger-item:nth-child(2) { animation-delay: 40ms; }
+  .stagger-item:nth-child(3) { animation-delay: 80ms; }
+  .stagger-item:nth-child(4) { animation-delay: 120ms; }
+  .stagger-item:nth-child(5) { animation-delay: 160ms; }
+  .stagger-item:nth-child(6) { animation-delay: 200ms; }
+  .stagger-item:nth-child(7) { animation-delay: 240ms; }
+  .stagger-item:nth-child(8) { animation-delay: 280ms; }
+  .stagger-item:nth-child(9) { animation-delay: 320ms; }
+  .stagger-item:nth-child(10) { animation-delay: 360ms; }
+  .stagger-item:nth-child(11) { animation-delay: 400ms; }
+  .stagger-item:nth-child(12) { animation-delay: 440ms; }
+  @keyframes stagger-fade-in {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* Card hover — subtle lift with shadow, only on hover-capable devices */
+@media (hover: hover) and (pointer: fine) {
+  .card-hover {
+    transition: box-shadow 200ms var(--ease-out), transform 200ms var(--ease-out);
+  }
+  .card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px -2px oklch(0.18 0.02 260 / 0.08), 0 2px 6px -1px oklch(0.18 0.02 260 / 0.04);
+  }
+}
+
+/* Tooltip skip-delay on subsequent hovers */
+@layer utilities {
+  .tooltip-instant {
+    transition-duration: 0ms !important;
+  }
+}
+
+/* Ant Design overrides — button press feedback */
+.ant-btn {
+  transition: transform 160ms var(--ease-button), background-color 200ms var(--ease-out), border-color 200ms var(--ease-out), color 200ms var(--ease-out) !important;
+}
+.ant-btn:active {
+  transform: scale(0.97) !important;
+}
+
+/* Ant Design — Table row hover with smooth transition */
+.ant-table-tbody > tr {
+  transition: background-color 150ms var(--ease-out);
+}
+
+/* Ant Design — Tag scale-in on appear */
+.ant-tag {
+  transition: transform 200ms var(--ease-out), opacity 200ms var(--ease-out);
+}
+
+/* Ant Design — Modal entrance: scale from 0.95 (never from 0) */
+.ant-modal-content {
+  transform-origin: center;
+}
+
+/* Ant Design — Popconfirm / Popover origin-aware */
+.ant-popover-content,
+.ant-popconfirm-content {
+  transform-origin: var(--ant-popover-transform-origin, center);
+}
+
+/* Ant Design — Select dropdown smooth entrance */
+.ant-select-dropdown {
+  animation: dropdown-enter 180ms var(--ease-out);
+}
+@keyframes dropdown-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Ant Design — Drawer uses drawer easing */
+.ant-drawer-content {
+  transition: transform 400ms var(--ease-drawer);
+}
+
+/* Ant Design — Skeleton shimmer with custom easing */
+.ant-skeleton .ant-skeleton-content > .ant-skeleton-title,
+.ant-skeleton .ant-skeleton-content > .ant-skeleton-paragraph > li {
+  background: linear-gradient(90deg, oklch(0.96 0.008 250 / 1) 25%, oklch(0.91 0.008 250 / 1) 37%, oklch(0.96 0.008 250 / 1) 63%);
+  background-size: 400% 100%;
+  animation: skeleton-shimmer 1.4s var(--ease-in-out) infinite;
+}
+@keyframes skeleton-shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+/* Ant Design — Spin (loading) faster spin for perceived performance */
+.ant-spin .ant-spin-dot {
+  animation-duration: 0.8s !important;
+}
+
+/* Ant Design — Card hover lift */
+.ant-card.card-hover {
+  transition: box-shadow 200ms var(--ease-out), transform 200ms var(--ease-out), border-color 200ms var(--ease-out);
+}
+
+/* Ant Design — Stats cards: auto-apply hover lift and stagger */
+.ant-row[class*="mb-6"] > .ant-col > .ant-card.ant-card-bordered {
+  transition: box-shadow 200ms var(--ease-out), transform 200ms var(--ease-out), border-color 200ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .ant-row[class*="mb-6"] > .ant-col > .ant-card.ant-card-bordered:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px -2px oklch(0.18 0.02 260 / 0.08), 0 2px 6px -1px oklch(0.18 0.02 260 / 0.04);
+  }
+}
+
+/* Page header icon containers — subtle hover effect */
+@media (hover: hover) and (pointer: fine) {
+  .p-6 > div:first-child > div:first-child > div[class*="rounded-lg"]:hover {
+    transform: scale(1.05);
+  }
+  .p-6 > div:first-child > div:first-child > div[class*="rounded-lg"] {
+    transition: transform 200ms var(--ease-out);
+  }
+}
+
+/* Filter cards — subtle border highlight on hover */
+.ant-card.ant-card-bordered[class*="mb-4"] {
+  transition: border-color 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .ant-card.ant-card-bordered[class*="mb-4"]:hover {
+    border-color: oklch(0.8 0.02 263 / 0.3);
+    box-shadow: 0 1px 3px -1px oklch(0.18 0.02 260 / 0.04);
+  }
+}
+
+/* Employee detail cards — hover lift for cards in tab content */
+.ant-tabs-tabpane .ant-card.ant-card-bordered {
+  transition: box-shadow 200ms var(--ease-out), transform 200ms var(--ease-out), border-color 200ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .ant-tabs-tabpane .ant-card.ant-card-bordered:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px -2px oklch(0.18 0.02 260 / 0.06);
+  }
+}
+
+/* shadcn/ui Card — hover lift in grid layouts */
+.grid[class*="gap-4"] > div > [class*="hover:shadow-md"],
+.grid[class*="gap-4"] > [class*="hover:shadow-md"] {
+  transition: box-shadow 200ms var(--ease-out), transform 200ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .grid[class*="gap-4"] > div > [class*="hover:shadow-md"]:hover,
+  .grid[class*="gap-4"] > [class*="hover:shadow-md"]:hover {
+    transform: translateY(-2px);
+  }
+}
+
+/* Timeline items — stagger entrance */
+.ant-timeline-item {
+  animation: timeline-enter 300ms var(--ease-out) both;
+}
+.ant-timeline-item:nth-child(1) { animation-delay: 0ms; }
+.ant-timeline-item:nth-child(2) { animation-delay: 60ms; }
+.ant-timeline-item:nth-child(3) { animation-delay: 120ms; }
+.ant-timeline-item:nth-child(4) { animation-delay: 180ms; }
+.ant-timeline-item:nth-child(5) { animation-delay: 240ms; }
+.ant-timeline-item:nth-child(6) { animation-delay: 300ms; }
+@keyframes timeline-enter {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Ant Design — Tabs: smooth underline transition */
+.ant-tabs-ink-bar {
+  transition: width 200ms var(--ease-out), left 200ms var(--ease-out) !important;
+}
+
+/* Ant Design — Tab item hover/active transitions */
+.ant-tabs-tab {
+  transition: color 200ms var(--ease-out) !important;
+}
+
+/* Ant Design — Empty state: subtle fade-in */
+.ant-empty {
+  animation: empty-fade-in 300ms var(--ease-out) both;
+}
+@keyframes empty-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ant Design — Message: smooth entrance */
+.ant-message-notice-content {
+  animation: message-enter 250ms var(--ease-out) both;
+}
+@keyframes message-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Ant Design — Notification: smooth entrance */
+.ant-notification-notice {
+  animation: notification-enter 300ms var(--ease-out) both;
+}
+@keyframes notification-enter {
+  from {
+    opacity: 0;
+    transform: translateX(100%) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+/* Ant Design — Pagination: smooth transitions */
+.ant-pagination-item,
+.ant-pagination-prev,
+.ant-pagination-next {
+  transition: all 150ms var(--ease-out) !important;
+}
+
+/* Ant Design — Collapse: smooth expand/collapse */
+.ant-collapse-content {
+  transition: height 250ms var(--ease-out) !important;
+}
+
+/* Ant Design — Dropdown menu: stagger items */
+.ant-dropdown-menu-item {
+  animation: dropdown-item-enter 150ms var(--ease-out) both;
+}
+.ant-dropdown-menu-item:nth-child(1) { animation-delay: 0ms; }
+.ant-dropdown-menu-item:nth-child(2) { animation-delay: 25ms; }
+.ant-dropdown-menu-item:nth-child(3) { animation-delay: 50ms; }
+.ant-dropdown-menu-item:nth-child(4) { animation-delay: 75ms; }
+.ant-dropdown-menu-item:nth-child(5) { animation-delay: 100ms; }
+.ant-dropdown-menu-item:nth-child(6) { animation-delay: 125ms; }
+@keyframes dropdown-item-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ant Design — Switch press feedback */
+.ant-switch:active {
+  transform: scale(0.97);
+}
+
+/* Ant Design — Input focus ring with custom easing */
+.ant-input,
+.ant-input-affix-wrapper,
+.ant-input-number,
+.ant-picker {
+  transition: border-color 200ms var(--ease-out), box-shadow 200ms var(--ease-out) !important;
+}
+
+/* Reduced motion — fewer/gentler animations, keep opacity/color transitions */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .page-enter,
+  .stagger-item {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .press-feedback:active,
+  .ant-btn:active {
+    transform: none !important;
+  }
+  .card-hover:hover,
+  .ant-tabs-tabpane .ant-card.ant-card-bordered:hover,
+  .ant-card.ant-card-bordered[class*="mb-4"]:hover,
+  .ant-row[class*="mb-6"] > .ant-col > .ant-card.ant-card-bordered:hover {
+    transform: none !important;
+  }
+  .ant-timeline-item {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .ant-empty,
+  .ant-message-notice-content,
+  .ant-notification-notice,
+  .ant-dropdown-menu-item {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
 }

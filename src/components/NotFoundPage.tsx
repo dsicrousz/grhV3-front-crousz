@@ -9,14 +9,14 @@ export function NotFoundPage() {
     <div className="min-h-screen flex items-center justify-center bg-slate-50">
       <div className="text-center max-w-md px-6">
         <div className="flex justify-center mb-6">
-          <div className="p-5 bg-teal-50 rounded-full">
-            <FileQuestion className="w-16 h-16 text-teal-500" />
+          <div className="p-5 bg-indigo-50 rounded-full">
+            <FileQuestion className="w-16 h-16 text-indigo-500" />
           </div>
         </div>
-        <Title level={1} style={{ fontSize: 72, marginBottom: 0, color: '#0d9488', lineHeight: 1 }}>
+        <Title level={1} style={{ fontSize: 72, marginBottom: 0, color: '#4f46e5', lineHeight: 1 }}>
           404
         </Title>
-        <Title level={3} style={{ marginTop: 12, marginBottom: 8, color: '#1e293b' }}>
+        <Title level={3} style={{ marginTop: 12, marginBottom: 8, color: '#1e1b4b' }}>
           Page introuvable
         </Title>
         <Text type="secondary" style={{ fontSize: 15 }}>
@@ -28,7 +28,7 @@ export function NotFoundPage() {
               type="primary"
               size="large"
               icon={<ArrowLeft className="w-4 h-4" />}
-              style={{ backgroundColor: '#0d9488', borderColor: '#0d9488', borderRadius: 8, height: 44 }}
+              style={{ backgroundColor: '#4f46e5', borderColor: '#4f46e5', borderRadius: 8, height: 44 }}
             >
               Retour à l'accueil
             </Button>

@@ -37,7 +37,7 @@ export function LoginForm({
                 <div style={{ textAlign: 'center' }}>
                   <Title level={2}>Bienvenue</Title>
                   <Text type="secondary">
-                    Connectez-vous à votre compte E-Campus
+                    Connectez-vous à votre espace GRH CROUS/Z
                   </Text>
                 </div>
 
@@ -126,7 +126,7 @@ export function LoginForm({
               style={{
                 height: '100%',
                 minHeight: '500px',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                background: 'linear-gradient(135deg, #4f46e5 0%, #1e40af 100%)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',

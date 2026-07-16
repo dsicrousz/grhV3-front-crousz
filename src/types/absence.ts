@@ -9,8 +9,10 @@ export enum TypeAbsence {
 
 export enum StatutDemande {
   EN_ATTENTE = 'en_attente',
+  EN_COURS_VALIDATION = 'en_cours_validation',
   APPROUVEE = 'approuvee',
-  REJETEE = 'rejetee'
+  REJETEE = 'rejetee',
+  ANNULEE = 'annulee'
 }
 
 export interface Absence {

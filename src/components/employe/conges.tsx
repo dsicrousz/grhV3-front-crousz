@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Typography, Button, Space, Card, Tag, Modal, Form, DatePicker, Select, Input, InputNumber, message, Table, Popconfirm, Tooltip, Progress } from 'antd'
-import { Plus, Pencil, Trash2, Calendar, CheckCircle, XCircle, Clock, Palmtree, Baby, Stethoscope, GraduationCap, Briefcase, HelpCircle } from 'lucide-react'
+import { Plus, Pencil, Trash2, Calendar, CheckCircle, XCircle, Clock, Palmtree, Baby, Stethoscope, GraduationCap, Briefcase, HelpCircle, Send, Ban } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import type { Conge, CreateCongeDto, UpdateCongeDto } from '@/types/conge'
 import { TypeConge, StatutDemandeConge } from '@/types/conge'
@@ -28,8 +28,10 @@ const typeCongeLabels: Record<TypeConge, { label: string; color: string; icon: R
 
 const statutLabels: Record<StatutDemandeConge, { label: string; color: string; icon: React.ReactNode }> = {
   [StatutDemandeConge.EN_ATTENTE]: { label: 'En attente', color: 'orange', icon: <Clock className="w-3 h-3" /> },
+  [StatutDemandeConge.EN_COURS_VALIDATION]: { label: 'En validation', color: 'blue', icon: <Send className="w-3 h-3" /> },
   [StatutDemandeConge.APPROUVEE]: { label: 'Approuvé', color: 'green', icon: <CheckCircle className="w-3 h-3" /> },
   [StatutDemandeConge.REJETEE]: { label: 'Rejeté', color: 'red', icon: <XCircle className="w-3 h-3" /> },
+  [StatutDemandeConge.ANNULEE]: { label: 'Annulé', color: 'default', icon: <Ban className="w-3 h-3" /> },
 }
 
 export const EmployeConges = ({ employeId }: EmployeCongesProps) => {

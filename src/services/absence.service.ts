@@ -1,4 +1,5 @@
 import type { Absence, CreateAbsenceDto, UpdateAbsenceDto } from '@/types/absence'
+import { StatutDemande } from '@/types/absence'
 import Api from './Api'
 import { Service } from './Service'
 
@@ -31,12 +32,8 @@ class AbsenceServiceClass extends Service {
     return this.api.get(`${this.ressource}/employe/${employeId}`).then(res => res.data)
   }
 
-  async approve(id: string): Promise<Absence> {
-    return this.api.patch(`${this.ressource}/${id}/validate`).then(res => res.data)
-  }
-
-  async reject(id: string): Promise<Absence> {
-    return this.api.patch(`${this.ressource}/${id}/reject`).then(res => res.data)
+  async validate(id: string, statut: StatutDemande): Promise<Absence> {
+    return this.api.patch(`${this.ressource}/${id}/validate`, { statut }).then(res => res.data)
   }
 }
 

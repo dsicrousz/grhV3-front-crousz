@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Typography, Button, Space, Card, Tag, Modal, Form, DatePicker, Select, Input, message, Table, Popconfirm, Tooltip } from 'antd'
-import { Plus, Pencil, Trash2, Calendar, CheckCircle, XCircle, Clock, Stethoscope, User, Users, HelpCircle } from 'lucide-react'
+import { Plus, Pencil, Trash2, Calendar, CheckCircle, XCircle, Clock, Stethoscope, User, Users, HelpCircle, Send, Ban } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import type { Absence, CreateAbsenceDto, UpdateAbsenceDto } from '@/types/absence'
 import { TypeAbsence, StatutDemande } from '@/types/absence'
@@ -24,8 +24,10 @@ const typeAbsenceLabels: Record<TypeAbsence, { label: string; color: string; ico
 
 const statutLabels: Record<StatutDemande, { label: string; color: string; icon: React.ReactNode }> = {
   [StatutDemande.EN_ATTENTE]: { label: 'En attente', color: 'orange', icon: <Clock className="w-3 h-3" /> },
+  [StatutDemande.EN_COURS_VALIDATION]: { label: 'En validation', color: 'blue', icon: <Send className="w-3 h-3" /> },
   [StatutDemande.APPROUVEE]: { label: 'Approuvée', color: 'green', icon: <CheckCircle className="w-3 h-3" /> },
   [StatutDemande.REJETEE]: { label: 'Rejetée', color: 'red', icon: <XCircle className="w-3 h-3" /> },
+  [StatutDemande.ANNULEE]: { label: 'Annulée', color: 'default', icon: <Ban className="w-3 h-3" /> },
 }
 
 export const EmployeAbsences = ({ employeId }: EmployeAbsencesProps) => {
@@ -79,25 +81,19 @@ export const EmployeAbsences = ({ employeId }: EmployeAbsencesProps) => {
     }
   })
 
-  const approveMutation = useMutation({
-    mutationFn: (id: string) => AbsenceService.approve(id),
-    onSuccess: () => {
-      message.success('Absence approuvée')
+  const validateMutation = useMutation({
+    mutationFn: ({ id, statut }: { id: string; statut: StatutDemande }) =>
+      AbsenceService.validate(id, statut),
+    onSuccess: (_, variables) => {
+      const msg = variables.statut === StatutDemande.APPROUVEE ? 'Absence approuvée'
+        : variables.statut === StatutDemande.REJETEE ? 'Absence rejetée'
+        : variables.statut === StatutDemande.EN_COURS_VALIDATION ? 'Absence transmise'
+        : 'Absence annulée'
+      message.success(msg)
       queryClient.invalidateQueries({ queryKey: ['absences', employeId] })
     },
     onError: () => {
-      message.error('Erreur lors de l\'approbation')
-    }
-  })
-
-  const rejectMutation = useMutation({
-    mutationFn: (id: string) => AbsenceService.reject(id),
-    onSuccess: () => {
-      message.success('Absence rejetée')
-      queryClient.invalidateQueries({ queryKey: ['absences', employeId] })
-    },
-    onError: () => {
-      message.error('Erreur lors du rejet')
+      message.error('Erreur lors de la validation')
     }
   })
 
@@ -207,8 +203,8 @@ export const EmployeAbsences = ({ employeId }: EmployeAbsencesProps) => {
                   type="text"
                   size="small"
                   icon={<CheckCircle className="w-4 h-4 text-green-500" />}
-                  onClick={() => approveMutation.mutate(record._id)}
-                  loading={approveMutation.isPending}
+                  onClick={() => validateMutation.mutate({ id: record._id, statut: StatutDemande.APPROUVEE })}
+                  loading={validateMutation.isPending}
                 />
               </Tooltip>
               <Tooltip title="Rejeter">
@@ -216,8 +212,8 @@ export const EmployeAbsences = ({ employeId }: EmployeAbsencesProps) => {
                   type="text"
                   size="small"
                   icon={<XCircle className="w-4 h-4 text-red-500" />}
-                  onClick={() => rejectMutation.mutate(record._id)}
-                  loading={rejectMutation.isPending}
+                  onClick={() => validateMutation.mutate({ id: record._id, statut: StatutDemande.REJETEE })}
+                  loading={validateMutation.isPending}
                 />
               </Tooltip>
             </>
